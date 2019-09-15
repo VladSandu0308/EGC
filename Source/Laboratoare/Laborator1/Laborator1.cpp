@@ -83,7 +83,7 @@ void Laborator1::OnInputUpdate(float deltaTime, int mods)
 {
 	if (window->KeyHold(GLFW_KEY_R))
 	{
-		degrees += deltaTime;
+		degrees += 2.f * deltaTime;
 		if (degrees > 360.f)
 		{
 			degrees = 0.f;
