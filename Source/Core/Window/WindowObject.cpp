@@ -14,7 +14,7 @@ using namespace std;
 
 WindowProperties::WindowProperties()
 {
-	name = "WindowName";
+	name = "Laborator";
 	resolution = glm::ivec2(1280, 720);
 	aspectRatio = 1280.0f / 720.0f;
 	cursorPos = resolution / 2;

@@ -81,6 +81,18 @@ void Laborator1::FrameEnd()
 
 void Laborator1::OnInputUpdate(float deltaTime, int mods)
 {
+	if (window->KeyHold(GLFW_KEY_R))
+	{
+		degrees += deltaTime;
+		if (degrees > 360.f)
+		{
+			degrees = 0.f;
+		}
+
+		posX += RANGE * cos(degrees);
+		posY += RANGE * sin(degrees);
+	}
+
 	// treat continuous update based on input
 	if (window->KeyHold(GLFW_KEY_W))
 	{

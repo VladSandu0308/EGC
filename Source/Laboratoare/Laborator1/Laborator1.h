@@ -4,7 +4,8 @@
 
 #define NUM_COLOURS		(4)
 #define NUM_OBJECTS		(3)
-#define MOVE			(0.1f)
+#define MOVE			(.1f)
+#define RANGE			(.02f)
 
 class Laborator1 : public SimpleScene
 {
@@ -22,6 +23,8 @@ class Laborator1 : public SimpleScene
 		glm::vec3 objScale;
 
 		GLfloat posX, posY, posZ;
+
+		GLfloat degrees;
 
 		void FrameStart() override;
 		void Update(float deltaTimeSeconds) override;
