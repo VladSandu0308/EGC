@@ -2,6 +2,10 @@
 
 #include <Component/SimpleScene.h>
 
+#define NUM_COLOURS		(4)
+#define NUM_OBJECTS		(3)
+#define MOVE			(0.1f)
+
 class Laborator1 : public SimpleScene
 {
 	public:
@@ -11,6 +15,14 @@ class Laborator1 : public SimpleScene
 		void Init() override;
 
 	private:
+		GLuint colourCase, objectCase;
+		GLfloat clearRed, clearGreen, clearBlue;
+		
+		std::string objName;
+		glm::vec3 objScale;
+
+		GLfloat posX, posY, posZ;
+
 		void FrameStart() override;
 		void Update(float deltaTimeSeconds) override;
 		void FrameEnd() override;
@@ -23,4 +35,6 @@ class Laborator1 : public SimpleScene
 		void OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods) override;
 		void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
 		void OnWindowResize(int width, int height) override;
+		void changeClearColour();
+		void changeObject();
 };
