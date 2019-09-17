@@ -18,7 +18,7 @@ Laborator2::~Laborator2()
 
 void Laborator2::Init()
 {
-	cullFace = GL_BACK;
+	cullFace = GL_FRONT;
 	polygonMode = GL_FILL;
 
 	// Load a mesh from file into GPU memory
@@ -32,29 +32,29 @@ void Laborator2::Init()
 	{
 		vector<VertexFormat> vertices
 		{
-			VertexFormat(glm::vec3(0, 0 , 0), glm::vec3(.5f, .5f, 1.f)),
-			VertexFormat(glm::vec3(1, 0 , 0), glm::vec3(1.f, .5f, 1.f)),
-			VertexFormat(glm::vec3(1, 1 , 0), glm::vec3(.5f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(0, 1 , 0), glm::vec3(.75f, .25f, .25f)),
-			VertexFormat(glm::vec3(0, 0 , 1), glm::vec3(1.f, .5f, .5f)),
-			VertexFormat(glm::vec3(1, 0 , 1), glm::vec3(.25f, .75f, .75f)),
-			VertexFormat(glm::vec3(1, 1 , 1), glm::vec3(1.f, 1.f, .5f)),
-			VertexFormat(glm::vec3(0, 1 , 1), glm::vec3(.5f, 1.f, .5f))
+			VertexFormat(glm::vec3(0, 0, 0), glm::vec3(.5f, .5f, 1.f)),
+			VertexFormat(glm::vec3(1, 0, 0), glm::vec3(1.f, .5f, 1.f)),
+			VertexFormat(glm::vec3(1, 1, 0), glm::vec3(.5f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(0, 1, 0), glm::vec3(.75f, .25f, .25f)),
+			VertexFormat(glm::vec3(0, 0, 1), glm::vec3(1.f, .5f, .5f)),
+			VertexFormat(glm::vec3(1, 0, 1), glm::vec3(.25f, .75f, .75f)),
+			VertexFormat(glm::vec3(1, 1, 1), glm::vec3(1.f, 1.f, .5f)),
+			VertexFormat(glm::vec3(0, 1, 1), glm::vec3(.5f, 1.f, .5f))
 		};
 
-		vector<unsigned short> indices =
+		vector<GLushort> indices =
 		{
-			0, 1, 5,	// indices for first triangle
-			0, 5, 4,	// indices for second triangle
-			0, 4, 7,	// ...
-			0, 7, 3,
-			3, 7, 6,
-			3, 6, 2,
-			2, 6, 5,
-			2, 5, 1,
+			0, 5, 1,	// indices for first triangle
+			0, 4, 5,	// indices for second triangle
+			0, 7, 4,	// etc.
+			0, 3, 7,
+			3, 6, 7,
+			3, 2, 6,
+			2, 5, 6,
+			2, 1, 5,
 			0, 1, 2,
-			0, 3, 2,
-			4, 5, 6,
+			0, 2, 3,
+			4, 6, 5,
 			4, 7, 6
 		};
 
@@ -62,7 +62,75 @@ void Laborator2::Init()
 		meshes["cube1"]->InitFromData(vertices, indices);
 
 		// Create a new mesh from buffer data
-		Mesh *cube = CreateMesh("cube3", vertices, indices);
+		CreateMesh("cube3", vertices, indices);
+	}
+
+	// Create a tetrahedron mesh using vertices and indices
+	{
+		vector<VertexFormat> vertices
+		{
+			VertexFormat(glm::vec3(0, 0, 0), glm::vec3(.5f, .5f, 1.f)),
+			VertexFormat(glm::vec3(1, 0, 0), glm::vec3(1.f, .5f, 1.f)),
+			VertexFormat(glm::vec3(0, 1, 0), glm::vec3(.75f, .25f, .25f)),
+			VertexFormat(glm::vec3(0, 0, 1), glm::vec3(1.f, .5f, .5f))
+		};
+
+		vector<GLushort> indices =
+		{
+			0, 3, 1,	// indices for first triangle
+			0, 1, 2,	// indices for second triangle
+			0, 2, 3,	// etc.
+			1, 3, 2
+		};
+
+		// Create a new mesh from buffer data
+		CreateMesh("tetrahedron", vertices, indices);
+	}
+
+	// Create a sqare mesh using vertices and indices
+	{
+		vector<VertexFormat> vertices
+		{
+			VertexFormat(glm::vec3(0, 0, 0), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(0, 1, 0)),
+			VertexFormat(glm::vec3(0, 1, 1), glm::vec3(0.f, 0.f, 1.f)),
+			VertexFormat(glm::vec3(0, 0, 1))
+		};
+
+		vector<GLushort> indices =
+		{
+			0, 3, 1,	// indices for first triangle
+			1, 2, 3		// indices for second triangle
+		};
+
+		// Create a new mesh from buffer data
+		CreateMesh("square", vertices, indices);
+	}
+
+	// BONUS: Create a circle mesh using vertices and indices
+	{
+		vector<VertexFormat> vertices;
+		GLfloat arg;
+
+		vertices.emplace_back(glm::vec3(0, 0, 0), glm::vec3(1.f, 1.f, 1.f));
+		for (GLushort i = 0; i < NUM_TRIANGLES; i++)
+		{
+			arg = TWO_PI * i / NUM_TRIANGLES;
+
+			vertices.emplace_back(glm::vec3(cos(arg), sin(arg), 0), glm::vec3(1.f, 1.f, 0.f));
+		}
+
+		vector<GLushort> indices;
+
+		for (GLushort i = 0; i < NUM_TRIANGLES; i++)
+		{
+			indices.push_back(i);
+		}
+		indices.push_back(1);
+
+		// Create a new mesh from buffer data
+		CreateMesh("circle", vertices, indices);
+		meshes["circle"]->SetDrawMode(GL_TRIANGLE_FAN);
 	}
 }
 
@@ -114,7 +182,7 @@ Mesh* Laborator2::CreateMesh(const char *name, const std::vector<VertexFormat> &
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3) + sizeof(glm::vec2)));
 	// ========================================================================
 
-	// TODO: Unbind the VAO
+	// Unbind the VAO
 	glBindVertexArray(0);
 
 	// Check for OpenGL errors
@@ -123,6 +191,7 @@ Mesh* Laborator2::CreateMesh(const char *name, const std::vector<VertexFormat> &
 	// Mesh information is saved into a Mesh object
 	meshes[name] = new Mesh(name);
 	meshes[name]->InitFromBuffer(VAO, static_cast<unsigned short>(indices.size()));
+	
 	return meshes[name];
 }
 
@@ -144,18 +213,27 @@ void Laborator2::Update(float deltaTimeSeconds)
 	glPointSize(5);
 	glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
 
-	// TODO: Enable face culling
+	// Enable face culling
+	glEnable(GL_CULL_FACE);
 
-	// TODO: Set face custom culling. Use the "cullFace" variable
+	// Set face custom culling. Use the "cullFace" variable
+	glCullFace(cullFace);
 
-	// render an object using face normals for color
+	// Render an object using face normals for color
 	RenderMesh(meshes["box"], shaders["VertexNormal"], glm::vec3(0, 0.5f, -1.5f), glm::vec3(0.75f));
 
-	// render an object using colors from vertex
-	RenderMesh(meshes["cube1"], shaders["VertexColor"], glm::vec3(-1.5f, 0.5f, 0)); // generated with InitFromData
-	RenderMesh(meshes["cube3"], shaders["VertexColor"], glm::vec3(1.5f, 0.5f, 0)); // generated with VAO, VBO, IBO
+	// Render an object using colors from vertex
+	RenderMesh(meshes["cube1"], shaders["VertexColor"], glm::vec3(-1.5f, 0.5f, 0.f)); // cube generated with InitFromData
+	RenderMesh(meshes["cube3"], shaders["VertexColor"], glm::vec3(1.5f, 0.5f, 0.f)); // the same cube generated with VAO, VBO, IBO
 
-	// TODO: Disable face culling
+	RenderMesh(meshes["tetrahedron"], shaders["VertexColor"], glm::vec3(0.f, 2.f, -1.5f)); // tetrahedron generated with VAO, VBO, IBO
+
+	RenderMesh(meshes["square"], shaders["VertexColor"], glm::vec3(0.f, 3.f, 0.f));
+
+	RenderMesh(meshes["circle"], shaders["VertexColor"], glm::vec3(0.f, 2.f, 1.5f));
+
+	// Disable face culling
+	glDisable(GL_CULL_FACE);
 }
 
 void Laborator2::FrameEnd()
@@ -170,8 +248,12 @@ void Laborator2::OnInputUpdate(float deltaTime, int mods)
 
 void Laborator2::OnKeyPress(int key, int mods)
 {
-	// TODO: switch between GL_FRONT and GL_BACK culling
+	// Switch between GL_FRONT and GL_BACK culling
 	// Save the state in "cullFace" variable and apply it in the Update() method not here
+	if (key == GLFW_KEY_F2)
+	{
+		cullFace ^= 1;
+	}
 
 	if (key == GLFW_KEY_SPACE)
 	{

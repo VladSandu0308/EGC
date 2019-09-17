@@ -3,6 +3,9 @@
 #include <Component/SimpleScene.h>
 #include <Core/Engine.h>
 
+#define TWO_PI			(6.28318530718f)
+#define NUM_TRIANGLES	(50)
+
 class Laborator2 : public SimpleScene
 {
 	public:
