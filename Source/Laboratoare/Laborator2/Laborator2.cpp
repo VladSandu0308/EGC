@@ -141,7 +141,6 @@ Mesh* Laborator2::CreateMesh(const char *name, const std::vector<VertexFormat> &
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-
 	// Create the VBO and bind it
 	GLuint VBO = 0;
 	glGenBuffers(1, &VBO);

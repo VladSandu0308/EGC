@@ -267,5 +267,6 @@
       <Filter>Laboratoare\Laborator9\Shaders</Filter>
     </None>
     <None Include="ClassDiagram.cd" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>
