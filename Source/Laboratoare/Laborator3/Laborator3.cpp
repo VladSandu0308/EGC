@@ -39,7 +39,7 @@ void Laborator3::Init()
 	translateY		= 0.f;
 
 	translateXFast	= 0.f;
-	translateYFall  = resolution.y;
+	translateYFall  = (GLfloat)resolution.y;
 
 	// initialise moving directions
 	moveRight		= false;
@@ -123,8 +123,8 @@ void Laborator3::Update(float deltaTimeSeconds)
 		modelMatrix = Transform2D::Translate(650, 250);
 
 		// Create animations by multiplying current transform matrix with matrices from Transform 2D
-		scaleX += 4.5f * M_1_PI * deltaTimeSeconds;
-		scaleY += 4.5f * M_1_PI * deltaTimeSeconds;
+		scaleX += 4.5f * (GLfloat)M_1_PI * deltaTimeSeconds;
+		scaleY += 4.5f * (GLfloat)M_1_PI * deltaTimeSeconds;
 
 		modelMatrix *= Transform2D::Translate(SQUARE_SIDE / 2, SQUARE_SIDE / 2);
 		modelMatrix *= Transform2D::Scale(sin(scaleX), sin(scaleY));
@@ -135,6 +135,7 @@ void Laborator3::Update(float deltaTimeSeconds)
 
 	// BONUS: some fancier rotations and faster movement
 	{
+		// TODO: make the square rotate around the centre of the image
 		modelMatrix = Transform2D::Translate(150, 250);
 
 		// Create animations by multiplying current transform matrix with matrices from Transform 2D
@@ -186,7 +187,7 @@ void Laborator3::Update(float deltaTimeSeconds)
 
 		if (translateYFall <= 0)
 		{
-			translateYFall = resolution.y;
+			translateYFall = (GLfloat)resolution.y;
 		}
 
 		RenderMesh2D(meshes["square1"], shaders["VertexColor"], modelMatrix);
