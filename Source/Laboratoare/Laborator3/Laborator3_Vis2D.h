@@ -4,6 +4,9 @@
 #include <string>
 #include <Core/Engine.h>
 
+#define ZOOM_RATIO		(5.f)
+#define DISPLACEMENT	(2)
+
 class Laborator3_Vis2D : public SimpleScene
 {
 	public:

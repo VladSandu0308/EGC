@@ -4,6 +4,14 @@
 #include <string>
 #include <Core/Engine.h>
 
+#define MOVE_RATIO			(.25f)
+#define MOVE_RATIO_FAST		(.75f)
+#define LIMIT				(.5f)
+#define ROTATION_SPEEDUP	(1.25f)
+#define SQUARE_SIDE			(100.f)
+#define SQUARES_DISTANCE	(10.f)
+#define START_FALL			(1000.f)
+
 class Laborator3 : public SimpleScene
 {
 	public:
@@ -31,4 +39,9 @@ class Laborator3 : public SimpleScene
 		float translateX, translateY;
 		float scaleX, scaleY;
 		float angularStep;
+
+		GLboolean moveRight;
+		GLboolean moveRightFast;
+
+		GLfloat translateXFast, translateYFall;
 };
