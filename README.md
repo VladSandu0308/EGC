@@ -1,6 +1,8 @@
 # Framework-EGC
 Framework for EGC class
+
 Contains laboratories and homework assignments
+
 Each of these is documented via a `README.md` file
 
 ## Laboratories
