@@ -1,6 +1,8 @@
 #pragma once
 #include <Component/SimpleScene.h>
 
+#define SPEEDUP_RATIO		(3.f)
+
 class Laborator4 : public SimpleScene
 {
 	public:
@@ -29,4 +31,7 @@ class Laborator4 : public SimpleScene
 		float scaleX, scaleY, scaleZ;
 		float angularStepOX, angularStepOY, angularStepOZ;
 		GLenum polygonMode;
+
+		GLfloat translateZSine, translateXSine, translateYSine;
+		GLfloat angleX, angleZ;
 };

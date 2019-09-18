@@ -26,19 +26,26 @@ void Laborator4::Init()
 	meshes[mesh->GetMeshID()] = mesh;
 
 	// initialize tx, ty and tz (the translation steps)
-	translateX = 0;
-	translateY = 0;
-	translateZ = 0;
+	translateX		= 0;
+	translateY		= 0;
+	translateZ		= 0;
+
+	translateXSine	= 0.f;
+	translateYSine	= 0.f;
+	translateZSine	= 0.f;
 
 	// initialize sx, sy and sz (the scale factors)
-	scaleX = 1;
-	scaleY = 1;
-	scaleZ = 1;
+	scaleX			= 1.f;
+	scaleY			= 1.f;
+	scaleZ			= 1.f;
 	
 	// initialize angularSteps
-	angularStepOX = 0;
-	angularStepOY = 0;
-	angularStepOZ = 0;
+	angularStepOX	= 0.f;
+	angularStepOY	= 0.f;
+	angularStepOZ	= 0.f;
+
+	angleX			= 0.f;
+	angleZ			= 0.f;
 }
 
 void Laborator4::FrameStart()
@@ -74,6 +81,15 @@ void Laborator4::Update(float deltaTimeSeconds)
 	modelMatrix *= Transform3D::RotateOY(angularStepOY);
 	modelMatrix *= Transform3D::RotateOZ(angularStepOZ);
 	RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+
+	// BONUS: Sinusoidal movement + semi-chaotic rotations
+	modelMatrix = glm::mat4(1);
+	modelMatrix *= Transform3D::Translate(3.f, 3.f, 3.f);
+	modelMatrix *= Transform3D::Translate(translateXSine, translateYSine, translateZSine);
+	modelMatrix *= Transform3D::RotateOX(angleX + angleZ + angleX * angleZ);
+	modelMatrix *= Transform3D::RotateOY(angleX + angleZ + angleX * angleZ);
+	modelMatrix *= Transform3D::RotateOZ(angleX + angleZ + angleX * angleZ);
+	RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
 }
 
 void Laborator4::FrameEnd()
@@ -83,7 +99,94 @@ void Laborator4::FrameEnd()
 
 void Laborator4::OnInputUpdate(float deltaTime, int mods)
 {
-	// TODO
+	if (window->KeyHold(GLFW_KEY_S))
+	{
+		translateZ += deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_W))
+	{
+		translateZ -= deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_D))
+	{
+		translateX += deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_A))
+	{
+		translateX -= deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_R))
+	{
+		translateY += deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_F))
+	{
+		translateY -= deltaTime;
+	}
+
+	if (window->KeyHold(GLFW_KEY_1))
+	{
+		scaleX += deltaTime;
+		scaleY += deltaTime;
+		scaleZ += deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_2))
+	{
+		scaleX -= deltaTime;
+		scaleY -= deltaTime;
+		scaleZ -= deltaTime;
+	}
+
+	if (window->KeyHold(GLFW_KEY_3))
+	{
+		angularStepOX += deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_4))
+	{
+		angularStepOX -= deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_5))
+	{
+		angularStepOY += deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_6))
+	{
+		angularStepOY -= deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_7))
+	{
+		angularStepOZ += deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_8))
+	{
+		angularStepOZ -= deltaTime;
+	}
+
+	// BONUS: A more complex sinusoidal movement is rendered by pressing arrow keys
+	if (window->KeyHold(GLFW_KEY_UP))
+	{
+		angleZ += deltaTime;
+		translateYSine = sin(angleZ * SPEEDUP_RATIO) + sin(angleX * SPEEDUP_RATIO);
+		translateZSine += deltaTime * SPEEDUP_RATIO;
+	}
+	if (window->KeyHold(GLFW_KEY_DOWN))
+	{
+		angleZ -= deltaTime;
+		translateYSine = sin(angleZ * SPEEDUP_RATIO) + sin(angleX * SPEEDUP_RATIO);
+		translateZSine -= deltaTime * SPEEDUP_RATIO;
+	}
+	if (window->KeyHold(GLFW_KEY_RIGHT))
+	{
+		angleX += deltaTime;
+		translateYSine = sin(angleX * SPEEDUP_RATIO) + sin(angleZ * SPEEDUP_RATIO);
+		translateXSine += deltaTime * SPEEDUP_RATIO;
+	}
+	if (window->KeyHold(GLFW_KEY_LEFT))
+	{
+		angleX -= deltaTime;
+		translateYSine = sin(angleX * SPEEDUP_RATIO) + sin(angleZ * SPEEDUP_RATIO);
+		translateXSine -= deltaTime * SPEEDUP_RATIO;
+	}
 }
 
 void Laborator4::OnKeyPress(int key, int mods)
