@@ -7,3 +7,7 @@ Each of these is documented via a `README.md` file
 
 1. Introduction to OpenGL
 2. OpenGL data buffers
+3. 2D transformations and glm
+
+## Homework Assignments
+???
