@@ -2,6 +2,9 @@
 #include <Component/SimpleScene.h>
 #include "LabCamera.h"
 
+#define Z_FAR		(200.f)
+#define Z_NEAR		(.01f)
+
 class Laborator5 : public SimpleScene
 {
 	public:
@@ -30,4 +33,11 @@ class Laborator5 : public SimpleScene
 		Laborator::Camera *camera;
 		glm::mat4 projectionMatrix;
 		bool renderCameraTarget;
+		bool projectionType;
+
+		GLfloat right;
+		GLfloat left;
+		GLfloat bottom;
+		GLfloat top;
+		GLfloat fov;
 };
