@@ -82,6 +82,7 @@
     <ClInclude Include="..\Source\Laboratoare\Laborator9\Laborator9.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md" />
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\VertexShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator7\Shaders\FragmentShader.glsl" />
@@ -91,7 +92,6 @@
     <None Include="..\Source\Laboratoare\Laborator9\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator9\Shaders\VertexShader.glsl" />
     <None Include="ClassDiagram.cd" />
-    <None Include="README.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FB43B467-42CC-458C-9556-597B025830F7}</ProjectGuid>
