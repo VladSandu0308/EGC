@@ -64,24 +64,24 @@ void Laborator6::Init()
 Mesh* Laborator6::CreateMesh(const char *name, const std::vector<VertexFormat> &vertices, const std::vector<unsigned short> &indices)
 {
 	unsigned int VAO = 0;
-	// TODO: Create the VAO and bind it
+	// Create the VAO and bind it
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	// TODO: Create the VBO and bind it
+	// Create the VBO and bind it
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	// TODO: Send vertices data into the VBO buffer
+	// Send vertices data into the VBO buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 
-	// TODO: Crete the IBO and bind it
+	// Crete the IBO and bind it
 	unsigned int IBO;
 	glGenBuffers(1, &IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
-	// TODO: Send indices data into the IBO buffer
+	// Send indices data into the IBO buffer
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);
 
 	// ========================================================================
@@ -93,7 +93,8 @@ Mesh* Laborator6::CreateMesh(const char *name, const std::vector<VertexFormat> &
 
 	// set vertex normal attribute
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(sizeof(glm::vec3)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3) + sizeof(glm::vec2)));
+	
 
 	// set texture coordinate attribute
 	glEnableVertexAttribArray(2);
@@ -101,7 +102,9 @@ Mesh* Laborator6::CreateMesh(const char *name, const std::vector<VertexFormat> &
 
 	// set vertex color attribute
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3) + sizeof(glm::vec2)));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(sizeof(glm::vec3)));
+	
+	// OBSERVATION: after interchanging the colour and normal pipes, the colours appear altered
 	// ========================================================================
 
 	// Unbind the VAO
@@ -161,7 +164,7 @@ void Laborator6::FrameEnd()
 	DrawCoordinatSystem();
 }
 
-void Laborator6::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & modelMatrix)
+void Laborator6::RenderSimpleMesh(Mesh* mesh, Shader* shader, const glm::mat4 & modelMatrix)
 {
 	if (!mesh || !shader || !shader->GetProgramID())
 		return;
@@ -169,19 +172,31 @@ void Laborator6::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & 
 	// render an object using the specified shader and the specified position
 	glUseProgram(shader->program);
 
-	// TODO : get shader location for uniform mat4 "Model"
+	// get shader location for uniform mat4 "Model"
+	GLint modelLocation = glGetUniformLocation(shader->GetProgramID(), "Model");
 
-	// TODO : set shader uniform "Model" to modelMatrix
+	// set shader uniform "Model" to modelMatrix
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
-	// TODO : get shader location for uniform mat4 "View"
+	// get shader location for uniform mat4 "View"
+	GLint viewLocation = glGetUniformLocation(shader->GetProgramID(), "View");
 
-	// TODO : set shader uniform "View" to viewMatrix
+	// set shader uniform "View" to viewMatrix
 	glm::mat4 viewMatrix = GetSceneCamera()->GetViewMatrix();
+	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
-	// TODO : get shader location for uniform mat4 "Projection"
+	// get shader location for uniform mat4 "Projection"
+	GLint projLocation = glGetUniformLocation(shader->GetProgramID(), "Projection");
 
-	// TODO : set shader uniform "Projection" to projectionMatrix
+	// set shader uniform "Projection" to projectionMatrix
 	glm::mat4 projectionMatrix = GetSceneCamera()->GetProjectionMatrix();
+	glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+	// get shader location for "Time"
+	GLint timeLocation = glGetUniformLocation(shader->GetProgramID(), "Time");
+	
+	// set shader uniform "Time" to elapsed time
+	glUniform1f(timeLocation, Engine::GetElapsedTime());
 
 	// Draw the object
 	glBindVertexArray(mesh->GetBuffers()->VAO);

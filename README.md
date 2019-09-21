@@ -9,6 +9,7 @@ Each of these is documented via a `README.md` file
 3. 2D transformations and glm
 4. 3D transformations
 5. Camera types and projections
+6. OpenGL shaders
 
 ## Homework Assignments
 ???
