@@ -10,7 +10,8 @@ Each of these is documented via a `README.md` file
 4. 3D transformations
 5. Camera types and projections
 6. OpenGL shaders
-7. Lighting with shaders
+7. Gouraud lighting model with shaders
+8. Phong lighting
 
 ## Homework Assignments
 ???

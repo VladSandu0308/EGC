@@ -47,11 +47,16 @@ void Laborator8::Init()
 
 	//Light & material properties
 	{
-		lightPosition = glm::vec3(0, 1, 1);
-		lightDirection = glm::vec3(0, -1, 0);
-		materialShininess = 30;
-		materialKd = 0.5;
-		materialKs = 0.5;
+		lightPosition		= glm::vec3(0, 1, 1);
+		lightDirection		= glm::vec3(0, -1, 0);
+		materialShininess	= 30;
+		materialKd			= 0.5;
+		materialKs			= 0.5;
+
+		typeOfLight			= 0;
+		angleOX				= 0.f;
+		angleOY				= 0.f;
+		cutoffAngle			= 30.f;
 	}
 }
 
@@ -71,7 +76,7 @@ void Laborator8::Update(float deltaTimeSeconds)
 	{
 		glm::mat4 modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 1, 0));
-		RenderSimpleMesh(meshes["sphere"], shaders["ShaderLab8"], modelMatrix);
+		RenderSimpleMesh(meshes["sphere"], shaders["ShaderLab8"], modelMatrix, glm::vec3(.447f, .737f, .831f));
 	}
 
 	{
@@ -79,7 +84,7 @@ void Laborator8::Update(float deltaTimeSeconds)
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(2, 0.5f, 0));
 		modelMatrix = glm::rotate(modelMatrix, RADIANS(60.0f), glm::vec3(1, 0, 0));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5f));
-		RenderSimpleMesh(meshes["box"], shaders["ShaderLab8"], modelMatrix);
+		RenderSimpleMesh(meshes["box"], shaders["ShaderLab8"], modelMatrix, glm::vec3(0.54f, 0.15f, 0.46f));
 	}
 
 	{
@@ -94,7 +99,7 @@ void Laborator8::Update(float deltaTimeSeconds)
 		glm::mat4 modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 0.01f, 0));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.25f));
-		RenderSimpleMesh(meshes["plane"], shaders["ShaderLab8"], modelMatrix);
+		RenderSimpleMesh(meshes["plane"], shaders["ShaderLab8"], modelMatrix, glm::vec3(.5f, .5f, .5f));
 	}
 
 	// Render the point light in the scene
@@ -159,6 +164,12 @@ void Laborator8::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & 
 	int loc_projection_matrix = glGetUniformLocation(shader->program, "Projection");
 	glUniformMatrix4fv(loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
+	GLint type = glGetUniformLocation(shader->program, "type_of_light");
+	glUniform1i(type, typeOfLight);
+
+	GLint cut_off_angle = glGetUniformLocation(shader->program, "cut_off_angle");
+	glUniform1f(cut_off_angle, cutoffAngle);
+
 	// Draw the object
 	glBindVertexArray(mesh->GetBuffers()->VAO);
 	glDrawElements(mesh->GetDrawMode(), static_cast<int>(mesh->indices.size()), GL_UNSIGNED_SHORT, 0);
@@ -185,12 +196,49 @@ void Laborator8::OnInputUpdate(float deltaTime, int mods)
 		if (window->KeyHold(GLFW_KEY_D)) lightPosition += right * deltaTime * speed;
 		if (window->KeyHold(GLFW_KEY_E)) lightPosition += up * deltaTime * speed;
 		if (window->KeyHold(GLFW_KEY_Q)) lightPosition -= up * deltaTime * speed;
+
+		if (window->KeyHold(GLFW_KEY_UP))
+		{
+			angleOX += deltaTime * speed;
+		}
+		if (window->KeyHold(GLFW_KEY_DOWN))
+		{
+			angleOX -= deltaTime * speed;
+		}
+		if (window->KeyHold(GLFW_KEY_LEFT))
+		{
+			angleOY += deltaTime * speed;
+		}
+		if (window->KeyHold(GLFW_KEY_RIGHT))
+		{
+			angleOY -= deltaTime * speed;
+		}
+
+		if (window->KeyHold(GLFW_KEY_R))
+		{
+			cutoffAngle += deltaTime * ANGLE_SPEEDUP;
+		}
+		if (window->KeyHold(GLFW_KEY_T))
+		{
+			cutoffAngle -= deltaTime * ANGLE_SPEEDUP;
+		}
+
+		glm::mat4 turn	= glm::mat4(1);
+		turn			= glm::rotate(turn, angleOY, glm::vec3(0, 1, 0));
+		turn			= glm::rotate(turn, angleOX, glm::vec3(1, 0, 0));
+
+		lightDirection	= glm::vec3(0, -1, 0);
+		lightDirection	= glm::vec3(turn * glm::vec4(lightDirection, 0));
 	}
 }
 
 void Laborator8::OnKeyPress(int key, int mods)
 {
 	// add key press event
+	if (key == GLFW_KEY_F)
+	{
+		typeOfLight ^= 1;
+	}
 }
 
 void Laborator8::OnKeyRelease(int key, int mods)

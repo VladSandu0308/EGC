@@ -3,6 +3,8 @@
 #include <Component/Transform/Transform.h>
 #include <Core/GPU/Mesh.h>
 
+#define ANGLE_SPEEDUP		(30.f)
+
 class Laborator8 : public SimpleScene
 {
 	public:
@@ -32,4 +34,8 @@ class Laborator8 : public SimpleScene
 		unsigned int materialShininess;
 		float materialKd;
 		float materialKs;
+
+		GLint typeOfLight;
+		GLfloat angleOX, angleOY;
+		GLfloat cutoffAngle;
 };
