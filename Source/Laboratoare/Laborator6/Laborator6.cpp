@@ -196,7 +196,7 @@ void Laborator6::RenderSimpleMesh(Mesh* mesh, Shader* shader, const glm::mat4 & 
 	GLint timeLocation = glGetUniformLocation(shader->GetProgramID(), "Time");
 	
 	// set shader uniform "Time" to elapsed time
-	glUniform1f(timeLocation, Engine::GetElapsedTime());
+	glUniform1f(timeLocation, (GLfloat)Engine::GetElapsedTime());
 
 	// Draw the object
 	glBindVertexArray(mesh->GetBuffers()->VAO);
