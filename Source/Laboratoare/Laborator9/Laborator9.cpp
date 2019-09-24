@@ -86,10 +86,13 @@ void Laborator9::Init()
 			glm::vec3(0, 1, 0)
 		};
 
-		// TODO : Complete texture coordinates for the square
+		// Texture coordinates for the square
 		vector<glm::vec2> textureCoords
 		{
-			glm::vec2(0.0f, 0.0f)
+			glm::vec2(0.f, 0.f),
+			glm::vec2(1.f, 0.f),
+			glm::vec2(1.f, 1.f),
+			glm::vec2(0.f, 1.f)
 		};
 
 		vector<unsigned short> indices =
@@ -111,6 +114,8 @@ void Laborator9::Init()
 		shader->CreateAndLink();
 		shaders[shader->GetName()] = shader;
 	}
+
+	mixTextures = false;
 }
 
 void Laborator9::FrameStart()
@@ -130,7 +135,7 @@ void Laborator9::Update(float deltaTimeSeconds)
 		glm::mat4 modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(1, 1, -3));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(2));
-		RenderSimpleMesh(meshes["sphere"], shaders["ShaderLab9"], modelMatrix, mapTextures["earth"]);
+		RenderSimpleMesh(meshes["sphere"], shaders["ShaderLab9"], modelMatrix, mapTextures["earth"], nullptr);
 	}
 
 	{
@@ -138,7 +143,7 @@ void Laborator9::Update(float deltaTimeSeconds)
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(2, 0.5f, 0));
 		modelMatrix = glm::rotate(modelMatrix, RADIANS(60.0f), glm::vec3(1, 0, 0));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.75f));
-		RenderSimpleMesh(meshes["box"], shaders["ShaderLab9"], modelMatrix, mapTextures["crate"]);
+		RenderSimpleMesh(meshes["box"], shaders["ShaderLab9"], modelMatrix, mapTextures["crate"], nullptr);
 	}
 
 	{
@@ -146,21 +151,24 @@ void Laborator9::Update(float deltaTimeSeconds)
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(-2, 0.5f, 0));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.75f));
 		modelMatrix = glm::rotate(modelMatrix, RADIANS(75.0f), glm::vec3(1, 1, 0));
-		RenderSimpleMesh(meshes["box"], shaders["ShaderLab9"], modelMatrix, mapTextures["random"]);
+		RenderSimpleMesh(meshes["box"], shaders["ShaderLab9"], modelMatrix, mapTextures["random"], nullptr);
 	}
 
 	{
 		glm::mat4 modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.5f, 0.0f));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5f));
-		RenderSimpleMesh(meshes["square"], shaders["ShaderLab9"], modelMatrix, mapTextures["grass"]);
+
+		mixTextures = true;
+		RenderSimpleMesh(meshes["square"], shaders["ShaderLab9"], modelMatrix, mapTextures["grass"], mapTextures["earth"]);
+		mixTextures = false;
 	}
 
 	{
 		glm::mat4 modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(-2, -0.5f, -3));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f));
-		RenderSimpleMesh(meshes["bamboo"], shaders["ShaderLab9"], modelMatrix, mapTextures["bamboo"]);
+		RenderSimpleMesh(meshes["bamboo"], shaders["ShaderLab9"], modelMatrix, mapTextures["bamboo"], nullptr);
 	}
 }
 
@@ -191,18 +199,41 @@ void Laborator9::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & 
 	int loc_projection_matrix = glGetUniformLocation(shader->program, "Projection");
 	glUniformMatrix4fv(loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
+	// BONUS: Deciding wether to rotate the mesh or not
+	GLint locTime = glGetUniformLocation(shader->program, "time");
+
+	if (mesh == meshes["sphere"])
+	{
+		glUniform1f(locTime, (GLfloat)Engine::GetElapsedTime());
+	} else
+	{
+		glUniform1f(locTime, -1.f);
+	}
+
+	glUniform1i(glGetUniformLocation(shader->program, "mix_textures"), mixTextures);
+
 	if (texture1)
 	{
-		//TODO : activate texture location 0
-		//TODO : Bind the texture1 ID
-		//TODO : Send texture uniform value
+		// Activate texture location 0
+		glActiveTexture(GL_TEXTURE0);
+
+		// Bind the texture1 ID
+		glBindTexture(GL_TEXTURE_2D, texture1->GetTextureID());
+
+		// Send texture uniform value
+		glUniform1i(glGetUniformLocation(shader->program, "texture_1"), 0);
 	}
 
 	if (texture2)
 	{
-		//TODO : activate texture location 1
-		//TODO : Bind the texture2 ID
-		//TODO : Send texture uniform value
+		// Activate texture location 1
+		glActiveTexture(GL_TEXTURE1);
+
+		// Bind the texture2 ID
+		glBindTexture(GL_TEXTURE_2D, texture2->GetTextureID());
+
+		// Send texture uniform value
+		glUniform1i(glGetUniformLocation(shader->program, "texture_2"), 1);
 	}
 
 	// Draw the object
@@ -212,32 +243,40 @@ void Laborator9::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & 
 
 Texture2D* Laborator9::CreateRandomTexture(unsigned int width, unsigned int height)
 {
-	GLuint textureID = 0;
-	unsigned int channels = 3;
-	unsigned int size = width * height * channels;
-	unsigned char* data = new unsigned char[size];
+	GLuint textureID		= 0;
+	unsigned int channels	= 3;
+	unsigned int size		= width * height * channels;
+	unsigned char* data		= new unsigned char[size];
 
-	// TODO: generate random texture data
+	// Generate random texture data
+	for (size_t i = 0; i < size; ++i)
+	{
+		data[i] = rand() % (UINT8_MAX + 1);
+	}
 
 	// Generate and bind the new texture ID
+	glGenTextures(1, &randomTextureID);
+	glBindTexture(GL_TEXTURE_2D, randomTextureID);
 
-	// TODO: Set the texture parameters (MIN_FILTER, MAG_FILTER and WRAPPING MODE) using glTexParameteri
-
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 4);
+	// Set the texture parameters (MIN_FILTER, MAG_FILTER and WRAPPING MODE) using glTexParameteri
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	CheckOpenGLError();
 
-	// TODO: Use glTextImage2D to set the texture data
+	// Use glTextImage2D to set the texture data
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
-	// TODO: Generate texture mip-maps
-
+	// Generate texture mip-maps
+	glGenerateMipmap(GL_TEXTURE_2D);
 	CheckOpenGLError();
 
 	// Save the texture into a wrapper Texture2D class for using easier later during rendering phase
 	Texture2D* texture = new Texture2D();
-	texture->Init(textureID, width, height, channels);
+	texture->Init(randomTextureID, width, height, channels);
 
 	SAFE_FREE_ARRAY(data);
 	return texture;
