@@ -81,42 +81,45 @@ void Laborator1::FrameEnd()
 
 void Laborator1::OnInputUpdate(float deltaTime, int mods)
 {
-	if (window->KeyHold(GLFW_KEY_R))
+	if (!window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
 	{
-		degrees += 2.f * deltaTime;
-		if (degrees > 360.f)
+		if (window->KeyHold(GLFW_KEY_R))
 		{
-			degrees = 0.f;
+			degrees += SPEED_FACTOR * deltaTime;
+			if (degrees > 360.f)
+			{
+				degrees = 0.f;
+			}
+
+			posX += RANGE * cos(degrees);
+			posY += RANGE * sin(degrees);
 		}
 
-		posX += RANGE * cos(degrees);
-		posY += RANGE * sin(degrees);
-	}
-
-	// treat continuous update based on input
-	if (window->KeyHold(GLFW_KEY_W))
-	{
-		posZ -= MOVE;
-	}
-	if (window->KeyHold(GLFW_KEY_S))
-	{
-		posZ += MOVE;
-	}
-	if (window->KeyHold(GLFW_KEY_A))
-	{
-		posX -= MOVE;
-	}
-	if (window->KeyHold(GLFW_KEY_D))
-	{
-		posX += MOVE;
-	}
-	if (window->KeyHold(GLFW_KEY_Q))
-	{
-		posY -= MOVE;
-	}
-	if (window->KeyHold(GLFW_KEY_E))
-	{
-		posY += MOVE;
+		// treat continuous update based on input
+		if (window->KeyHold(GLFW_KEY_W))
+		{
+			posZ -= deltaTime * SPEED_FACTOR;
+		}
+		if (window->KeyHold(GLFW_KEY_S))
+		{
+			posZ += deltaTime * SPEED_FACTOR;
+		}
+		if (window->KeyHold(GLFW_KEY_A))
+		{
+			posX -= deltaTime * SPEED_FACTOR;
+		}
+		if (window->KeyHold(GLFW_KEY_D))
+		{
+			posX += deltaTime * SPEED_FACTOR;
+		}
+		if (window->KeyHold(GLFW_KEY_Q))
+		{
+			posY -= deltaTime * SPEED_FACTOR;
+		}
+		if (window->KeyHold(GLFW_KEY_E))
+		{
+			posY += deltaTime * SPEED_FACTOR;
+		}
 	}
 };
 

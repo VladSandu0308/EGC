@@ -4,7 +4,7 @@
 
 #define NUM_COLOURS		(4)
 #define NUM_OBJECTS		(3)
-#define MOVE			(.1f)
+#define SPEED_FACTOR	(2.f)
 #define RANGE			(.02f)
 
 class Laborator1 : public SimpleScene
