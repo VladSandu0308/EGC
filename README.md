@@ -14,6 +14,7 @@ Each of these is documented via a `README.md` file
 6. OpenGL shaders
 7. Gouraud lighting model with shaders
 8. Phong lighting
+9. OpenGL textures
 
 ## Homework Assignments
 ???
