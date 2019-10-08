@@ -110,6 +110,7 @@ void Laborator2::Init()
 	// BONUS: Create a circle mesh using vertices and indices
 	{
 		vector<VertexFormat> vertices;
+		vector<GLushort> indices;
 		GLfloat arg;
 
 		vertices.emplace_back(glm::vec3(0, 0, 0), glm::vec3(1.f, 1.f, 1.f));
@@ -118,14 +119,9 @@ void Laborator2::Init()
 			arg = TWO_PI * i / NUM_TRIANGLES;
 
 			vertices.emplace_back(glm::vec3(cos(arg), sin(arg), 0), glm::vec3(1.f, 1.f, 0.f));
-		}
-
-		vector<GLushort> indices;
-
-		for (GLushort i = 0; i < NUM_TRIANGLES; i++)
-		{
 			indices.push_back(i);
 		}
+		indices.push_back(NUM_TRIANGLES);
 		indices.push_back(1);
 
 		// Create a new mesh from buffer data
@@ -251,7 +247,7 @@ void Laborator2::OnKeyPress(int key, int mods)
 	// Save the state in "cullFace" variable and apply it in the Update() method not here
 	if (key == GLFW_KEY_F2)
 	{
-		cullFace ^= 1;
+		cullFace = cullFace ^ GL_BACK ^ GL_FRONT;
 	}
 
 	if (key == GLFW_KEY_SPACE)
