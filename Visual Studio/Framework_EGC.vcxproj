@@ -80,6 +80,7 @@
     <ClInclude Include="..\Source\Laboratoare\Laborator7\Laborator7.h" />
     <ClInclude Include="..\Source\Laboratoare\Laborator8\Laborator8.h" />
     <ClInclude Include="..\Source\Laboratoare\Laborator9\Laborator9.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
@@ -92,6 +93,9 @@
     <None Include="..\Source\Laboratoare\Laborator9\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator9\Shaders\VertexShader.glsl" />
     <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Framework_EGC.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FB43B467-42CC-458C-9556-597B025830F7}</ProjectGuid>

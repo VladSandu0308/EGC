@@ -240,6 +240,7 @@
     <ClInclude Include="..\Source\Laboratoare\Laborator9\Laborator9.h">
       <Filter>Laboratoare\Laborator9</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\FragmentShader.glsl">
@@ -268,5 +269,8 @@
     </None>
     <None Include="ClassDiagram.cd" />
     <None Include="..\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Framework_EGC.rc" />
   </ItemGroup>
 </Project>
