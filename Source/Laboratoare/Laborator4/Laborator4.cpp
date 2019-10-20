@@ -46,6 +46,10 @@ void Laborator4::Init()
 
 	angleX			= 0.f;
 	angleZ			= 0.f;
+	angle			= 5.f;
+
+	posX			= cos(angle);
+	posZ			= sin(angle);
 }
 
 void Laborator4::FrameStart()
@@ -65,31 +69,41 @@ void Laborator4::Update(float deltaTimeSeconds)
 	glPointSize(5);
 	glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
 
-	modelMatrix = glm::mat4(1);
-	modelMatrix *= Transform3D::Translate(-2.5f, 0.5f,-1.5f);
-	modelMatrix *= Transform3D::Translate(translateX, translateY, translateZ);
-	RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+	{
+		modelMatrix = glm::mat4(1);
+		modelMatrix *= Transform3D::Translate(-2.5f, 0.5f, -1.5f);
+		modelMatrix *= Transform3D::Translate(translateX, translateY, translateZ);
+		RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+	}
 
-	modelMatrix = glm::mat4(1);
-	modelMatrix *= Transform3D::Translate(0.0f, 0.5f, -1.5f);
-	modelMatrix *= Transform3D::Scale(scaleX, scaleY, scaleZ);
-	RenderMesh(meshes["box"], shaders["Simple"], modelMatrix);
+	{
+		modelMatrix = glm::mat4(1);
+		modelMatrix *= Transform3D::Translate(0.0f, 0.5f, -1.5f);
+		modelMatrix *= Transform3D::Scale(scaleX, scaleY, scaleZ);
+		RenderMesh(meshes["box"], shaders["Simple"], modelMatrix);
+	}
 
-	modelMatrix = glm::mat4(1);
-	modelMatrix *= Transform3D::Translate(2.5f, 0.5f, -1.5f);
-	modelMatrix *= Transform3D::RotateOX(angularStepOX);
-	modelMatrix *= Transform3D::RotateOY(angularStepOY);
-	modelMatrix *= Transform3D::RotateOZ(angularStepOZ);
-	RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+	{
+		modelMatrix = glm::mat4(1);
+		modelMatrix *= Transform3D::Translate(-2.5f, 0.5f, -1.5f);
+		modelMatrix *= Transform3D::Translate(translateX, translateY, translateZ);
+		modelMatrix *= Transform3D::Translate(posX * CUBES_DISTANCE, 0.f, posZ * CUBES_DISTANCE);
+		modelMatrix *= Transform3D::RotateOX(angularStepOX);
+		modelMatrix *= Transform3D::RotateOY(angularStepOY);
+		modelMatrix *= Transform3D::RotateOZ(angularStepOZ);
+		RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+	}
 
 	// BONUS: Sinusoidal movement + semi-chaotic rotations
-	modelMatrix = glm::mat4(1);
-	modelMatrix *= Transform3D::Translate(3.f, 3.f, 3.f);
-	modelMatrix *= Transform3D::Translate(translateXSine, translateYSine, translateZSine);
-	modelMatrix *= Transform3D::RotateOX(angleX + angleZ + angleX * angleZ);
-	modelMatrix *= Transform3D::RotateOY(angleX + angleZ + angleX * angleZ);
-	modelMatrix *= Transform3D::RotateOZ(angleX + angleZ + angleX * angleZ);
-	RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+	{
+		modelMatrix = glm::mat4(1);
+		modelMatrix *= Transform3D::Translate(3.f, 3.f, 3.f);
+		modelMatrix *= Transform3D::Translate(translateXSine, translateYSine, translateZSine);
+		modelMatrix *= Transform3D::RotateOX(angleX + angleZ + angleX * angleZ);
+		modelMatrix *= Transform3D::RotateOY(angleX + angleZ + angleX * angleZ);
+		modelMatrix *= Transform3D::RotateOZ(angleX + angleZ + angleX * angleZ);
+		RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+	}
 }
 
 void Laborator4::FrameEnd()
@@ -99,29 +113,32 @@ void Laborator4::FrameEnd()
 
 void Laborator4::OnInputUpdate(float deltaTime, int mods)
 {
-	if (window->KeyHold(GLFW_KEY_S))
+	if (!window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
 	{
-		translateZ += deltaTime;
-	}
-	if (window->KeyHold(GLFW_KEY_W))
-	{
-		translateZ -= deltaTime;
-	}
-	if (window->KeyHold(GLFW_KEY_D))
-	{
-		translateX += deltaTime;
-	}
-	if (window->KeyHold(GLFW_KEY_A))
-	{
-		translateX -= deltaTime;
-	}
-	if (window->KeyHold(GLFW_KEY_R))
-	{
-		translateY += deltaTime;
-	}
-	if (window->KeyHold(GLFW_KEY_F))
-	{
-		translateY -= deltaTime;
+		if (window->KeyHold(GLFW_KEY_S))
+		{
+			translateZ += deltaTime;
+		}
+		if (window->KeyHold(GLFW_KEY_W))
+		{
+			translateZ -= deltaTime;
+		}
+		if (window->KeyHold(GLFW_KEY_D))
+		{
+			translateX += deltaTime;
+		}
+		if (window->KeyHold(GLFW_KEY_A))
+		{
+			translateX -= deltaTime;
+		}
+		if (window->KeyHold(GLFW_KEY_R))
+		{
+			translateY += deltaTime;
+		}
+		if (window->KeyHold(GLFW_KEY_F))
+		{
+			translateY -= deltaTime;
+		}
 	}
 
 	if (window->KeyHold(GLFW_KEY_1))
@@ -162,7 +179,33 @@ void Laborator4::OnInputUpdate(float deltaTime, int mods)
 		angularStepOZ -= deltaTime;
 	}
 
-	// BONUS: A more complex sinusoidal movement is rendered by pressing arrow keys
+	if (window->KeyHold(GLFW_KEY_0))
+	{
+		angle += deltaTime;
+
+		if (angle >= 360.f)
+		{
+			angle = 0;
+		}
+
+		posX = cos(angle);
+		posZ = sin(angle);
+	}
+
+	if (window->KeyHold(GLFW_KEY_9))
+	{
+		angle -= deltaTime;
+
+		if (angle <= -360.f)
+		{
+			angle = 0;
+		}
+
+		posX = cos(angle);
+		posZ = sin(angle);
+	}
+
+	// BONUS: A more complex sinusoidal movement is rendered by pressing the arrow keys
 	if (window->KeyHold(GLFW_KEY_UP))
 	{
 		angleZ += deltaTime;

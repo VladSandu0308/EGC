@@ -2,6 +2,7 @@
 #include <Component/SimpleScene.h>
 
 #define SPEEDUP_RATIO		(3.f)
+#define CUBES_DISTANCE		(3.f)
 
 class Laborator4 : public SimpleScene
 {
@@ -34,4 +35,5 @@ class Laborator4 : public SimpleScene
 
 		GLfloat translateZSine, translateXSine, translateYSine;
 		GLfloat angleX, angleZ;
+		GLfloat posX, posZ, angle;
 };
