@@ -84,6 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
+    <None Include="..\Source\Laboratoare\Laborator1\README.md" />
+    <None Include="..\Source\Laboratoare\Laborator3\README.md" />
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\VertexShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator7\Shaders\FragmentShader.glsl" />

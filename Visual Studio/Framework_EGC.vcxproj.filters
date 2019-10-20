@@ -269,6 +269,12 @@
     </None>
     <None Include="ClassDiagram.cd" />
     <None Include="..\README.md" />
+    <None Include="..\Source\Laboratoare\Laborator3\README.md">
+      <Filter>Laboratoare\Laborator3</Filter>
+    </None>
+    <None Include="..\Source\Laboratoare\Laborator1\README.md">
+      <Filter>Laboratoare\Laborator1</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Framework_EGC.rc" />
