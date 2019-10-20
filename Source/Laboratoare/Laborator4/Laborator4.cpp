@@ -82,7 +82,8 @@ void Laborator4::Update(float deltaTimeSeconds)
 		modelMatrix *= Transform3D::Scale(scaleX, scaleY, scaleZ);
 		RenderMesh(meshes["box"], shaders["Simple"], modelMatrix);
 	}
-
+	
+	// BONUS: Rotate the third cube around the first
 	{
 		modelMatrix = glm::mat4(1);
 		modelMatrix *= Transform3D::Translate(-2.5f, 0.5f, -1.5f);
