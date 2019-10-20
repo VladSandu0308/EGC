@@ -38,12 +38,8 @@ void Laborator3::Init()
 	translateX		= 0.f;
 	translateY		= 0.f;
 
-	translateXFast	= 0.f;
-	translateYFall  = (GLfloat)resolution.y;
-
 	// initialise moving directions
 	moveRight		= false;
-	moveRightFast	= false;
 
 	// initialize sx and sy (the scale factors)
 	scaleX			= 1.f;
@@ -52,6 +48,8 @@ void Laborator3::Init()
 	// initialize angularStep
 	angularStep		= 0.f;
 	
+	posSunX = 300.f;
+	posSunY = 450.f;
 
 	Mesh* square1 = Object2D::CreateSquare("square1", corner, squareSide, glm::vec3(1, 0, 0), true);
 	AddMeshToList(square1);
@@ -112,9 +110,9 @@ void Laborator3::Update(float deltaTimeSeconds)
 		// Create animations by multiplying current transform matrix with matrices from Transform 2D
 
 		angularStep += deltaTimeSeconds;
-		modelMatrix *= Transform2D::Translate(SQUARE_SIDE / 2, SQUARE_SIDE / 2);
+		modelMatrix *= Transform2D::Translate(SQUARE_SIDE / 2.f, SQUARE_SIDE / 2.f);
 		modelMatrix *= Transform2D::Rotate(angularStep);
-		modelMatrix *= Transform2D::Translate(-SQUARE_SIDE / 2, -SQUARE_SIDE / 2);
+		modelMatrix *= Transform2D::Translate(-SQUARE_SIDE / 2.f, -SQUARE_SIDE / 2.f);
 
 		RenderMesh2D(meshes["square2"], shaders["VertexColor"], modelMatrix);
 	}
@@ -123,74 +121,35 @@ void Laborator3::Update(float deltaTimeSeconds)
 		modelMatrix = Transform2D::Translate(650, 250);
 
 		// Create animations by multiplying current transform matrix with matrices from Transform 2D
-		scaleX += 4.5f * (GLfloat)M_1_PI * deltaTimeSeconds;
-		scaleY += 4.5f * (GLfloat)M_1_PI * deltaTimeSeconds;
+		scaleX += SCALE_FACTOR_X * deltaTimeSeconds;
+		scaleY += SCALE_FACTOR_Y * deltaTimeSeconds;
 
-		modelMatrix *= Transform2D::Translate(SQUARE_SIDE / 2, SQUARE_SIDE / 2);
+		modelMatrix *= Transform2D::Translate(SQUARE_SIDE / 2.f, SQUARE_SIDE / 2.f);
 		modelMatrix *= Transform2D::Scale(sin(scaleX), sin(scaleY));
-		modelMatrix *= Transform2D::Translate(-SQUARE_SIDE / 2, -SQUARE_SIDE / 2);
+		modelMatrix *= Transform2D::Translate(-SQUARE_SIDE / 2.f, -SQUARE_SIDE / 2.f);
 
 		RenderMesh2D(meshes["square3"], shaders["VertexColor"], modelMatrix);
 	}
 
-	// BONUS: some fancier rotations and faster movement
+	// BONUS: Create 3 squares that orbit each other in a Sun - Earth - Moon relation
 	{
-		// TODO: make the square rotate around the centre of the image
-		modelMatrix = Transform2D::Translate(150, 250);
-
-		// Create animations by multiplying current transform matrix with matrices from Transform 2D
-		if (moveRightFast)
-		{
-			translateXFast += MOVE_RATIO_FAST * deltaTimeSeconds * resolution.x;
-			modelMatrix *= Transform2D::Translate(translateXFast, translateY);
-
-			if (translateXFast > resolution.x * LIMIT)
-			{
-				moveRightFast = false;
-			}
-
-		}
-		else
-		{
-			translateXFast -= MOVE_RATIO_FAST * deltaTimeSeconds * resolution.x;
-			modelMatrix *= Transform2D::Translate(translateXFast, translateY);
-
-			if (translateXFast <= 0)
-			{
-				moveRightFast = true;
-			}
-		}
-
-		RenderMesh2D(meshes["square3"], shaders["VertexColor"], modelMatrix);
-	}
-
-	{
-		modelMatrix = Transform2D::Translate(150, 250);
-		// Create animations by multiplying current transform matrix with matrices from Transform 2D
-
-		modelMatrix *= Transform2D::Translate(translateX + SQUARE_SIDE / 2, translateY + SQUARE_SIDE / 2);
-		modelMatrix *= Transform2D::Rotate(angularStep);
-		modelMatrix *= Transform2D::Translate(-translateX + SQUARE_SIDE / 2, -translateY + SQUARE_SIDE / 2);
-		modelMatrix *= Transform2D::Translate(translateX + SQUARES_DISTANCE, 0);
-
-		RenderMesh2D(meshes["square2"], shaders["VertexColor"], modelMatrix);
-	}
-
-	{
-		translateYFall -= MOVE_RATIO * deltaTimeSeconds * resolution.y;
-		modelMatrix = Transform2D::Translate(START_FALL, translateYFall);
-
-		// Create animations by multiplying current transform matrix with matrices from Transform 2D
-		modelMatrix *= Transform2D::Translate(SQUARE_SIDE / 2, SQUARE_SIDE / 2);
-		modelMatrix *= Transform2D::Rotate(-angularStep * ROTATION_SPEEDUP);
-		modelMatrix *= Transform2D::Translate(-SQUARE_SIDE / 2, -SQUARE_SIDE / 2);
-
-		if (translateYFall <= 0)
-		{
-			translateYFall = (GLfloat)resolution.y;
-		}
-
+		// Sun
+		modelMatrix = Transform2D::Translate(posSunX, posSunY);
 		RenderMesh2D(meshes["square1"], shaders["VertexColor"], modelMatrix);
+
+		// Earth (orbits the Sun)
+		modelMatrix *= Transform2D::Translate(SQUARE_SIDE / 2.f, SQUARE_SIDE / 2.f);
+		modelMatrix *= Transform2D::Rotate(angularStep * 2.f);
+		modelMatrix *= Transform2D::Translate(SQUARES_DISTANCE * 1.5f, SQUARES_DISTANCE * 1.5f);
+		modelMatrix *= Transform2D::Translate(-SQUARE_SIDE / 2.f, -SQUARE_SIDE / 2.f);
+		RenderMesh2D(meshes["square2"], shaders["VertexColor"], modelMatrix);
+
+		// Moon (orbits the Earth)
+		modelMatrix *= Transform2D::Translate(SQUARE_SIDE / 2.f, SQUARE_SIDE / 2.f);
+		modelMatrix *= Transform2D::Rotate(angularStep * 2.f);
+		modelMatrix *= Transform2D::Translate(SQUARES_DISTANCE * 1.2f, SQUARES_DISTANCE * 1.2f);
+		modelMatrix *= Transform2D::Translate(-SQUARE_SIDE / 2.f, -SQUARE_SIDE / 2.f);
+		RenderMesh2D(meshes["square3"], shaders["VertexColor"], modelMatrix);
 	}
 }
 
