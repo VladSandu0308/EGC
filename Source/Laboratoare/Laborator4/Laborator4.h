@@ -3,6 +3,7 @@
 
 #define SPEEDUP_RATIO		(3.f)
 #define CUBES_DISTANCE		(3.f)
+#define JUMP_DISTANCE		(4.f)
 
 class Laborator4 : public SimpleScene
 {
@@ -28,6 +29,7 @@ class Laborator4 : public SimpleScene
 
 	protected:
 		glm::mat4 modelMatrix;
+		glm::vec3 endPos, midPos, startPos;
 		float translateX, translateY, translateZ;
 		float scaleX, scaleY, scaleZ;
 		float angularStepOX, angularStepOY, angularStepOZ;
@@ -36,4 +38,5 @@ class Laborator4 : public SimpleScene
 		GLfloat translateZSine, translateXSine, translateYSine;
 		GLfloat angleX, angleZ;
 		GLfloat posX, posZ, angle;
+		GLfloat angleJump;
 };

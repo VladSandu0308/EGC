@@ -20,7 +20,7 @@ Laborator4::~Laborator4()
 void Laborator4::Init()
 {
 	polygonMode = GL_FILL;
-
+	
 	Mesh* mesh = new Mesh("box");
 	mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "box.obj");
 	meshes[mesh->GetMeshID()] = mesh;
@@ -50,6 +50,11 @@ void Laborator4::Init()
 
 	posX			= cos(angle);
 	posZ			= sin(angle);
+
+	angleJump		= 0.f;
+
+	startPos		= glm::vec3(1.f, 1.f, 1.f);
+	endPos			= glm::vec3(1.f + JUMP_DISTANCE, 1.f, 1.f);
 }
 
 void Laborator4::FrameStart()
@@ -103,6 +108,18 @@ void Laborator4::Update(float deltaTimeSeconds)
 		modelMatrix *= Transform3D::RotateOX(angleX + angleZ + angleX * angleZ);
 		modelMatrix *= Transform3D::RotateOY(angleX + angleZ + angleX * angleZ);
 		modelMatrix *= Transform3D::RotateOZ(angleX + angleZ + angleX * angleZ);
+		//RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
+	}
+
+	// BONUS: Make a cube jump
+	{
+		midPos = (startPos + endPos) * 0.5f;
+		
+		modelMatrix = glm::mat4(1);
+		modelMatrix *= Transform3D::Translate(midPos[0], midPos[1], midPos[2]);
+		modelMatrix *= Transform3D::RotateOZ(angleJump);
+		modelMatrix *= Transform3D::Translate(startPos[0] - midPos[0], startPos[1] - midPos[1], startPos[2] - midPos[2]);
+
 		RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
 	}
 }
@@ -230,6 +247,19 @@ void Laborator4::OnInputUpdate(float deltaTime, int mods)
 		angleX -= deltaTime;
 		translateYSine = sin(angleX * SPEEDUP_RATIO) + sin(angleZ * SPEEDUP_RATIO);
 		translateXSine -= deltaTime * SPEEDUP_RATIO;
+	}
+
+	// BONUS: Make the cube jump
+	if (window->KeyHold(GLFW_KEY_P))
+	{
+		angleJump -= deltaTime;
+
+		if (angleJump <= -M_PI)
+		{
+			startPos = endPos;
+			endPos[0] += JUMP_DISTANCE;
+			angleJump = 0.f;
+		}
 	}
 }
 
