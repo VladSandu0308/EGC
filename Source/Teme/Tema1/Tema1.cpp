@@ -8,8 +8,10 @@
 
 
 Tema1::Tema1():
-	fallAngleSpeed(10.f),
-	riseAngleSpeed(100.f)
+	fallAngleSpeed(50.f),
+	riseAngleSpeed(100.f),
+	gravity(400.f),
+	liftForce(300.f)
 {
 }
 
@@ -36,7 +38,7 @@ void Tema1::Init()
 	fall				= true;
 
 	centreX				= 200.f;
-	centreY				= resolution.y / 2.f;
+	centreY				= resolution.y / 2.f + 200.f;
 }
 
 void Tema1::FrameStart()
@@ -57,6 +59,9 @@ void Tema1::Update(float deltaTimeSeconds)
 	glm::ivec2 resolution = window->GetResolution();
 
 	bird->FlapWing(deltaTimeSeconds);
+	speed -= gravity * deltaTimeSeconds;
+	centreY += speed * deltaTimeSeconds
+		- gravity * deltaTimeSeconds * deltaTimeSeconds / 2.f;
 	
 	/* Transformations that will be applied to the bird, one part at a time */
 	CalculateMovementMatrix();
@@ -120,6 +125,7 @@ void Tema1::OnKeyPress(int key, int mods)
 	{
 		// TODO: sari, fa, sari
 		fall = false;
+		speed = liftForce;
 	}
 }
 
@@ -145,9 +151,9 @@ void Tema1::CalculateBirdAngle(float deltaTimeSeconds)
 	{
 		angle -= deltaTimeSeconds * fallAngleSpeed;
 		
-		if (angle <= -30.f)
+		if (angle <= -90.f)
 		{
-			angle = -30.f;
+			angle = -90.f;
 		}
 	} else
 	{
