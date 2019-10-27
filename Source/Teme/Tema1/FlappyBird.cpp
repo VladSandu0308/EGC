@@ -1,4 +1,4 @@
-#include "Tema1.h"
+#include "FlappyBird.h"
 
 #include <vector>
 #include <iostream>
@@ -7,20 +7,20 @@
 #include "Transform2D.h"
 
 
-Tema1::Tema1():
+FlappyBird::FlappyBird():
 	fallAngleSpeed(50.f),
-	riseAngleSpeed(100.f),
+	riseAngleSpeed(200.f),
 	gravity(400.f),
 	liftForce(300.f)
 {
 }
 
-Tema1::~Tema1()
+FlappyBird::~FlappyBird()
 {
 	delete bird;
 }
 
-void Tema1::Init()
+void FlappyBird::Init()
 {
 	glm::ivec2 resolution = window->GetResolution();
 	auto camera = GetSceneCamera();
@@ -41,7 +41,7 @@ void Tema1::Init()
 	centreY				= resolution.y / 2.f + 200.f;
 }
 
-void Tema1::FrameStart()
+void FlappyBird::FrameStart()
 {
 	// clears the color buffer (using the previously set color) and depth buffer
 	glClearColor(0, 0, 0, 1);
@@ -52,7 +52,7 @@ void Tema1::FrameStart()
 	glViewport(0, 0, resolution.x, resolution.y);
 }
 
-void Tema1::Update(float deltaTimeSeconds)
+void FlappyBird::Update(float deltaTimeSeconds)
 {
 	GLfloat offsetX, offsetY;
 	Mesh* bodyPart;
@@ -115,11 +115,11 @@ void Tema1::Update(float deltaTimeSeconds)
 	}
 }
 
-void Tema1::FrameEnd()
+void FlappyBird::FrameEnd()
 {
 }
 
-void Tema1::OnKeyPress(int key, int mods)
+void FlappyBird::OnKeyPress(int key, int mods)
 {
 	if (key == GLFW_KEY_SPACE)
 	{
@@ -129,7 +129,7 @@ void Tema1::OnKeyPress(int key, int mods)
 	}
 }
 
-void Tema1::RenderBodyPart(Mesh* bodyPart, GLfloat offsetX, GLfloat offsetY)
+void FlappyBird::RenderBodyPart(Mesh* bodyPart, GLfloat offsetX, GLfloat offsetY)
 {
 	glm::mat3 offsetMatrix = modelMatrix;
 	offsetMatrix *= Transform2D::Rotate(RADIANS(angle));
@@ -138,14 +138,14 @@ void Tema1::RenderBodyPart(Mesh* bodyPart, GLfloat offsetX, GLfloat offsetY)
 	RenderMesh2D(bodyPart, shaders["VertexColor"], offsetMatrix);
 }
 
-void Tema1::CalculateMovementMatrix()
+void FlappyBird::CalculateMovementMatrix()
 {
 	modelMatrix = glm::mat3(1);
 	modelMatrix *= Transform2D::Translate(centreX, centreY);
 	// TODO: misca cioara
 }
 
-void Tema1::CalculateBirdAngle(float deltaTimeSeconds)
+void FlappyBird::CalculateBirdAngle(float deltaTimeSeconds)
 {
 	if (fall)
 	{

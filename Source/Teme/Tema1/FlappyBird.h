@@ -5,11 +5,11 @@
 #include <Core/Engine.h>
 #include "Bird.h"
 
-class Tema1 : public SimpleScene
+class FlappyBird : public SimpleScene
 {
 public:
-	Tema1();
-	~Tema1();
+	FlappyBird();
+	~FlappyBird();
 
 	void Init() override;
 
