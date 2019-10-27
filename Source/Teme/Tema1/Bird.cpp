@@ -12,10 +12,10 @@ Bird::Bird() :
 
 	/* Generate the bird's head */
 	{
-		Mesh* part = new Mesh("head");
+		mHead = new Mesh("head");
 		
-		vector<VertexFormat> vertices;
-		vector<GLushort> indices;
+		std::vector<VertexFormat> vertices;
+		std::vector<GLushort> indices;
 
 		// TODO: schimba culorile
 		vertices.emplace_back(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.811f, 0.188f, 0.517f));
@@ -32,20 +32,19 @@ Bird::Bird() :
 		indices.push_back(numTriangles);
 		indices.push_back(1);
 
-		part->InitFromData(vertices, indices);
-		part->SetDrawMode(GL_TRIANGLE_FAN);
+		mHead->InitFromData(vertices, indices);
+		mHead->SetDrawMode(GL_TRIANGLE_FAN);
 
 		headOffsetX = 35.f;
 		headOffsetY = 0.f;
-		meshes["head"] = part;
 	}
 
 	/* Generate the bird's body */
 	{
-		Mesh* part = new Mesh("body");
+		mBody = new Mesh("body");
 
-		vector<VertexFormat> vertices;
-		vector<GLushort> indices;
+		std::vector<VertexFormat> vertices;
+		std::vector<GLushort> indices;
 
 		// TODO: schimba culorile
 		vertices.emplace_back(
@@ -64,20 +63,19 @@ Bird::Bird() :
 		indices.push_back(numTriangles);
 		indices.push_back(1);
 
-		part->InitFromData(vertices, indices);
-		part->SetDrawMode(GL_TRIANGLE_FAN);
+		mBody->InitFromData(vertices, indices);
+		mBody->SetDrawMode(GL_TRIANGLE_FAN);
 
 		bodyOffsetX = -20.f;
 		bodyOffsetY = 0.f;
-		meshes["body"] = part;
 	}
 
 	/* Generate the bird's eye */
 	{
-		Mesh* part = new Mesh("eye");
+		mEye = new Mesh("eye");
 
-		vector<VertexFormat> vertices;
-		vector<GLushort> indices;
+		std::vector<VertexFormat> vertices;
+		std::vector<GLushort> indices;
 
 		vertices.emplace_back(
 			glm::vec3(0.f, 0.f, 0.f),
@@ -95,78 +93,74 @@ Bird::Bird() :
 		indices.push_back(numTriangles);
 		indices.push_back(1);
 
-		part->InitFromData(vertices, indices);
-		part->SetDrawMode(GL_TRIANGLE_FAN);
+		mEye->InitFromData(vertices, indices);
+		mEye->SetDrawMode(GL_TRIANGLE_FAN);
 
 		eyeOffsetX = 50.f;
 		eyeOffsetY = 10.f;
-		meshes["eye"] = part;
 	}
 
 	/* Generate the bird's beak */
 	{
-		Mesh* part = new Mesh("beak");
+		mBeak = new Mesh("beak");
 
-		vector<VertexFormat> vertices =
+		std::vector<VertexFormat> vertices =
 		{
 			VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.941f, 0.627f, 0.298f)),
 			VertexFormat(glm::vec3(0.f, -15.f, 0.f), glm::vec3(0.941f, 0.627f, 0.298f)),
 			VertexFormat(glm::vec3(30.f, -7.5f, 0.f), glm::vec3(0.941f, 0.627f, 0.298f))
 		};
-		vector<GLushort> indices =
+		std::vector<GLushort> indices =
 		{
 			0, 1, 2
 		};
 
-		part->InitFromData(vertices, indices);
+		mBeak->InitFromData(vertices, indices);
 
 		beakOffsetX = 50.f;
 		beakOffsetY = 0.f;
-		meshes["beak"] = part;
 	}
 
 	/* Generate the bird's tail */
 	{
-		Mesh* part = new Mesh("tail");
+		mTail = new Mesh("tail");
 
-		vector<VertexFormat> vertices =
+		std::vector<VertexFormat> vertices =
 		{
 			VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
 			VertexFormat(glm::vec3(-30.f, 20.f, 0.f), glm::vec3(0.f, 0.f, 1.f)),
 			VertexFormat(glm::vec3(-30.f, -20.f, 0.f), glm::vec3(0.f, 0.f, 1.f))
 		};
-		vector<GLushort> indices =
+		std::vector<GLushort> indices =
 		{
 			0, 1, 2
 		};
 
-		part->InitFromData(vertices, indices);
+		mTail->InitFromData(vertices, indices);
 
 		tailOffsetX = -50.f;
 		tailOffsetY = 0.f;
-		meshes["tail"] = part;
 	}
 
 	/* Generate the bird's wing */
 	{
-		Mesh* part = new Mesh("wing");
+		mWing = new Mesh("wing");
 
-		vector<VertexFormat> vertices =
+		std::vector<VertexFormat> vertices =
 		{
 			VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
 			VertexFormat(glm::vec3(50.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
 			VertexFormat(glm::vec3(25.f, wingHeight, 0.f), glm::vec3(.75f, 1.f, 0.f))
 		};
-		vector<GLushort> indices =
+		std::vector<GLushort> indices =
 		{
 			0, 1, 2
 		};
 
-		part->InitFromData(vertices, indices);
+		mWing->InitFromData(vertices, indices);
 
 		wingOffsetX = -50.f;
 		wingOffsetY = 0.f;
-		meshes["wing"] = part;
 	}
 }
 
@@ -185,25 +179,31 @@ void Bird::FlapWing(float deltaTimeSeconds)
 		wingDirection *= -1;
 	}
 
-	Mesh* part = new Mesh("wing");
+	delete mWing;
+	mWing = new Mesh("wing");
 
-	vector<VertexFormat> vertices =
+	std::vector<VertexFormat> vertices =
 	{
 		VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
 		VertexFormat(glm::vec3(50.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
 		VertexFormat(glm::vec3(25.f, wingHeight, 0.f), glm::vec3(.75f, 1.f, 0.f))
 	};
-	vector<GLushort> indices =
+	std::vector<GLushort> indices =
 	{
 		0, 1, 2
 	};
 
-	part->InitFromData(vertices, indices);
-	meshes["wing"] = part;
+	mWing->InitFromData(vertices, indices);
 }
 
 Bird::~Bird()
 {
+	delete mHead;
+	delete mBody;
+	delete mBeak;
+	delete mEye;
+	delete mWing;
+	delete mTail;
 }
 
 Mesh* Bird::getHeadMesh(GLfloat& offsetX, GLfloat& offsetY)
@@ -211,7 +211,7 @@ Mesh* Bird::getHeadMesh(GLfloat& offsetX, GLfloat& offsetY)
 	offsetX = headOffsetX;
 	offsetY = headOffsetY;
 
-	return meshes["head"];
+	return mHead;
 }
 
 Mesh* Bird::getBeakMesh(GLfloat& offsetX, GLfloat& offsetY)
@@ -219,7 +219,7 @@ Mesh* Bird::getBeakMesh(GLfloat& offsetX, GLfloat& offsetY)
 	offsetX = beakOffsetX;
 	offsetY = beakOffsetY;
 
-	return meshes["beak"];
+	return mBeak;
 }
 
 Mesh* Bird::getEyeMesh(GLfloat& offsetX, GLfloat& offsetY)
@@ -227,7 +227,7 @@ Mesh* Bird::getEyeMesh(GLfloat& offsetX, GLfloat& offsetY)
 	offsetX = eyeOffsetX;
 	offsetY = eyeOffsetY;
 
-	return meshes["eye"];
+	return mEye;
 }
 
 Mesh* Bird::getWingMesh(GLfloat& offsetX, GLfloat& offsetY)
@@ -235,7 +235,7 @@ Mesh* Bird::getWingMesh(GLfloat& offsetX, GLfloat& offsetY)
 	offsetX = wingOffsetX;
 	offsetY = wingOffsetY;
 
-	return meshes["wing"];
+	return mWing;
 }
 
 Mesh* Bird::getBodyMesh(GLfloat& offsetX, GLfloat& offsetY)
@@ -243,7 +243,7 @@ Mesh* Bird::getBodyMesh(GLfloat& offsetX, GLfloat& offsetY)
 	offsetX = bodyOffsetX;
 	offsetY = bodyOffsetY;
 
-	return meshes["body"];
+	return mBody;
 }
 
 Mesh* Bird::getTailMesh(GLfloat& offsetX, GLfloat& offsetY)
@@ -251,5 +251,5 @@ Mesh* Bird::getTailMesh(GLfloat& offsetX, GLfloat& offsetY)
 	offsetX = tailOffsetX;
 	offsetY = tailOffsetY;
 
-	return meshes["tail"];
+	return mTail;
 }

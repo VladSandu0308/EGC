@@ -1,13 +1,8 @@
 #pragma once
 
-#include <Component/SimpleScene.h>
 #include <Core/Engine.h>
-#include <iostream>
-#include <algorithm>
 
-using namespace std;
-
-class Bird : public SimpleScene
+class Bird
 {
 public:
 	Bird();
@@ -30,6 +25,13 @@ private:
 	const GLfloat wingSpeed;
 	GLfloat wingDirection;
 	GLfloat wingHeight;
+
+	Mesh* mBody;
+	Mesh* mHead;
+	Mesh* mEye;
+	Mesh* mBeak;
+	Mesh* mWing;
+	Mesh* mTail;
 
 	GLfloat headOffsetX, headOffsetY;
 	GLfloat bodyOffsetX, bodyOffsetY;

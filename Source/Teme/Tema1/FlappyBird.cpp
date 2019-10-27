@@ -11,7 +11,7 @@ FlappyBird::FlappyBird():
 	fallAngleSpeed(50.f),
 	riseAngleSpeed(200.f),
 	gravity(400.f),
-	liftForce(300.f)
+	liftForce(350.f)
 {
 }
 
