@@ -15,14 +15,15 @@ public:
 	Mesh* getTailMesh(GLfloat& offsetX, GLfloat& offsetY);
 	Mesh* getBeakMesh(GLfloat& offsetX, GLfloat& offsetY);
 
-	void FlapWing(float deltaTimeSeconds);
+	void FlapWing(GLfloat deltaTimeSeconds);
 
 private:
 	const GLfloat radius;
 	const GLfloat scale;
 	const GLuint numTriangles;
 
-	const GLfloat wingSpeed;
+	const GLfloat wingAcceleration;
+	GLfloat wingSpeed;
 	GLfloat wingDirection;
 	GLfloat wingHeight;
 

@@ -5,7 +5,8 @@ Bird::Bird() :
 	wingSpeed(200.f),
 	radius(30.f),
 	scale(1.f),
-	numTriangles(50)
+	numTriangles(50),
+	wingAcceleration(30.f)
 {
 	GLfloat arg;
 	wingHeight = 70.f;
@@ -17,7 +18,6 @@ Bird::Bird() :
 		std::vector<VertexFormat> vertices;
 		std::vector<GLushort> indices;
 
-		// TODO: schimba culorile
 		vertices.emplace_back(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.811f, 0.188f, 0.517f));
 
 		for (GLushort i = 0; i < numTriangles; ++i)
@@ -46,7 +46,6 @@ Bird::Bird() :
 		std::vector<VertexFormat> vertices;
 		std::vector<GLushort> indices;
 
-		// TODO: schimba culorile
 		vertices.emplace_back(
 			glm::vec3(0.f, 0.f, 0.f),
 			glm::vec3(0.635f, 0.086f, 0.376f));
@@ -164,9 +163,10 @@ Bird::Bird() :
 	}
 }
 
-void Bird::FlapWing(float deltaTimeSeconds)
+void Bird::FlapWing(GLfloat deltaTimeSeconds)
 {
-	wingHeight += wingDirection * deltaTimeSeconds * wingSpeed;
+	wingHeight	+= wingDirection * deltaTimeSeconds * wingSpeed;
+	wingSpeed	+= deltaTimeSeconds * wingAcceleration;
 
 	if (wingHeight >= 70.f)
 	{
