@@ -1,8 +1,5 @@
 #include "FlappyBird.h"
 
-#include <vector>
-#include <iostream>
-
 #include <Core/Engine.h>
 #include "Transform2D.h"
 
@@ -17,7 +14,8 @@ FlappyBird::FlappyBird() :
 	obstacleWidth(80.f),
 	obstacleDistance(325.f),
 	obstacleStart(955.f),
-	numPoints(50)
+	numPoints(50),
+	scaleSpeed(300.f)
 {
 }
 
@@ -61,15 +59,22 @@ GLvoid FlappyBird::Init()
 
 	bird->getHeadRadius(birdHeadRadius);
 	bird->getBodyRadii(birdBodyRadiusX, birdBodyRadiusY);
-	birdHitBox = bird->getHitBox();
+	birdHitBox			= bird->getHitBox();
+	birdHitBoxRadius	= bird->getHitBoxRadius();
+
+	/* Use the Mersenne Twister to generate random obstacle colours */
+	std::random_device rd;
+	engine.seed(rd());
+	floatDist = std::uniform_real_distribution<GLfloat>(0.0, 1.0);
+	shortDist = std::uniform_int_distribution<GLushort>(0, 255);
 
 	GLfloat r, g, b;
 
 	for (GLushort i = 0; i < totalNumObstacles; ++i)
 	{
-		r = (rand() % 255) / 255.f;
-		g = (rand() % 255) / 255.f;
-		b = (rand() % 255) / 255.f;
+		r = floatDist(engine);
+		g = floatDist(engine);
+		b = floatDist(engine);
 
 		allObstacles.emplace_back(
 			obstacleWidth,
@@ -87,23 +92,33 @@ GLvoid FlappyBird::Init()
 
 	for (GLushort i = 0; i < numObstacles; ++i, posX += obstacleDistance)
 	{
-		pos							= rand() % totalNumObstacles;
-		scaleFactor					= 10.f / (rand() % 30 + 20);
+		pos							= shortDist(engine) % totalNumObstacles;
 		
 		usedObstacles[i].obstacle	= &allObstacles[pos];
 		usedObstacles[i].posX		= posX;
-		usedObstacles[i].scale		= scaleFactor;
+		usedObstacles[i].scale		= 10.f / (shortDist(engine) % 30 + 20);;
+
+		if (!(shortDist(engine) % 5))
+		{
+			usedObstacles[i].isVariable = true;
+			usedObstacles[i].scaleAngle = 0.f;
+		}
+		else
+		{
+			usedObstacles[i].isVariable = false;
+			usedObstacles[i].scaleAngle = 90.f;
+		}
 	}
 }
 
 GLvoid FlappyBird::FrameStart()
 {
-	// clears the color buffer (using the previously set color) and depth buffer
-	glClearColor(0, 0, 0, 1);
+	/* Clear the color buffer (using the previously set color) and depth buffer */
+	glClearColor(0.5725f, 0.718f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	/* Set the screen area where to draw */
 	glm::ivec2 resolution = window->GetResolution();
-	// sets the screen area where to draw
 	glViewport(0, 0, resolution.x, resolution.y);
 }
 
@@ -112,9 +127,6 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 	GLfloat offsetX, offsetY;
 	Mesh* bodyPart;
 	glm::ivec2 resolution = window->GetResolution();
-	        
-	/* Render the obstacles */
-	RenderObstacles(deltaTimeSeconds);
 
 	if (!collision)
 	{
@@ -134,10 +146,12 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 			shownScore = (GLint)trueScore;
 			std::cout << "Score: " << shownScore << "\n\n";
 		}
-	}	
+	}
+
+	/* Render the obstacles */
+	RenderObstacles(deltaTimeSeconds);
 
 	/* Reneder all the bird parts one by one */
-
 	/* Render the wing */
 	{
 		bodyPart = bird->getWingMesh(offsetX, offsetY);
@@ -191,6 +205,8 @@ GLvoid FlappyBird::OnKeyPress(GLint key, GLint mods)
 {
 	if (key == GLFW_KEY_SPACE && !collision)
 	{
+		//PlaySound(TEXT("crow_caw.wav"), NULL, SND_FILENAME | SND_ASYNC);
+
 		fall = false;
 		speed = liftForce;
 	}
@@ -236,8 +252,6 @@ GLvoid FlappyBird::RenderBodyPart(
 	modelMatrix *= Transform2D::Translate(offsetX, offsetY);
 
 	RenderMesh2D(bodyPart, shaders["VertexColor"], modelMatrix);
-
-	glm::vec3 initial(0.f, 0.f, 1.f);
 }
 
 inline GLboolean FlappyBird::isObstacleInMap(ObstaclePos& obs)
@@ -254,20 +268,41 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 		if (!collision)
 		{
 			obs.posX -= deltaTimeSeconds * obstacleSpeed;
+
+			if (obs.isVariable)
+			{
+				obs.scaleAngle += deltaTimeSeconds * scaleSpeed;
+
+				if (obs.scaleAngle >= 180.f)
+				{
+					obs.scaleAngle = 0.f;
+				}
+			}
 		}
 
 		if (!isObstacleInMap(obs))
 		{
-			GLushort pos		= rand() % totalNumObstacles;
-			GLfloat scaleFactor = 10.f / (rand() % 31 + 20);
+			GLushort pos		= shortDist(engine) % totalNumObstacles;
 
 			obs.obstacle	= &allObstacles[pos];
 			obs.posX		= (GLfloat)resolution.x;
-			obs.scale		= scaleFactor;
+			obs.scale		= 10.f / (shortDist(engine) % 31 + 20);
+
+			if (!(shortDist(engine) % 5))
+			{
+				obs.isVariable = true;
+				obs.scaleAngle = 0.f;
+			} else
+			{
+				obs.isVariable = false;
+				obs.scaleAngle = 90.f;
+			}
 		} else
 		{
 			modelMatrix = Transform2D::Translate(obs.posX, 0.f);
-			modelMatrix *= Transform2D::Scale(1.f, obs.scale);
+			modelMatrix *= Transform2D::Scale(
+				1.f,
+				obs.scale * sin(RADIANS(obs.scaleAngle)));
 			RenderMesh2D(
 				obs.obstacle->getMesh(),
 				shaders["VertexColor"],
@@ -277,26 +312,32 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 				obs.posX + obstacleWidth,
 				(GLfloat)resolution.y);
 			modelMatrix *= Transform2D::Rotate(RADIANS(180.f));
-			modelMatrix *= Transform2D::Scale(1.f, 0.6f - obs.scale);
+			modelMatrix *= Transform2D::Scale(
+				1.f,
+				(0.6f - obs.scale) * sin(RADIANS(obs.scaleAngle)));
 			RenderMesh2D(
 				obs.obstacle->getMesh(),
 				shaders["VertexColor"],
 				modelMatrix);
 
-			if (!collision)
+			if (centreX + birdHitBoxRadius >= obs.posX
+				&& centreX - birdHitBoxRadius <= obs.posX + obstacleWidth)
 			{
-				collision = checkBirdCollision(
-					obs.posX,
-					0,
-					resolution.y * obs.scale);
-			}
-			if (!collision)
-			{
-				collision = checkBirdCollision(
-					obs.posX,
-					resolution.y * (0.4f + obs.scale),
-					resolution.y);
-			}
+				if (!collision)
+				{
+					collision = checkBirdCollision(
+						obs.posX,
+						0.f,
+						resolution.y * obs.scale * sin(RADIANS(obs.scaleAngle)));
+				}
+				if (!collision)
+				{
+					collision = checkBirdCollision(
+						obs.posX,
+						resolution.y * (1.f - (0.6f - obs.scale) * sin(RADIANS(obs.scaleAngle))),
+						(GLfloat)resolution.y);
+				}
+			}			
 		}
 	}
 }

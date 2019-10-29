@@ -8,7 +8,9 @@ Bird::Bird() :
 	bodyRadiusY(30.f),
 	eyeRadius(7.5f),
 	numTriangles(50),
-	wingAcceleration(30.f)
+	wingAcceleration(30.f),
+	hitBoxRadiusX(70.f),
+	hitBoxRadiusY(30.f)
 {
 	GLfloat arg;
 	wingHeight = 70.f;
@@ -20,7 +22,7 @@ Bird::Bird() :
 		std::vector<VertexFormat> vertices;
 		std::vector<GLushort> indices;
 
-		vertices.emplace_back(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.811f, 0.188f, 0.517f));
+		vertices.emplace_back(glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.f));
 
 		for (GLushort i = 0; i < numTriangles; ++i)
 		{
@@ -50,7 +52,7 @@ Bird::Bird() :
 
 		vertices.emplace_back(
 			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(0.635f, 0.086f, 0.376f));
+			glm::vec3(0.f, 0.f, 1.f));
 
 		for (GLushort i = 0; i < numTriangles; ++i)
 		{
@@ -107,9 +109,9 @@ Bird::Bird() :
 
 		std::vector<VertexFormat> vertices =
 		{
-			VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.941f, 0.627f, 0.298f)),
-			VertexFormat(glm::vec3(0.f, -15.f, 0.f), glm::vec3(0.941f, 0.627f, 0.298f)),
-			VertexFormat(glm::vec3(30.f, -7.5f, 0.f), glm::vec3(0.941f, 0.627f, 0.298f))
+			VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.0f, 0.682f, 0.258f)),
+			VertexFormat(glm::vec3(0.f, -15.f, 0.f), glm::vec3(1.0f, 0.682f, 0.258f)),
+			VertexFormat(glm::vec3(20.f, -7.5f, 0.f), glm::vec3(1.0f, 0.682f, 0.258f))
 		};
 		std::vector<GLushort> indices =
 		{
@@ -129,8 +131,8 @@ Bird::Bird() :
 		std::vector<VertexFormat> vertices =
 		{
 			VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
-			VertexFormat(glm::vec3(-30.f, 20.f, 0.f), glm::vec3(0.f, 0.f, 1.f)),
-			VertexFormat(glm::vec3(-30.f, -20.f, 0.f), glm::vec3(0.f, 0.f, 1.f))
+			VertexFormat(glm::vec3(-50.f, 15.f, 0.f), glm::vec3(0.f, 0.f, 1.f)),
+			VertexFormat(glm::vec3(-50.f, -15.f, 0.f), glm::vec3(0.f, 0.f, 1.f))
 		};
 		std::vector<GLushort> indices =
 		{
@@ -179,39 +181,10 @@ Bird::Bird() :
 			arg = 2.0f * (GLfloat)M_PI * i / numTriangles;
 
 			vertices.emplace_back(
-				glm::vec3(cos(arg) * 80.f, sin(arg) * 30.f, 0),
+				glm::vec3(cos(arg) * hitBoxRadiusX, sin(arg) * hitBoxRadiusY, 0),
 				glm::vec3(1.f, 0.f, 0.f));
 			indices.push_back(i);
-		}
-		indices.push_back(numTriangles);
-		indices.push_back(1);
-
-		mHitBox->InitFromData(vertices, indices);
-		mHitBox->SetDrawMode(GL_TRIANGLE_FAN);
-
-		hitBoxOffsetX = 0.f;
-		hitBoxOffsetY = 0.f;
-	}
-
-	{
-		mHitBox = new Mesh("mHitBox");
-
-		std::vector<VertexFormat> vertices;
-		std::vector<GLushort> indices;
-
-		vertices.emplace_back(
-			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(1.f, 0.f, 0.f));
-
-		for (GLushort i = 0; i < numTriangles; ++i)
-		{
-			arg = 2.0f * (GLfloat)M_PI * i / numTriangles;
-
-			vertices.emplace_back(
-				glm::vec3(cos(arg) * 80.f, sin(arg) * 30.f, 0),
-				glm::vec3(1.f, 0.f, 0.f));
-			indices.push_back(i);
-			hitBox.emplace_back(cos(arg) * 80.f, sin(arg) * 30.f);
+			hitBox.emplace_back(cos(arg) * 70.f, sin(arg) * 30.f);
 		}
 		indices.push_back(numTriangles);
 		indices.push_back(1);
@@ -338,4 +311,9 @@ GLvoid Bird::getBodyRadii(GLfloat& radiusX, GLfloat& radiusY)
 const std::vector<std::pair<GLfloat, GLfloat>>& Bird::getHitBox()
 {
 	return hitBox;
+}
+
+GLfloat Bird::getHitBoxRadius()
+{
+	return hitBoxRadiusX;
 }

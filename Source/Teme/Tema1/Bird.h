@@ -20,6 +20,7 @@ public:
 
 	Mesh* getHitBoxMesh(GLfloat& offsetX, GLfloat& offsetY);
 	const std::vector<std::pair<GLfloat, GLfloat>>& getHitBox();
+	GLfloat getHitBoxRadius();
 
 	void FlapWing(GLfloat deltaTimeSeconds);
 
@@ -29,6 +30,8 @@ private:
 	const GLfloat bodyRadiusY;
 	const GLfloat eyeRadius;
 	const GLuint numTriangles;
+	const GLfloat hitBoxRadiusX;
+	const GLfloat hitBoxRadiusY;
 
 	const GLfloat wingAcceleration;
 	GLfloat wingSpeed;

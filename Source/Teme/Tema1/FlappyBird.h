@@ -3,9 +3,15 @@
 #include <Component/SimpleScene.h>
 #include <Core/Engine.h>
 #include <ctime>
+#include <random>
+#include <iostream>
+#include <Windows.h>
+#include <mmsystem.h>
 
 #include "Obstacle.h"
 #include "Bird.h"
+
+#pragma comment(lib, "winmm.lib")
 
 #define coordX first
 #define coordY second
@@ -21,6 +27,8 @@ public:
 private:
 	struct ObstaclePos
 	{
+		GLboolean isVariable;
+		GLfloat scaleAngle;
 		GLfloat posX;
 		GLfloat scale;
 		Obstacle* obstacle;
@@ -55,6 +63,7 @@ protected:
 	const GLfloat obstacleWidth;
 	const GLfloat obstacleDistance;
 	const GLfloat obstacleStart;
+	const GLfloat scaleSpeed;
 	GLfloat obstacleSpeed;
 
 	GLfloat birdHeadRadius;
@@ -73,8 +82,13 @@ protected:
 	GLint shownScore;
 
 	Bird* bird;
+	GLfloat birdHitBoxRadius;
 	std::vector<std::pair<GLfloat, GLfloat>> birdHitBox;
 
 	std::vector<Obstacle> allObstacles;
 	std::vector<ObstaclePos> usedObstacles;
+
+	std::mt19937 engine;
+	std::uniform_real_distribution<GLfloat> floatDist;
+	std::uniform_int_distribution<GLushort> shortDist;
 };
