@@ -205,8 +205,7 @@ GLvoid FlappyBird::OnKeyPress(GLint key, GLint mods)
 {
 	if (key == GLFW_KEY_SPACE && !collision)
 	{
-		//PlaySound(TEXT("crow_caw.wav"), NULL, SND_FILENAME | SND_ASYNC);
-
+		PlaySound(TEXT("crow_caw.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		fall = false;
 		speed = liftForce;
 	}
