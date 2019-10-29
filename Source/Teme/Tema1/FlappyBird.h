@@ -7,6 +7,9 @@
 #include "Obstacle.h"
 #include "Bird.h"
 
+#define coordX first
+#define coordY second
+
 class FlappyBird : public SimpleScene
 {
 public:
@@ -36,9 +39,11 @@ private:
 	GLvoid CalculateBirdMovement(GLfloat deltaTimeSeconds);
 	GLvoid CalculateBirdAngle(GLfloat deltaTimeSeconds);
 
-	GLboolean checkBirdCollision();
+	GLboolean checkBirdCollision(GLfloat lowX, GLfloat lowY, GLfloat highY);
 
 protected:
+	const GLfloat numPoints;
+
 	const GLfloat fallAngleSpeed;
 	const GLfloat riseAngleSpeed;
 	
@@ -52,8 +57,11 @@ protected:
 	const GLfloat obstacleStart;
 	GLfloat obstacleSpeed;
 
+	GLfloat birdHeadRadius;
+	GLfloat birdBodyRadiusX;
+	GLfloat birdBodyRadiusY;
+
 	glm::mat3 modelMatrix;
-	glm::mat3 birdPartMatrix;
 
 	GLfloat centreX, centreY;
 	GLboolean fall;
@@ -65,6 +73,8 @@ protected:
 	GLint shownScore;
 
 	Bird* bird;
+	std::vector<std::pair<GLfloat, GLfloat>> birdHitBox;
+
 	std::vector<Obstacle> allObstacles;
 	std::vector<ObstaclePos> usedObstacles;
 };

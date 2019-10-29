@@ -3,8 +3,10 @@
 Bird::Bird() :
 	wingDirection(1.f),
 	wingSpeed(200.f),
-	radius(30.f),
-	scale(1.f),
+	headRadius(23.f),
+	bodyRadiusX(45.f),
+	bodyRadiusY(30.f),
+	eyeRadius(7.5f),
 	numTriangles(50),
 	wingAcceleration(30.f)
 {
@@ -25,7 +27,7 @@ Bird::Bird() :
 			arg = 2.0f * (GLfloat)M_PI * i / numTriangles;
 
 			vertices.emplace_back(
-				glm::vec3(cos(arg) * radius * .75f, sin(arg) * radius * .75f, 0),
+				glm::vec3(cos(arg) * headRadius, sin(arg) * headRadius, 0),
 				glm::vec3(0.811f, 0.188f, 0.517f));
 			indices.push_back(i);
 		}
@@ -55,7 +57,7 @@ Bird::Bird() :
 			arg = 2.0f * (GLfloat)M_PI * i / numTriangles;
 
 			vertices.emplace_back(
-				glm::vec3(cos(arg) * radius * 1.5f, sin(arg) * radius, 0),
+				glm::vec3(cos(arg) * bodyRadiusX, sin(arg) * bodyRadiusY, 0),
 				glm::vec3(0.635f, 0.086f, 0.376f));
 			indices.push_back(i);
 		}
@@ -85,7 +87,7 @@ Bird::Bird() :
 			arg = 2.0f * (GLfloat)M_PI * i / numTriangles;
 
 			vertices.emplace_back(
-				glm::vec3(cos(arg) * radius / 4.f, sin(arg) * radius / 4.f, 0),
+				glm::vec3(cos(arg) * eyeRadius, sin(arg) * eyeRadius, 0),
 				glm::vec3(1.f, 1.f, 1.f));
 			indices.push_back(i);
 		}
@@ -160,6 +162,65 @@ Bird::Bird() :
 
 		wingOffsetX = -50.f;
 		wingOffsetY = 0.f;
+	}
+
+	{
+		mHitBox = new Mesh("mHitBox");
+
+		std::vector<VertexFormat> vertices;
+		std::vector<GLushort> indices;
+
+		vertices.emplace_back(
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(1.f, 0.f, 0.f));
+
+		for (GLushort i = 0; i < numTriangles; ++i)
+		{
+			arg = 2.0f * (GLfloat)M_PI * i / numTriangles;
+
+			vertices.emplace_back(
+				glm::vec3(cos(arg) * 80.f, sin(arg) * 30.f, 0),
+				glm::vec3(1.f, 0.f, 0.f));
+			indices.push_back(i);
+		}
+		indices.push_back(numTriangles);
+		indices.push_back(1);
+
+		mHitBox->InitFromData(vertices, indices);
+		mHitBox->SetDrawMode(GL_TRIANGLE_FAN);
+
+		hitBoxOffsetX = 0.f;
+		hitBoxOffsetY = 0.f;
+	}
+
+	{
+		mHitBox = new Mesh("mHitBox");
+
+		std::vector<VertexFormat> vertices;
+		std::vector<GLushort> indices;
+
+		vertices.emplace_back(
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(1.f, 0.f, 0.f));
+
+		for (GLushort i = 0; i < numTriangles; ++i)
+		{
+			arg = 2.0f * (GLfloat)M_PI * i / numTriangles;
+
+			vertices.emplace_back(
+				glm::vec3(cos(arg) * 80.f, sin(arg) * 30.f, 0),
+				glm::vec3(1.f, 0.f, 0.f));
+			indices.push_back(i);
+			hitBox.emplace_back(cos(arg) * 80.f, sin(arg) * 30.f);
+		}
+		indices.push_back(numTriangles);
+		indices.push_back(1);
+
+		mHitBox->InitFromData(vertices, indices);
+		mHitBox->SetDrawMode(GL_TRIANGLE_FAN);
+
+		hitBoxOffsetX = 0.f;
+		hitBoxOffsetY = 0.f;
 	}
 }
 
@@ -252,4 +313,29 @@ Mesh* Bird::getTailMesh(GLfloat& offsetX, GLfloat& offsetY)
 	offsetY = tailOffsetY;
 
 	return mTail;
+}
+
+Mesh* Bird::getHitBoxMesh(GLfloat& offsetX, GLfloat& offsetY)
+{
+	offsetX = hitBoxOffsetX;
+	offsetY = hitBoxOffsetY;
+
+	return mHitBox;
+}
+
+
+GLvoid Bird::getHeadRadius(GLfloat& radius)
+{
+	radius = headRadius;
+}
+
+GLvoid Bird::getBodyRadii(GLfloat& radiusX, GLfloat& radiusY)
+{
+	radiusX = bodyRadiusX;
+	radiusY = bodyRadiusY;
+}
+
+const std::vector<std::pair<GLfloat, GLfloat>>& Bird::getHitBox()
+{
+	return hitBox;
 }

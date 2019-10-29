@@ -8,15 +8,16 @@
 
 
 FlappyBird::FlappyBird() :
-	fallAngleSpeed(50.f),
+	fallAngleSpeed(100.f),
 	riseAngleSpeed(200.f),
-	gravity(700.f),
+	gravity(1200.f),
 	liftForce(300.f),
 	totalNumObstacles(20),
 	numObstacles(4),
 	obstacleWidth(80.f),
 	obstacleDistance(325.f),
-	obstacleStart(630.f)
+	obstacleStart(955.f),
+	numPoints(50)
 {
 }
 
@@ -32,7 +33,13 @@ GLvoid FlappyBird::Init()
 	glm::ivec2 resolution = window->GetResolution();
 
 	auto camera = GetSceneCamera();
-	camera->SetOrthographic(0, (GLfloat)resolution.x, 0, (GLfloat)resolution.y, 0.01f, 400);
+	camera->SetOrthographic(
+		0,
+		(GLfloat)resolution.x,
+		0,
+		(GLfloat)resolution.y,
+		0.01f,
+		400);
 	camera->SetPosition(glm::vec3(0, 0, 50));
 	camera->SetRotation(glm::vec3(0, 0, 0));
 	camera->Update();
@@ -47,9 +54,14 @@ GLvoid FlappyBird::Init()
 	collision		= false;
 
 	centreX			= 200.f;
-	centreY			= (GLfloat)resolution.y;
+	centreY			= (GLfloat)resolution.y * 1.5f;
 
-	obstacleSpeed = 200.f;
+	obstacleSpeed	= 200.f;
+	speed			= liftForce;
+
+	bird->getHeadRadius(birdHeadRadius);
+	bird->getBodyRadii(birdBodyRadiusX, birdBodyRadiusY);
+	birdHitBox = bird->getHitBox();
 
 	GLfloat r, g, b;
 
@@ -100,18 +112,32 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 	GLfloat offsetX, offsetY;
 	Mesh* bodyPart;
 	glm::ivec2 resolution = window->GetResolution();
-
-	/* Make the bird fly */
-	bird->FlapWing(deltaTimeSeconds);
-
+	        
 	/* Render the obstacles */
 	RenderObstacles(deltaTimeSeconds);
-	
-	/* Transformations that will be applied to the bird, one part at a time */
-	CalculateBirdMovement(deltaTimeSeconds);
-	CalculateBirdAngle(deltaTimeSeconds);
+
+	if (!collision)
+	{
+		/* Make the bird fly */
+		bird->FlapWing(deltaTimeSeconds);
+
+		/* Transformations that will be applied to each part of the bird */
+		CalculateBirdMovement(deltaTimeSeconds);
+		CalculateBirdAngle(deltaTimeSeconds);
+
+		/* Print the score */
+		trueScore += deltaTimeSeconds * 2.f * obstacleSpeed / 200.f;
+		obstacleSpeed += deltaTimeSeconds * 30.f;
+
+		if ((GLint)trueScore > shownScore)
+		{
+			shownScore = (GLint)trueScore;
+			std::cout << "Score: " << shownScore << "\n\n";
+		}
+	}	
 
 	/* Reneder all the bird parts one by one */
+
 	/* Render the wing */
 	{
 		bodyPart = bird->getWingMesh(offsetX, offsetY);
@@ -148,18 +174,13 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 		RenderBodyPart(bodyPart, offsetX, offsetY);
 	}
 
-	if (!collision)
+	/* Render the hit box */
 	{
-		/* Print the score */
-		trueScore += deltaTimeSeconds * 2.f * obstacleSpeed / 200.f;
-		obstacleSpeed += deltaTimeSeconds * 30.f;
-
-		if ((GLint)trueScore > shownScore)
-		{
-			shownScore = (GLint)trueScore;
-			std::cout << "Score: " << shownScore << "\n\n";
-		}
-	}	
+		bodyPart = bird->getHitBoxMesh(offsetX, offsetX);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		RenderBodyPart(bodyPart, offsetX, offsetY);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 }
 
 GLvoid FlappyBird::FrameEnd()
@@ -168,7 +189,7 @@ GLvoid FlappyBird::FrameEnd()
 
 GLvoid FlappyBird::OnKeyPress(GLint key, GLint mods)
 {
-	if (key == GLFW_KEY_SPACE)
+	if (key == GLFW_KEY_SPACE && !collision)
 	{
 		fall = false;
 		speed = liftForce;
@@ -177,11 +198,6 @@ GLvoid FlappyBird::OnKeyPress(GLint key, GLint mods)
 
 GLvoid FlappyBird::CalculateBirdAngle(GLfloat deltaTimeSeconds)
 {
-	if (collision)
-	{
-		return;
-	}
-
 	if (fall)
 	{
 		angle -= deltaTimeSeconds * fallAngleSpeed;
@@ -208,17 +224,20 @@ GLvoid FlappyBird::CalculateBirdMovement(GLfloat deltaTimeSeconds)
 	centreY +=
 		speed * deltaTimeSeconds
 		- gravity * deltaTimeSeconds * deltaTimeSeconds / 2.f;
-
-	modelMatrix = Transform2D::Translate(centreX, centreY);
 }
 
-GLvoid FlappyBird::RenderBodyPart(Mesh* bodyPart, GLfloat offsetX, GLfloat offsetY)
+GLvoid FlappyBird::RenderBodyPart(
+	Mesh* bodyPart,
+	GLfloat offsetX,
+	GLfloat offsetY)
 {
-	birdPartMatrix = modelMatrix;
-	birdPartMatrix *= Transform2D::Rotate(RADIANS(angle));
-	birdPartMatrix *= Transform2D::Translate(offsetX, offsetY);
+	modelMatrix = Transform2D::Translate(centreX, centreY);
+	modelMatrix *= Transform2D::Rotate(RADIANS(angle));
+	modelMatrix *= Transform2D::Translate(offsetX, offsetY);
 
-	RenderMesh2D(bodyPart, shaders["VertexColor"], birdPartMatrix);
+	RenderMesh2D(bodyPart, shaders["VertexColor"], modelMatrix);
+
+	glm::vec3 initial(0.f, 0.f, 1.f);
 }
 
 inline GLboolean FlappyBird::isObstacleInMap(ObstaclePos& obs)
@@ -232,7 +251,10 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 
 	for (ObstaclePos& obs : usedObstacles)
 	{
-		obs.posX -= deltaTimeSeconds * obstacleSpeed;
+		if (!collision)
+		{
+			obs.posX -= deltaTimeSeconds * obstacleSpeed;
+		}
 
 		if (!isObstacleInMap(obs))
 		{
@@ -260,6 +282,43 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 				obs.obstacle->getMesh(),
 				shaders["VertexColor"],
 				modelMatrix);
+
+			if (!collision)
+			{
+				collision = checkBirdCollision(
+					obs.posX,
+					0,
+					resolution.y * obs.scale);
+			}
+			if (!collision)
+			{
+				collision = checkBirdCollision(
+					obs.posX,
+					resolution.y * (0.4f + obs.scale),
+					resolution.y);
+			}
 		}
 	}
+}
+
+GLboolean FlappyBird::checkBirdCollision(
+	GLfloat lowX,
+	GLfloat lowY,
+	GLfloat highY)
+{
+	GLfloat birdX, birdY;
+
+	for (auto& point : birdHitBox)
+	{
+		birdX = centreX + point.coordX;
+		birdY = centreY + point.coordY;
+
+		if (birdX <= lowX + obstacleWidth && birdX >= lowX
+			&& birdY <= highY && birdY >= lowY)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
