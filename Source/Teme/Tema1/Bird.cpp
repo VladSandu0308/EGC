@@ -7,10 +7,11 @@ Bird::Bird() :
 	bodyRadiusX(45.f),
 	bodyRadiusY(30.f),
 	eyeRadius(7.5f),
-	numTriangles(50),
+	numTriangles(20),
 	wingAcceleration(30.f),
 	hitBoxRadiusX(70.f),
-	hitBoxRadiusY(30.f)
+	hitBoxRadiusY(30.f),
+	numTrianglesHBox(15)
 {
 	GLfloat arg;
 	wingHeight = 70.f;
@@ -166,6 +167,7 @@ Bird::Bird() :
 		wingOffsetY = 0.f;
 	}
 
+	/* Generate the bird's hit box (vector and the mesh) */
 	{
 		mHitBox = new Mesh("mHitBox");
 
@@ -176,9 +178,9 @@ Bird::Bird() :
 			glm::vec3(0.f, 0.f, 0.f),
 			glm::vec3(1.f, 0.f, 0.f));
 
-		for (GLushort i = 0; i < numTriangles; ++i)
+		for (GLushort i = 0; i < numTrianglesHBox; ++i)
 		{
-			arg = 2.0f * (GLfloat)M_PI * i / numTriangles;
+			arg = 2.0f * (GLfloat)M_PI * i / numTrianglesHBox;
 
 			vertices.emplace_back(
 				glm::vec3(cos(arg) * hitBoxRadiusX, sin(arg) * hitBoxRadiusY, 0),
@@ -186,7 +188,7 @@ Bird::Bird() :
 			indices.push_back(i);
 			hitBox.emplace_back(cos(arg) * 70.f, sin(arg) * 30.f);
 		}
-		indices.push_back(numTriangles);
+		indices.push_back(numTrianglesHBox);
 		indices.push_back(1);
 
 		mHitBox->InitFromData(vertices, indices);
@@ -199,6 +201,7 @@ Bird::Bird() :
 
 void Bird::FlapWing(GLfloat deltaTimeSeconds)
 {
+	/* Flap the wing by changing the upper vertex of the triangle its triangle */
 	wingHeight	+= wingDirection * deltaTimeSeconds * wingSpeed;
 	wingSpeed	+= deltaTimeSeconds * wingAcceleration;
 
@@ -216,6 +219,7 @@ void Bird::FlapWing(GLfloat deltaTimeSeconds)
 	delete mWing;
 	mWing = new Mesh("wing");
 
+	/* Create a new mesh  */
 	std::vector<VertexFormat> vertices =
 	{
 		VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
@@ -240,7 +244,7 @@ Bird::~Bird()
 	delete mTail;
 }
 
-Mesh* Bird::getHeadMesh(GLfloat& offsetX, GLfloat& offsetY)
+Mesh* Bird::GetHeadMesh(GLfloat& offsetX, GLfloat& offsetY)
 {
 	offsetX = headOffsetX;
 	offsetY = headOffsetY;
@@ -248,7 +252,7 @@ Mesh* Bird::getHeadMesh(GLfloat& offsetX, GLfloat& offsetY)
 	return mHead;
 }
 
-Mesh* Bird::getBeakMesh(GLfloat& offsetX, GLfloat& offsetY)
+Mesh* Bird::GetBeakMesh(GLfloat& offsetX, GLfloat& offsetY)
 {
 	offsetX = beakOffsetX;
 	offsetY = beakOffsetY;
@@ -256,7 +260,7 @@ Mesh* Bird::getBeakMesh(GLfloat& offsetX, GLfloat& offsetY)
 	return mBeak;
 }
 
-Mesh* Bird::getEyeMesh(GLfloat& offsetX, GLfloat& offsetY)
+Mesh* Bird::GetEyeMesh(GLfloat& offsetX, GLfloat& offsetY)
 {
 	offsetX = eyeOffsetX;
 	offsetY = eyeOffsetY;
@@ -264,7 +268,7 @@ Mesh* Bird::getEyeMesh(GLfloat& offsetX, GLfloat& offsetY)
 	return mEye;
 }
 
-Mesh* Bird::getWingMesh(GLfloat& offsetX, GLfloat& offsetY)
+Mesh* Bird::GetWingMesh(GLfloat& offsetX, GLfloat& offsetY)
 {
 	offsetX = wingOffsetX;
 	offsetY = wingOffsetY;
@@ -272,7 +276,7 @@ Mesh* Bird::getWingMesh(GLfloat& offsetX, GLfloat& offsetY)
 	return mWing;
 }
 
-Mesh* Bird::getBodyMesh(GLfloat& offsetX, GLfloat& offsetY)
+Mesh* Bird::GetBodyMesh(GLfloat& offsetX, GLfloat& offsetY)
 {
 	offsetX = bodyOffsetX;
 	offsetY = bodyOffsetY;
@@ -280,7 +284,7 @@ Mesh* Bird::getBodyMesh(GLfloat& offsetX, GLfloat& offsetY)
 	return mBody;
 }
 
-Mesh* Bird::getTailMesh(GLfloat& offsetX, GLfloat& offsetY)
+Mesh* Bird::GetTailMesh(GLfloat& offsetX, GLfloat& offsetY)
 {
 	offsetX = tailOffsetX;
 	offsetY = tailOffsetY;
@@ -288,7 +292,7 @@ Mesh* Bird::getTailMesh(GLfloat& offsetX, GLfloat& offsetY)
 	return mTail;
 }
 
-Mesh* Bird::getHitBoxMesh(GLfloat& offsetX, GLfloat& offsetY)
+Mesh* Bird::GetHitBoxMesh(GLfloat& offsetX, GLfloat& offsetY)
 {
 	offsetX = hitBoxOffsetX;
 	offsetY = hitBoxOffsetY;
@@ -297,23 +301,23 @@ Mesh* Bird::getHitBoxMesh(GLfloat& offsetX, GLfloat& offsetY)
 }
 
 
-GLvoid Bird::getHeadRadius(GLfloat& radius)
+GLvoid Bird::GetHeadRadius(GLfloat& radius)
 {
 	radius = headRadius;
 }
 
-GLvoid Bird::getBodyRadii(GLfloat& radiusX, GLfloat& radiusY)
+GLvoid Bird::GetBodyRadii(GLfloat& radiusX, GLfloat& radiusY)
 {
 	radiusX = bodyRadiusX;
 	radiusY = bodyRadiusY;
 }
 
-const std::vector<std::pair<GLfloat, GLfloat>>& Bird::getHitBox()
+const std::vector<std::pair<GLfloat, GLfloat>>& Bird::GetHitBox()
 {
 	return hitBox;
 }
 
-GLfloat Bird::getHitBoxRadius()
+GLfloat Bird::GetHitBoxRadius()
 {
 	return hitBoxRadiusX;
 }

@@ -13,18 +13,20 @@
 
 #pragma comment(lib, "winmm.lib")
 
+/* To make std::pair more expressive */
 #define coordX first
 #define coordY second
 
 class FlappyBird : public SimpleScene
 {
 public:
-	FlappyBird();
+	FlappyBird(GLboolean soundOpt = true);
 	~FlappyBird();
 
 	GLvoid Init() override;
 
 private:
+	/* Will contain information regarding each obstacle */
 	struct ObstaclePos
 	{
 		GLboolean isVariable;
@@ -40,16 +42,49 @@ private:
 
 	GLvoid OnKeyPress(GLint key, GLint mods) override;
 
-	GLvoid RenderBodyPart(Mesh* bodyPart, GLfloat offsetX, GLfloat offsetY);
-	GLvoid RenderObstacles(GLfloat deltaTimeSeconds);
-	inline GLboolean isObstacleInMap(ObstaclePos& obs);
+	/* Renders the bird mesh by mesh */
+	GLvoid RenderBird();
 
+	/**
+	* Creates a given part of the bird and places it at its corresponding
+	* offsets
+	*/
+	GLvoid RenderBodyPart(Mesh* bodyPart, GLfloat offsetX, GLfloat offsetY);
+
+	/* Renders all obstacles and checks for collisions */
+	GLvoid RenderObstacles(GLfloat deltaTimeSeconds);
+
+	/**
+	* Checks if an obstacle is still visible in order to decide if it should
+	* be rendered
+	*/
+	inline GLboolean IsObstacleInMap(ObstaclePos& obs);
+
+	/**
+	* Uses the equation of motion in order to update the coodrinates of the
+	* bird's centre
+	*/
 	GLvoid CalculateBirdMovement(GLfloat deltaTimeSeconds);
+
+	/* Calculates the bird's inclination */
 	GLvoid CalculateBirdAngle(GLfloat deltaTimeSeconds);
 
-	GLboolean checkBirdCollision(GLfloat lowX, GLfloat lowY, GLfloat highY);
+	/* Rotates the bird's ordinary hitbox to reflect its orientation */
+	GLvoid CalculateBirdHitBox();
+
+	/**
+	* Checks if the bird is colliding with an object identified by its
+	* corners
+	*/
+	GLboolean CheckBirdCollision(GLfloat lowX, GLfloat lowY, GLfloat highY);
+
+	/* Checks if the bird is still inside the viewport */
+	GLboolean CheckBirdInMap();
 
 protected:
+	GLboolean canRender;
+	const GLboolean sound;
+
 	const GLfloat numPoints;
 
 	const GLfloat fallAngleSpeed;
@@ -70,8 +105,6 @@ protected:
 	GLfloat birdBodyRadiusX;
 	GLfloat birdBodyRadiusY;
 
-	glm::mat3 modelMatrix;
-
 	GLfloat centreX, centreY;
 	GLboolean fall;
 	GLboolean collision;
@@ -81,14 +114,17 @@ protected:
 	GLfloat trueScore;
 	GLint shownScore;
 
+	glm::mat3 modelMatrix;
+
 	Bird* bird;
 	GLfloat birdHitBoxRadius;
 	std::vector<std::pair<GLfloat, GLfloat>> birdHitBox;
+	GLboolean renderHitBox;
 
 	std::vector<Obstacle> allObstacles;
 	std::vector<ObstaclePos> usedObstacles;
 
-	std::mt19937 engine;
-	std::uniform_real_distribution<GLfloat> floatDist;
-	std::uniform_int_distribution<GLushort> shortDist;
+	const std::string texturesLoc;
+	const std::string shadersLoc;
+	Texture2D* obstacleTexture;
 };

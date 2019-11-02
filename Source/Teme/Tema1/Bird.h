@@ -8,20 +8,24 @@ public:
 	Bird();
 	~Bird();
 
-	GLvoid getHeadRadius(GLfloat& radius);
-	GLvoid getBodyRadii(GLfloat& radiusX, GLfloat& radiusY);
+	/* Getters for the various sizes (radii) of the body parts */
+	GLvoid GetHeadRadius(GLfloat& radius);
+	GLvoid GetBodyRadii(GLfloat& radiusX, GLfloat& radiusY);
 
-	Mesh* getHeadMesh(GLfloat& offsetX, GLfloat& offsetY);
-	Mesh* getBodyMesh(GLfloat& offsetX, GLfloat& offsetY);
-	Mesh* getEyeMesh(GLfloat& offsetX, GLfloat& offsetY);
-	Mesh* getWingMesh(GLfloat& offsetX, GLfloat& offsetY);
-	Mesh* getTailMesh(GLfloat& offsetX, GLfloat& offsetY);
-	Mesh* getBeakMesh(GLfloat& offsetX, GLfloat& offsetY);
+	/* Getters for the meshes comprising the bird */
+	Mesh* GetHeadMesh(GLfloat& offsetX, GLfloat& offsetY);
+	Mesh* GetBodyMesh(GLfloat& offsetX, GLfloat& offsetY);
+	Mesh* GetEyeMesh(GLfloat& offsetX, GLfloat& offsetY);
+	Mesh* GetWingMesh(GLfloat& offsetX, GLfloat& offsetY);
+	Mesh* GetTailMesh(GLfloat& offsetX, GLfloat& offsetY);
+	Mesh* GetBeakMesh(GLfloat& offsetX, GLfloat& offsetY);
 
-	Mesh* getHitBoxMesh(GLfloat& offsetX, GLfloat& offsetY);
-	const std::vector<std::pair<GLfloat, GLfloat>>& getHitBox();
-	GLfloat getHitBoxRadius();
+	/* Getters for the hitBox */
+	Mesh* GetHitBoxMesh(GLfloat& offsetX, GLfloat& offsetY);
+	const std::vector<std::pair<GLfloat, GLfloat>>& GetHitBox();
+	GLfloat GetHitBoxRadius();
 
+	/* Simulates the bird's flight by flapping its wing */
 	void FlapWing(GLfloat deltaTimeSeconds);
 
 private:
@@ -29,7 +33,8 @@ private:
 	const GLfloat bodyRadiusX;
 	const GLfloat bodyRadiusY;
 	const GLfloat eyeRadius;
-	const GLuint numTriangles;
+	const GLushort numTriangles;
+	const GLushort numTrianglesHBox;
 	const GLfloat hitBoxRadiusX;
 	const GLfloat hitBoxRadiusY;
 

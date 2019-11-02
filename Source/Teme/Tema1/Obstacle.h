@@ -8,7 +8,8 @@ public:
 	Obstacle(GLfloat width, GLfloat height, GLfloat r, GLfloat g, GLfloat b);
 	~Obstacle();
 
-	Mesh* getMesh();
+	/* Returns the created mesh */
+	Mesh* GetMesh();
 
 private:
 	Mesh* mObstacle;
