@@ -20,8 +20,8 @@ The hit box is also given to the *FlappyBird* module so that it can check for
 collisions.
 
 ## Obstacle
-Contains a mesh representing a rectangle of lenght equal to the width of the
-viewport in *FlappyBird* and some given `(R, G, B)`	 colour that fades into
+Contains a mesh representing a rectangle of length equal to the width of the
+viewport in *FlappyBird* and some given `(R, G, B)`	colour that fades into
 white at the top of the obstacle.
 
 ## FlappyBird
@@ -41,6 +41,18 @@ movement step. Thus, the first frame is not rendered.
 As long as the bird is still alive, it still moves (duh...) and the score is
 printed. However, whether a collision has occured or not, the visuals are stil
 rendered in order for the player to fully grasp their mistake.
+
+Whenever the score increases, it is shown to the player in order to give them
+some illusion of progress. When the game finally ends, the final score is shown
+again.
+
+### Controls
+Press `SPACE` to make the bird jump and caw. All supposed racist references are
+just that: *suppositions*.
+
+Press `H` to render the bird's hit box.
+
+Press `S` to toggle the *caw* sound on and off.
 
 ### Further notes:
 Collisions are only checked between the bird and the obstacles directly above

@@ -4,7 +4,7 @@
 #include "Transform2D.h"
 
 
-FlappyBird::FlappyBird(GLboolean soundOpt) :
+FlappyBird::FlappyBird() :
 	fallAngleSpeed(100.f),
 	riseAngleSpeed(200.f),
 	gravity(1200.f),
@@ -16,8 +16,7 @@ FlappyBird::FlappyBird(GLboolean soundOpt) :
 	obstacleStart(955.f),
 	numPoints(50),
 	scaleSpeed(300.f),
-	wingScaleSpeeddAcc(.5f),
-	sound(soundOpt)
+	wingScaleSpeeddAcc(.3f)
 {
 }
 
@@ -55,6 +54,8 @@ GLvoid FlappyBird::Init()
 	collision			= false;
 	renderHitBox		= false;
 	canRender			= false;
+	finalScore			= false;
+	sound				= true;
 
 	birdWingScaleSpeed	= 5.f;
 	birdWingScale		= 1.f;
@@ -125,7 +126,7 @@ GLvoid FlappyBird::FrameStart()
 
 GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 {
-	/* Don't reder the first frame */
+	/* Don't render the first frame */
 	if (!canRender)
 	{
 		canRender = true;
@@ -134,9 +135,6 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 
 	if (!collision)
 	{
-		/* Make the bird fly */
-		//bird->FlapWing(deltaTimeSeconds);
-
 		/* Transformations that will be applied to each part of the bird */
 		CalculateBirdAngle(deltaTimeSeconds);
 		CalculateBirdMovement(deltaTimeSeconds);
@@ -150,6 +148,13 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 			shownScore = (GLint)trueScore;
 			std::cout << "SCORE: " << shownScore << "\n\n";
 		}
+	} else if (!finalScore)
+	{
+		finalScore = true;
+		
+		std::cout << "\n====================== FINAL SCORE: "
+			<< (GLint)trueScore
+			<< " =======================\n";
 	}
 
 	birdHitBox = bird->GetHitBox();
@@ -162,7 +167,7 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 	/* Render the obstacles */
 	RenderObstacles(deltaTimeSeconds);
 
-	/* Reneder all the bird parts one by one */
+	/* Render all the bird parts one by one */
 	RenderBird(deltaTimeSeconds);
 }
 
@@ -188,6 +193,12 @@ GLvoid FlappyBird::OnKeyPress(GLint key, GLint mods)
 	if (key == GLFW_KEY_H)
 	{
 		renderHitBox = !renderHitBox;
+	}
+
+	/* Toggle the bird's sound on/off */
+	if (key == GLFW_KEY_S)
+	{
+		sound = !sound;
 	}
 }
 

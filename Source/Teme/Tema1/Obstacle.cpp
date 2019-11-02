@@ -4,6 +4,7 @@ Obstacle::Obstacle(GLfloat width, GLfloat height, GLfloat r, GLfloat g, GLfloat 
 {
 	mObstacle = new Mesh("Obstacle" + std::to_string(r));
 
+	/* Vertices for the obstacle */
 	std::vector<VertexFormat> vertices
 	{
 		VertexFormat(glm::vec3(0.f,		0.f,	0.f), glm::vec3(r, g, b)),

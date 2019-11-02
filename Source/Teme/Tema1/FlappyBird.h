@@ -20,7 +20,7 @@
 class FlappyBird : public SimpleScene
 {
 public:
-	FlappyBird(GLboolean soundOpt = true);
+	FlappyBird();
 	~FlappyBird();
 
 	GLvoid Init() override;
@@ -65,7 +65,7 @@ private:
 	inline GLboolean IsObstacleInMap(ObstaclePos& obs);
 
 	/**
-	* Uses the equation of motion in order to update the coodrinates of the
+	* Uses the equation of motion in order to update the coordinates of the
 	* bird's centre.
 	* Also calculates a new scale factor for the wing
 	*/
@@ -87,8 +87,9 @@ private:
 	GLboolean CheckBirdInMap();
 
 protected:
+	GLboolean finalScore;
 	GLboolean canRender;
-	const GLboolean sound;
+	GLboolean sound;
 
 	const GLfloat numPoints;
 
