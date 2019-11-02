@@ -154,7 +154,7 @@ Bird::Bird() :
 		{
 			VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
 			VertexFormat(glm::vec3(50.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(25.f, wingHeight, 0.f), glm::vec3(.75f, 1.f, 0.f))
+			VertexFormat(glm::vec3(25.f, wingHeight, 0.f), glm::vec3(1.f, 0.f, 0.f))
 		};
 		std::vector<GLushort> indices =
 		{

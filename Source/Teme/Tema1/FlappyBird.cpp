@@ -13,7 +13,7 @@ FlappyBird::FlappyBird(GLboolean soundOpt) :
 	numObstacles(4),
 	obstacleWidth(80.f),
 	obstacleDistance(325.f),
-	obstacleStart(630.f),
+	obstacleStart(955.f),
 	numPoints(50),
 	scaleSpeed(300.f),
 	sound(soundOpt)
@@ -128,8 +128,6 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 		return;
 	}
 
-	glm::ivec2 resolution = window->GetResolution();
-
 	if (!collision)
 	{
 		/* Make the bird fly */
@@ -218,7 +216,7 @@ GLvoid FlappyBird::CalculateBirdMovement(GLfloat deltaTimeSeconds)
 	/* The equation of motion */
 	centreY +=
 		speed * deltaTimeSeconds
-		- gravity * deltaTimeSeconds * deltaTimeSeconds / 2.f;
+		+ gravity * deltaTimeSeconds * deltaTimeSeconds / 2.f;
 }
 
 GLvoid FlappyBird::CalculateBirdHitBox()

@@ -14,12 +14,13 @@ int main(int argc, char **argv)
 	// Create a window property structure
 	WindowProperties wp;
 	wp.resolution = glm::ivec2(1280, 720);
+	wp.name = "FlappyBird";
 
 	// Init the Engine and create a new window with the defined properties
 	WindowObject* window = Engine::Init(wp);
 
 	// Create a new 3D world and start running it
-	World *world = new Laborator6();
+	World *world = new FlappyBird();
 	world->Init();
 	world->Run();
 
