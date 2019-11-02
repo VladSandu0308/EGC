@@ -43,13 +43,17 @@ private:
 	GLvoid OnKeyPress(GLint key, GLint mods) override;
 
 	/* Renders the bird mesh by mesh */
-	GLvoid RenderBird();
+	GLvoid RenderBird(GLfloat deltaTimeSeconds);
 
 	/**
 	* Creates a given part of the bird and places it at its corresponding
 	* offsets
 	*/
-	GLvoid RenderBodyPart(Mesh* bodyPart, GLfloat offsetX, GLfloat offsetY);
+	GLvoid RenderBodyPart(
+		Mesh* bodyPart,
+		GLfloat offsetX,
+		GLfloat offsetY,
+		GLfloat deltaTimeSeconds);
 
 	/* Renders all obstacles and checks for collisions */
 	GLvoid RenderObstacles(GLfloat deltaTimeSeconds);
@@ -62,7 +66,8 @@ private:
 
 	/**
 	* Uses the equation of motion in order to update the coodrinates of the
-	* bird's centre
+	* bird's centre.
+	* Also calculates a new scale factor for the wing
 	*/
 	GLvoid CalculateBirdMovement(GLfloat deltaTimeSeconds);
 
@@ -89,6 +94,7 @@ protected:
 
 	const GLfloat fallAngleSpeed;
 	const GLfloat riseAngleSpeed;
+	GLfloat birdWingScaleSpeed;
 	
 	const GLfloat gravity;
 	const GLfloat liftForce;
@@ -99,11 +105,14 @@ protected:
 	const GLfloat obstacleDistance;
 	const GLfloat obstacleStart;
 	const GLfloat scaleSpeed;
+	const GLfloat wingScaleSpeeddAcc;
+	GLfloat sign;
 	GLfloat obstacleSpeed;
 
 	GLfloat birdHeadRadius;
 	GLfloat birdBodyRadiusX;
 	GLfloat birdBodyRadiusY;
+	GLfloat birdWingScale;
 
 	GLfloat centreX, centreY;
 	GLboolean fall;

@@ -19,9 +19,6 @@ The bird is made up of 7 meshes:
 The hit box is also given to the *FlappyBird* module so that it can check for
 collisions.
 
-A new mesh for the wing is created every time the `FlapWing()` method is called
-in order to make the bird look like it's flying.
-
 ## Obstacle
 Contains a mesh representing a rectangle of lenght equal to the width of the
 viewport in *FlappyBird* and some given `(R, G, B)`	 colour that fades into
@@ -49,4 +46,6 @@ rendered in order for the player to fully grasp their mistake.
 Collisions are only checked between the bird and the obstacles directly above
 and below it (if there are any).
 
-The bird's movement follows the equation of motion, for better realism.
+The bird's movement follows the equation of motion, for better realism. The
+flapping of the wing is treated as a scale transformation of the wing on the
+*OY* axis.

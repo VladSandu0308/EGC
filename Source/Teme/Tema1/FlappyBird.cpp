@@ -16,6 +16,7 @@ FlappyBird::FlappyBird(GLboolean soundOpt) :
 	obstacleStart(955.f),
 	numPoints(50),
 	scaleSpeed(300.f),
+	wingScaleSpeeddAcc(.5f),
 	sound(soundOpt)
 {
 }
@@ -44,21 +45,24 @@ GLvoid FlappyBird::Init()
 	camera->Update();
 	GetCameraInput()->SetActive(false);
 
-	bird			= new Bird();
-	trueScore		= 0.f;
-	shownScore		= 0;
+	bird				= new Bird();
+	trueScore			= 0.f;
+	shownScore			= 0;
 	
-	angle			= 0.f;
-	fall			= true;
-	collision		= false;
-	renderHitBox	= false;
-	canRender		= false;
+	sign				= 1.f;
+	angle				= 0.f;
+	fall				= true;
+	collision			= false;
+	renderHitBox		= false;
+	canRender			= false;
 
-	centreX			= 200.f;
-	centreY			= (GLfloat)resolution.y / 2.f;
+	birdWingScaleSpeed	= 5.f;
+	birdWingScale		= 1.f;
+	centreX				= 200.f;
+	centreY				= (GLfloat)resolution.y / 2.f;
 
-	obstacleSpeed	= 300.f;
-	speed			= liftForce;
+	obstacleSpeed		= 300.f;
+	speed				= liftForce;
 
 	bird->GetHeadRadius(birdHeadRadius);
 	bird->GetBodyRadii(birdBodyRadiusX, birdBodyRadiusY);
@@ -131,7 +135,7 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 	if (!collision)
 	{
 		/* Make the bird fly */
-		bird->FlapWing(deltaTimeSeconds);
+		//bird->FlapWing(deltaTimeSeconds);
 
 		/* Transformations that will be applied to each part of the bird */
 		CalculateBirdAngle(deltaTimeSeconds);
@@ -159,7 +163,7 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 	RenderObstacles(deltaTimeSeconds);
 
 	/* Reneder all the bird parts one by one */
-	RenderBird();
+	RenderBird(deltaTimeSeconds);
 }
 
 GLvoid FlappyBird::FrameEnd()
@@ -217,6 +221,19 @@ GLvoid FlappyBird::CalculateBirdMovement(GLfloat deltaTimeSeconds)
 	centreY +=
 		speed * deltaTimeSeconds
 		+ gravity * deltaTimeSeconds * deltaTimeSeconds / 2.f;
+
+	/* Change the scale of the wing */
+	birdWingScaleSpeed += deltaTimeSeconds * wingScaleSpeeddAcc;
+	birdWingScale -= deltaTimeSeconds * birdWingScaleSpeed * sign;
+
+	if (birdWingScale >= 1.f)
+	{
+		sign = 1.f;
+	}
+	else if (birdWingScale <= -1.f)
+	{
+		sign = -1.f;
+	}
 }
 
 GLvoid FlappyBird::CalculateBirdHitBox()
@@ -236,7 +253,7 @@ GLvoid FlappyBird::CalculateBirdHitBox()
 	}
 }
 
-GLvoid FlappyBird::RenderBird()
+GLvoid FlappyBird::RenderBird(GLfloat deltaTimeSeconds)
 {
 	GLfloat offsetX, offsetY;
 
@@ -244,37 +261,71 @@ GLvoid FlappyBird::RenderBird()
 	if (renderHitBox)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		RenderBodyPart(bird->GetHitBoxMesh(offsetX, offsetY), offsetX, offsetY);
+		RenderBodyPart(
+			bird->GetHitBoxMesh(offsetX, offsetY),
+			offsetX,
+			offsetY,
+			deltaTimeSeconds);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
 	/* Render the wing */
-	RenderBodyPart(bird->GetWingMesh(offsetX, offsetY), offsetX, offsetY);
+	RenderBodyPart(
+		bird->GetWingMesh(offsetX, offsetY),
+		offsetX,
+		offsetY,
+		deltaTimeSeconds);
 
 	/* Render the beak */
-	RenderBodyPart(bird->GetBeakMesh(offsetX, offsetY), offsetX, offsetY);
+	RenderBodyPart(
+		bird->GetBeakMesh(offsetX, offsetY),
+		offsetX,
+		offsetY,
+		deltaTimeSeconds);
 
 	/* Render the eye */
-	RenderBodyPart(bird->GetEyeMesh(offsetX, offsetY), offsetX, offsetY);
+	RenderBodyPart(
+		bird->GetEyeMesh(offsetX, offsetY),
+		offsetX,
+		offsetY,
+		deltaTimeSeconds);
 
 	/* Render the head */
-	RenderBodyPart(bird->GetHeadMesh(offsetX, offsetY), offsetX, offsetY);
+	RenderBodyPart(
+		bird->GetHeadMesh(offsetX, offsetY),
+		offsetX,
+		offsetY,
+		deltaTimeSeconds);
 
 	/* Render the body */
-	RenderBodyPart(bird->GetBodyMesh(offsetX, offsetY), offsetX, offsetY);
+	RenderBodyPart(
+		bird->GetBodyMesh(offsetX, offsetY),
+		offsetX,
+		offsetY,
+		deltaTimeSeconds);
 
 	/* Render the tail */
-	RenderBodyPart(bird->GetTailMesh(offsetX, offsetY), offsetX, offsetY);
+	RenderBodyPart(
+		bird->GetTailMesh(offsetX, offsetY),
+		offsetX,
+		offsetY,
+		deltaTimeSeconds);
 }
 
 GLvoid FlappyBird::RenderBodyPart(
 	Mesh* bodyPart,
 	GLfloat offsetX,
-	GLfloat offsetY)
+	GLfloat offsetY,
+	GLfloat deltaTimeSeconds)
 {
 	modelMatrix = Transform2D::Translate(centreX, centreY);
 	modelMatrix *= Transform2D::Rotate(RADIANS(angle));
 	modelMatrix *= Transform2D::Translate(offsetX, offsetY);
+
+	if (!strcmp(bodyPart->GetMeshID(), "wing"))
+	{
+		modelMatrix *= Transform2D::Scale(1.f, birdWingScale);
+	}
 
 	RenderMesh2D(bodyPart, shaders["VertexColor"], modelMatrix);
 }

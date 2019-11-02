@@ -1,20 +1,16 @@
 #include "Bird.h"
 
 Bird::Bird() :
-	wingDirection(1.f),
-	wingSpeed(200.f),
 	headRadius(23.f),
 	bodyRadiusX(45.f),
 	bodyRadiusY(30.f),
 	eyeRadius(7.5f),
 	numTriangles(20),
-	wingAcceleration(30.f),
 	hitBoxRadiusX(70.f),
 	hitBoxRadiusY(30.f),
 	numTrianglesHBox(15)
 {
 	GLfloat arg;
-	wingHeight = 70.f;
 
 	/* Generate the bird's head */
 	{
@@ -154,7 +150,7 @@ Bird::Bird() :
 		{
 			VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
 			VertexFormat(glm::vec3(50.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(25.f, wingHeight, 0.f), glm::vec3(1.f, 0.f, 0.f))
+			VertexFormat(glm::vec3(25.f, 70.f, 0.f), glm::vec3(1.f, 0.f, 0.f))
 		};
 		std::vector<GLushort> indices =
 		{
@@ -197,41 +193,6 @@ Bird::Bird() :
 		hitBoxOffsetX = 0.f;
 		hitBoxOffsetY = 0.f;
 	}
-}
-
-void Bird::FlapWing(GLfloat deltaTimeSeconds)
-{
-	/* Flap the wing by changing the upper vertex of the triangle its triangle */
-	wingHeight	+= wingDirection * deltaTimeSeconds * wingSpeed;
-	wingSpeed	+= deltaTimeSeconds * wingAcceleration;
-
-	if (wingHeight >= 70.f)
-	{
-		wingHeight = 70.f;
-		wingDirection *= -1;
-	}
-	else if (wingHeight <= -70.f)
-	{
-		wingHeight = -70.f;
-		wingDirection *= -1;
-	}
-
-	delete mWing;
-	mWing = new Mesh("wing");
-
-	/* Create a new mesh  */
-	std::vector<VertexFormat> vertices =
-	{
-		VertexFormat(glm::vec3(0.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
-		VertexFormat(glm::vec3(50.f, 0.f, 0.f), glm::vec3(.75f, 1.f, 0.f)),
-		VertexFormat(glm::vec3(25.f, wingHeight, 0.f), glm::vec3(.75f, 1.f, 0.f))
-	};
-	std::vector<GLushort> indices =
-	{
-		0, 1, 2
-	};
-
-	mWing->InitFromData(vertices, indices);
 }
 
 Bird::~Bird()

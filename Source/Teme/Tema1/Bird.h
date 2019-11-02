@@ -25,9 +25,6 @@ public:
 	const std::vector<std::pair<GLfloat, GLfloat>>& GetHitBox();
 	GLfloat GetHitBoxRadius();
 
-	/* Simulates the bird's flight by flapping its wing */
-	void FlapWing(GLfloat deltaTimeSeconds);
-
 private:
 	const GLfloat headRadius;
 	const GLfloat bodyRadiusX;
@@ -37,11 +34,6 @@ private:
 	const GLushort numTrianglesHBox;
 	const GLfloat hitBoxRadiusX;
 	const GLfloat hitBoxRadiusY;
-
-	const GLfloat wingAcceleration;
-	GLfloat wingSpeed;
-	GLfloat wingDirection;
-	GLfloat wingHeight;
 
 	Mesh* mBody;
 	Mesh* mHead;
