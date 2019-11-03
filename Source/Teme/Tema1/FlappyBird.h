@@ -33,7 +33,6 @@ private:
 		GLfloat scaleAngle;
 		GLfloat posX;
 		GLfloat scale;
-		Obstacle* obstacle;
 	};
 
 	GLvoid FrameStart() override;
@@ -137,8 +136,7 @@ protected:
 	std::vector<std::pair<GLfloat, GLfloat>> birdHitBox;
 	GLboolean renderHitBox;
 
-	std::vector<Obstacle> allObstacles;
-	std::vector<ObstaclePos> usedObstacles;
+	std::vector<ObstaclePos> obstacles;
 
 	const std::string texturesLoc;
 	const std::string shadersLoc;
@@ -147,4 +145,5 @@ protected:
 	Texture2D* backgroundTexture;
 
 	Obstacle* background;
+	Obstacle* obstacle;
 };

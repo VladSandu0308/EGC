@@ -5,7 +5,7 @@
 class Obstacle
 {
 public:
-	Obstacle(GLfloat width, GLfloat height, GLfloat r, GLfloat g, GLfloat b);
+	Obstacle(GLfloat width, GLfloat height, const std::string& name);
 	~Obstacle();
 
 	/* Returns the created mesh */

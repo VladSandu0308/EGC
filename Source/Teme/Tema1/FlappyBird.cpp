@@ -25,7 +25,12 @@ FlappyBird::FlappyBird() :
 FlappyBird::~FlappyBird()
 {
 	delete bird;
+
 	delete background;
+	delete obstacle;
+	
+	delete obstacleTexture;
+	delete backgroundTexture;
 }
 
 GLvoid FlappyBird::Init()
@@ -68,50 +73,34 @@ GLvoid FlappyBird::Init()
 	obstacleSpeed		= 300.f;
 	speed				= liftForce;
 
+	obstacle	= new Obstacle(obstacleWidth, (GLfloat)resolution.y, "obstacle");
+	background	= new Obstacle(obstacleWidth, (GLfloat)resolution.y, "background");
+
 	bird->GetHeadRadius(birdHeadRadius);
 	bird->GetBodyRadii(birdBodyRadiusX, birdBodyRadiusY);
-	birdHitBoxRadius	= bird->GetHitBoxRadius();
+	birdHitBoxRadius = bird->GetHitBoxRadius();
 
-	GLfloat r, g, b;
-
-	for (GLushort i = 0; i < totalNumObstacles; ++i)
-	{
-		r = (rand() % 255) / 254.f;
-		g = (rand() % 255) / 254.f;
-		b = (rand() % 255) / 254.f;
-
-		allObstacles.emplace_back(
-			obstacleWidth,
-			(GLfloat)resolution.y,
-			r,
-			g,
-			b);
-	}
-
-	GLushort pos;
 	GLfloat scaleFactor;
 	GLfloat posX = obstacleStart;
 
-	usedObstacles.resize(numObstacles);
+	obstacles.resize(numObstacles);
 
 	for (GLushort i = 0; i < numObstacles; ++i, posX += obstacleDistance)
 	{
-		pos							= rand() % totalNumObstacles;
 		scaleFactor					= 10.f / (rand() % 30 + 20);
 		
-		usedObstacles[i].obstacle	= &allObstacles[pos];
-		usedObstacles[i].posX		= posX;
-		usedObstacles[i].scale		= scaleFactor;
+		obstacles[i].posX		= posX;
+		obstacles[i].scale		= scaleFactor;
 
 		if (!(rand() % 5))
 		{
-			usedObstacles[i].isVariable = true;
-			usedObstacles[i].scaleAngle = 0.f;
+			obstacles[i].isVariable = true;
+			obstacles[i].scaleAngle = 0.f;
 		}
 		else
 		{
-			usedObstacles[i].isVariable = false;
-			usedObstacles[i].scaleAngle = 90.f;
+			obstacles[i].isVariable = false;
+			obstacles[i].scaleAngle = 90.f;
 		}
 	}
 
@@ -370,10 +359,9 @@ inline GLboolean FlappyBird::IsObstacleInMap(ObstaclePos& obs)
 GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 {
 	glm::ivec2 resolution = window->GetResolution();
-	GLushort pos;
 	GLfloat scaleFactor;
 
-	for (ObstaclePos& obs : usedObstacles)
+	for (ObstaclePos& obs : obstacles)
 	{
 		/* Freeze the scene when a collision happens */
 		if (!collision)
@@ -394,10 +382,8 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 
 		if (!IsObstacleInMap(obs))
 		{
-			pos				= rand() % totalNumObstacles;
 			scaleFactor		= 10.f / (rand() % 31 + 20);
 
-			obs.obstacle	= &allObstacles[pos];
 			obs.posX		= (GLfloat)resolution.x;
 			obs.scale		= scaleFactor;
 
@@ -419,7 +405,7 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 				1.f,
 				obs.scale * sin(RADIANS(obs.scaleAngle)));
 			RenderTexturedMesh(
-				obs.obstacle->GetMesh(),
+				obstacle->GetMesh(),
 				shaders["ObstacleShader"],
 				modelMatrix,
 				obstacleTexture
@@ -434,7 +420,7 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 				1.f,
 				(0.6f - obs.scale) * sin(RADIANS(obs.scaleAngle)));
 			RenderTexturedMesh(
-				obs.obstacle->GetMesh(),
+				obstacle->GetMesh(),
 				shaders["ObstacleShader"],
 				modelMatrix,
 				obstacleTexture
