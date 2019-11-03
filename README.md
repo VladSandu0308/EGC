@@ -17,4 +17,4 @@ Each of these is documented via a `README.md` file
 9. OpenGL textures
 
 ## Homework Assignments
-???
+1. Flappy Bird

@@ -10,3 +10,5 @@
 #include <Laboratoare/Laborator7/Laborator7.h>
 #include <Laboratoare/Laborator8/Laborator8.h>
 #include <Laboratoare/Laborator9/Laborator9.h>
+
+#include <Teme/Tema1/FlappyBird.h>
