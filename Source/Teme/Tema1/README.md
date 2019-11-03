@@ -3,7 +3,8 @@ An OpenGL-powered version of the cancerous game.
 
 The game uses 3 modules:
 - **Bird** - creates and keeps the meshes that comprise the bird;
-- **Obstacle** - contains the mesh for a single obstacle;
+- **TexturedRectangle** - contains the mesh for a single rectangle (obstacle
+or backround) and its texture;
 - **FlappyBird** - implements the entire game logic
 
 ## Bird
@@ -21,8 +22,7 @@ collisions.
 
 ## Obstacle
 Contains a mesh representing a rectangle of length equal to the width of the
-viewport in *FlappyBird* and some given `(R, G, B)`	colour that fades into
-white at the top of the obstacle.
+viewport in *FlappyBird* and a texture that will bea applied to the obstacle.
 
 ## FlappyBird
 Contains constants regarding speeds, angles, positions, accelerations, movement
@@ -30,7 +30,7 @@ in general. Also renders the meshes individually in order to create the scene.
 
 ### Init()
 Assigns initial values to all movement and rotation parameters and creates
-**20** obstacles with random colours, **5** out of which will be rendered at any
+one  obstacle with a given textur that will rendered at any position at any
 time. Moreover, about **1 in 5** obstacles will have variable scale (the
 variation is sinusoidal).
 

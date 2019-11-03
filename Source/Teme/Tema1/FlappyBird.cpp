@@ -9,14 +9,13 @@ FlappyBird::FlappyBird() :
 	riseAngleSpeed(200.f),
 	gravity(1200.f),
 	liftForce(300.f),
-	totalNumObstacles(20),
 	numObstacles(4),
 	obstacleWidth(80.f),
 	obstacleDistance(325.f),
-	obstacleStart(955.f),
-	numPoints(50),
+	obstacleStart(630.f),
 	scaleSpeed(300.f),
 	wingScaleSpeeddAcc(.3f),
+	backgroundSpeed(50.f),
 	shadersLoc("Source/Teme/Tema1/Shaders/"),
 	texturesLoc("Source/Teme/Tema1/Textures/")
 {
@@ -28,9 +27,6 @@ FlappyBird::~FlappyBird()
 
 	delete background;
 	delete obstacle;
-	
-	delete obstacleTexture;
-	delete backgroundTexture;
 }
 
 GLvoid FlappyBird::Init()
@@ -73,12 +69,20 @@ GLvoid FlappyBird::Init()
 	obstacleSpeed		= 300.f;
 	speed				= liftForce;
 
-	obstacle	= new Obstacle(obstacleWidth, (GLfloat)resolution.y, "obstacle");
-	background	= new Obstacle(obstacleWidth, (GLfloat)resolution.y, "background");
+	backgroundAngle		= 0.f;
 
-	bird->GetHeadRadius(birdHeadRadius);
-	bird->GetBodyRadii(birdBodyRadiusX, birdBodyRadiusY);
-	birdHitBoxRadius = bird->GetHitBoxRadius();
+	birdHitBoxRadius	= bird->GetHitBoxRadius();
+
+	obstacle = new TexturedRectangle(
+		obstacleWidth,
+		(GLfloat)resolution.y,
+		"obstacle",
+		(texturesLoc + "bricks.jpg").c_str());
+	background	= new TexturedRectangle(
+		(GLfloat)resolution.x * 2.5f,
+		(GLfloat)resolution.y * 2.5f,
+		"background",
+		(texturesLoc + "hole.jpg").c_str());
 
 	GLfloat scaleFactor;
 	GLfloat posX = obstacleStart;
@@ -87,10 +91,10 @@ GLvoid FlappyBird::Init()
 
 	for (GLushort i = 0; i < numObstacles; ++i, posX += obstacleDistance)
 	{
-		scaleFactor					= 10.f / (rand() % 30 + 20);
+		scaleFactor			= 10.f / (rand() % 30 + 20);
 		
-		obstacles[i].posX		= posX;
-		obstacles[i].scale		= scaleFactor;
+		obstacles[i].posX	= posX;
+		obstacles[i].scale	= scaleFactor;
 
 		if (!(rand() % 5))
 		{
@@ -105,17 +109,7 @@ GLvoid FlappyBird::Init()
 	}
 
 	{
-		obstacleTexture = new Texture2D();
-		obstacleTexture->Load2D((texturesLoc + "bricks.jpg").c_str(), GL_REPEAT);
-	}
-
-	{
-		backgroundTexture = new Texture2D();
-		backgroundTexture->Load2D((texturesLoc + "bricks.jpg").c_str(), GL_REPEAT);
-	}
-
-	{
-		Shader* shader = new Shader("ObstacleShader");
+		Shader* shader = new Shader("ObjectShader");
 		shader->AddShader(shadersLoc + "VertexShader.glsl", GL_VERTEX_SHADER);
 		shader->AddShader(shadersLoc + "FragmentShader.glsl", GL_FRAGMENT_SHADER);
 		shader->CreateAndLink();
@@ -149,6 +143,9 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 		CalculateBirdAngle(deltaTimeSeconds);
 		CalculateBirdMovement(deltaTimeSeconds);
 
+		birdHitBox = bird->GetHitBox();
+		CalculateBirdHitBox();
+
 		/* Print the score */
 		trueScore += deltaTimeSeconds * 2.f * obstacleSpeed / 200.f;
 		obstacleSpeed += deltaTimeSeconds * 30.f;
@@ -167,11 +164,9 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 			<< " =======================\n\n";
 	}
 
-	birdHitBox = bird->GetHitBox();
-
 	if (!collision)
 	{
-		CheckBirdInMap();
+		collision = CheckBirdInMap();
 	}
 
 	/* Render the obstacles */
@@ -179,6 +174,9 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 
 	/* Render all the bird parts one by one */
 	RenderBird(deltaTimeSeconds);
+
+	/* Render the background */
+	RenderBackground(deltaTimeSeconds);
 }
 
 GLvoid FlappyBird::FrameEnd()
@@ -260,14 +258,16 @@ GLvoid FlappyBird::CalculateBirdMovement(GLfloat deltaTimeSeconds)
 GLvoid FlappyBird::CalculateBirdHitBox()
 {
 	glm::vec3 hitBoxPoint(0.f, 0.f, 1.f);
-	glm::mat3 rotationMatrix = Transform2D::Rotate(RADIANS(angle));
+
+	glm::mat3 hitBoxMatrix = Transform2D::Translate(centreX, centreY);
+	hitBoxMatrix *= Transform2D::Rotate(RADIANS(angle));
 
 	for (auto& point : birdHitBox)
 	{
 		/* Rotate the bird's hitbox */
 		hitBoxPoint[0]	= point.coordX;
 		hitBoxPoint[1]	= point.coordY;
-		hitBoxPoint		= rotationMatrix * hitBoxPoint;
+		hitBoxPoint		= hitBoxMatrix * hitBoxPoint;
 
 		point.coordX	= hitBoxPoint[0];
 		point.coordY	= hitBoxPoint[1];
@@ -351,7 +351,7 @@ GLvoid FlappyBird::RenderBodyPart(
 	RenderMesh2D(bodyPart, shaders["VertexColor"], modelMatrix);
 }
 
-inline GLboolean FlappyBird::IsObstacleInMap(ObstaclePos& obs)
+inline GLboolean FlappyBird::IsObstacleInMap(Obstacle& obs)
 {
 	return obs.posX + obstacleWidth >= 0.f;
 }
@@ -361,25 +361,8 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 	glm::ivec2 resolution = window->GetResolution();
 	GLfloat scaleFactor;
 
-	for (ObstaclePos& obs : obstacles)
+	for (Obstacle& obs : obstacles)
 	{
-		/* Freeze the scene when a collision happens */
-		if (!collision)
-		{
-			obs.posX -= deltaTimeSeconds * obstacleSpeed;
-
-			/* Scale the obstacle if required*/
-			if (obs.isVariable)
-			{
-				obs.scaleAngle += deltaTimeSeconds * scaleSpeed;
-
-				if (obs.scaleAngle >= 180.f)
-				{
-					obs.scaleAngle = 0.f;
-				}
-			}
-		}
-
 		if (!IsObstacleInMap(obs))
 		{
 			scaleFactor		= 10.f / (rand() % 31 + 20);
@@ -406,9 +389,9 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 				obs.scale * sin(RADIANS(obs.scaleAngle)));
 			RenderTexturedMesh(
 				obstacle->GetMesh(),
-				shaders["ObstacleShader"],
+				shaders["ObjectShader"],
 				modelMatrix,
-				obstacleTexture
+				obstacle->GetTexture()
 			);
 			
 			/* Render the upper obstacle */
@@ -421,9 +404,9 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 				(0.6f - obs.scale) * sin(RADIANS(obs.scaleAngle)));
 			RenderTexturedMesh(
 				obstacle->GetMesh(),
-				shaders["ObstacleShader"],
+				shaders["ObjectShader"],
 				modelMatrix,
-				obstacleTexture
+				obstacle->GetTexture()
 			);
 
 			/* Only for the obstacle below the bird, check for collisions*/
@@ -449,7 +432,52 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 				}
 			}			
 		}
+
+		/* Freeze the scene when a collision happens */
+		if (!collision)
+		{
+			obs.posX -= deltaTimeSeconds * obstacleSpeed;
+
+			/* Scale the obstacle if required*/
+			if (obs.isVariable)
+			{
+				obs.scaleAngle += deltaTimeSeconds * scaleSpeed;
+
+				if (obs.scaleAngle >= 180.f)
+				{
+					obs.scaleAngle = 0.f;
+				}
+			}
+		}
 	}
+}
+
+GLvoid FlappyBird::RenderBackground(GLfloat deltaTimeSeconds)
+{
+	glm::ivec2 resolution = window->GetResolution();
+
+	backgroundAngle += backgroundSpeed * deltaTimeSeconds;
+
+	if (backgroundAngle >= 360.f)
+	{
+		backgroundAngle = 0.f;
+	}
+
+	/* Rotate the background around its centre */
+	modelMatrix = Transform2D::Translate(
+		(GLfloat)resolution.x / 2.f,
+		(GLfloat)resolution.y / 2.f);
+	modelMatrix *= Transform2D::Rotate(RADIANS(backgroundAngle));
+	modelMatrix *= Transform2D::Translate(
+		-(GLfloat)resolution.x * 1.25f,
+		-(GLfloat)resolution.y * 1.25f);
+
+	RenderTexturedMesh(
+		background->GetMesh(),
+		shaders["ObjectShader"],
+		modelMatrix,
+		background->GetTexture()
+	);
 }
 
 GLvoid FlappyBird::RenderTexturedMesh(
@@ -480,12 +508,22 @@ GLvoid FlappyBird::RenderTexturedMesh(
 	// Bind view matrix
 	glm::mat4 viewMatrix = GetSceneCamera()->GetViewMatrix();
 	int loc_view_matrix = glGetUniformLocation(shader->program, "View");
-	glUniformMatrix4fv(loc_view_matrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniformMatrix4fv(
+		loc_view_matrix,
+		1,
+		GL_FALSE,
+		glm::value_ptr(viewMatrix));
 
 	// Bind projection matrix
 	glm::mat4 projectionMatrix = GetSceneCamera()->GetProjectionMatrix();
-	int loc_projection_matrix = glGetUniformLocation(shader->program, "Projection");
-	glUniformMatrix4fv(loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	int loc_projection_matrix = glGetUniformLocation(
+		shader->program,
+		"Projection");
+	glUniformMatrix4fv(
+		loc_projection_matrix,
+		1,
+		GL_FALSE,
+		glm::value_ptr(projectionMatrix));
 
 	// Activate texture location 0
 	glActiveTexture(GL_TEXTURE0);
@@ -494,11 +532,15 @@ GLvoid FlappyBird::RenderTexturedMesh(
 	glBindTexture(GL_TEXTURE_2D, texture->GetTextureID());
 
 	// Send texture uniform value
-	glUniform1i(glGetUniformLocation(shader->program, "texture_1"), 0);
+	glUniform1i(glGetUniformLocation(shader->program, "texture"), 0);
 
 	// Draw the object
 	glBindVertexArray(mesh->GetBuffers()->VAO);
-	glDrawElements(mesh->GetDrawMode(), static_cast<int>(mesh->indices.size()), GL_UNSIGNED_SHORT, 0);
+	glDrawElements(
+		mesh->GetDrawMode(),
+		static_cast<int>(mesh->indices.size()),
+		GL_UNSIGNED_SHORT,
+		0);
 }
 
 GLboolean FlappyBird::CheckBirdInMap()
@@ -509,6 +551,7 @@ GLboolean FlappyBird::CheckBirdInMap()
 	{
 		if (point.coordY >= resolution.y || point.coordY <= 0)
 		{
+			std::cout << point.coordY << '\n';
 			return true;
 		}
 	}
@@ -522,17 +565,13 @@ GLboolean FlappyBird::CheckBirdCollision(
 	GLfloat highY)
 {
 	GLfloat highX = lowX + obstacleWidth;
-	GLfloat birdX, birdY;
 
 	for (auto& point : birdHitBox)
 	{
-		birdX = centreX + point.coordX;
-		birdY = centreY + point.coordY;
-
 		/* Check  if the current point of the hit box collides with the given */
 		/* obstacle */
-		if (birdX <= highX && birdX >= lowX
-			&& birdY <= highY && birdY >= lowY)
+		if (point.coordX <= highX && point.coordX >= lowX
+			&& point.coordY <= highY && point.coordY >= lowY)
 		{
 			return true;
 		}

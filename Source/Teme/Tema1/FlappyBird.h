@@ -8,7 +8,7 @@
 #include <Windows.h>
 #include <mmsystem.h>
 
-#include "Obstacle.h"
+#include "TexturedRectangle.h"
 #include "Bird.h"
 
 #pragma comment(lib, "winmm.lib")
@@ -27,7 +27,7 @@ public:
 
 private:
 	/* Will contain information regarding each obstacle */
-	struct ObstaclePos
+	struct Obstacle
 	{
 		GLboolean isVariable;
 		GLfloat scaleAngle;
@@ -57,17 +57,20 @@ private:
 	/* Renders all obstacles and checks for collisions */
 	GLvoid RenderObstacles(GLfloat deltaTimeSeconds);
 
+	/* Renders a mesh with a texture applied to it */
 	GLvoid RenderTexturedMesh(
 		Mesh* mesh,
 		Shader* shader,
 		const glm::mat3& modelMatrix,
 		Texture2D* texture);
 
+	GLvoid RenderBackground(GLfloat deltaTimeSeconds);
+
 	/**
 	* Checks if an obstacle is still visible in order to decide if it should
 	* be rendered
 	*/
-	inline GLboolean IsObstacleInMap(ObstaclePos& obs);
+	inline GLboolean IsObstacleInMap(Obstacle& obs);
 
 	/**
 	* Uses the equation of motion in order to update the coordinates of the
@@ -96,8 +99,6 @@ protected:
 	GLboolean canRender;
 	GLboolean sound;
 
-	const GLfloat numPoints;
-
 	const GLfloat fallAngleSpeed;
 	const GLfloat riseAngleSpeed;
 	GLfloat birdWingScaleSpeed;
@@ -106,7 +107,6 @@ protected:
 	const GLfloat liftForce;
 	
 	const GLushort numObstacles;
-	const GLushort totalNumObstacles;
 	const GLfloat obstacleWidth;
 	const GLfloat obstacleDistance;
 	const GLfloat obstacleStart;
@@ -115,9 +115,6 @@ protected:
 	GLfloat sign;
 	GLfloat obstacleSpeed;
 
-	GLfloat birdHeadRadius;
-	GLfloat birdBodyRadiusX;
-	GLfloat birdBodyRadiusY;
 	GLfloat birdWingScale;
 
 	GLfloat centreX, centreY;
@@ -136,14 +133,14 @@ protected:
 	std::vector<std::pair<GLfloat, GLfloat>> birdHitBox;
 	GLboolean renderHitBox;
 
-	std::vector<ObstaclePos> obstacles;
+	std::vector<Obstacle> obstacles;
 
 	const std::string texturesLoc;
 	const std::string shadersLoc;
 
-	Texture2D* obstacleTexture;
-	Texture2D* backgroundTexture;
+	TexturedRectangle* background;
+	TexturedRectangle* obstacle;
 
-	Obstacle* background;
-	Obstacle* obstacle;
+	GLfloat backgroundAngle;
+	const GLfloat backgroundSpeed;
 };
