@@ -58,6 +58,12 @@ private:
 	/* Renders all obstacles and checks for collisions */
 	GLvoid RenderObstacles(GLfloat deltaTimeSeconds);
 
+	GLvoid RenderTexturedMesh(
+		Mesh* mesh,
+		Shader* shader,
+		const glm::mat3& modelMatrix,
+		Texture2D* texture);
+
 	/**
 	* Checks if an obstacle is still visible in order to decide if it should
 	* be rendered
@@ -136,5 +142,9 @@ protected:
 
 	const std::string texturesLoc;
 	const std::string shadersLoc;
+
 	Texture2D* obstacleTexture;
+	Texture2D* backgroundTexture;
+
+	Obstacle* background;
 };

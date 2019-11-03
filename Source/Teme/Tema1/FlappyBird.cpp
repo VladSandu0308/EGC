@@ -16,13 +16,16 @@ FlappyBird::FlappyBird() :
 	obstacleStart(955.f),
 	numPoints(50),
 	scaleSpeed(300.f),
-	wingScaleSpeeddAcc(.3f)
+	wingScaleSpeeddAcc(.3f),
+	shadersLoc("Source/Teme/Tema1/Shaders/"),
+	texturesLoc("Source/Teme/Tema1/Textures/")
 {
 }
 
 FlappyBird::~FlappyBird()
 {
 	delete bird;
+	delete background;
 }
 
 GLvoid FlappyBird::Init()
@@ -111,6 +114,24 @@ GLvoid FlappyBird::Init()
 			usedObstacles[i].scaleAngle = 90.f;
 		}
 	}
+
+	{
+		obstacleTexture = new Texture2D();
+		obstacleTexture->Load2D((texturesLoc + "bricks.jpg").c_str(), GL_REPEAT);
+	}
+
+	{
+		backgroundTexture = new Texture2D();
+		backgroundTexture->Load2D((texturesLoc + "bricks.jpg").c_str(), GL_REPEAT);
+	}
+
+	{
+		Shader* shader = new Shader("ObstacleShader");
+		shader->AddShader(shadersLoc + "VertexShader.glsl", GL_VERTEX_SHADER);
+		shader->AddShader(shadersLoc + "FragmentShader.glsl", GL_FRAGMENT_SHADER);
+		shader->CreateAndLink();
+		shaders[shader->GetName()] = shader;
+	}
 }
 
 GLvoid FlappyBird::FrameStart()
@@ -154,7 +175,7 @@ GLvoid FlappyBird::Update(GLfloat deltaTimeSeconds)
 		
 		std::cout << "\n====================== FINAL SCORE: "
 			<< (GLint)trueScore
-			<< " =======================\n";
+			<< " =======================\n\n";
 	}
 
 	birdHitBox = bird->GetHitBox();
@@ -266,7 +287,7 @@ GLvoid FlappyBird::CalculateBirdHitBox()
 
 GLvoid FlappyBird::RenderBird(GLfloat deltaTimeSeconds)
 {
-	GLfloat offsetX, offsetY;
+	GLfloat offsetX = 0.f, offsetY = 0.f;
 
 	/* Render the hit box */
 	if (renderHitBox)
@@ -397,10 +418,12 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 			modelMatrix *= Transform2D::Scale(
 				1.f,
 				obs.scale * sin(RADIANS(obs.scaleAngle)));
-			RenderMesh2D(
+			RenderTexturedMesh(
 				obs.obstacle->GetMesh(),
-				shaders["VertexColor"],
-				modelMatrix);
+				shaders["ObstacleShader"],
+				modelMatrix,
+				obstacleTexture
+			);
 			
 			/* Render the upper obstacle */
 			modelMatrix = Transform2D::Translate(
@@ -410,10 +433,12 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 			modelMatrix *= Transform2D::Scale(
 				1.f,
 				(0.6f - obs.scale) * sin(RADIANS(obs.scaleAngle)));
-			RenderMesh2D(
+			RenderTexturedMesh(
 				obs.obstacle->GetMesh(),
-				shaders["VertexColor"],
-				modelMatrix);
+				shaders["ObstacleShader"],
+				modelMatrix,
+				obstacleTexture
+			);
 
 			/* Only for the obstacle below the bird, check for collisions*/
 			if (centreX + birdHitBoxRadius >= obs.posX
@@ -439,6 +464,55 @@ GLvoid FlappyBird::RenderObstacles(GLfloat deltaTimeSeconds)
 			}			
 		}
 	}
+}
+
+GLvoid FlappyBird::RenderTexturedMesh(
+	Mesh* mesh,
+	Shader* shader,
+	const glm::mat3& modelMatrix,
+	Texture2D* texture)
+{
+	if (!mesh || !shader || !shader->GetProgramID())
+	{
+		return;
+	}
+
+	glm::mat3 mm = modelMatrix;
+	glm::mat4 model = glm::mat4(
+		mm[0][0],	mm[0][1],	mm[0][2],	0.f,
+		mm[1][0],	mm[1][1],	mm[1][2],	0.f,
+		0.f,		0.f,		mm[2][2],	0.f,
+		mm[2][0],	mm[2][1],	0.f,		1.f);
+
+	// render an object using the specified shader and the specified position
+	glUseProgram(shader->program);
+
+	// Bind model matrix
+	GLint loc_model_matrix = glGetUniformLocation(shader->program, "Model");
+	glUniformMatrix4fv(loc_model_matrix, 1, GL_FALSE, glm::value_ptr(model));
+
+	// Bind view matrix
+	glm::mat4 viewMatrix = GetSceneCamera()->GetViewMatrix();
+	int loc_view_matrix = glGetUniformLocation(shader->program, "View");
+	glUniformMatrix4fv(loc_view_matrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+	// Bind projection matrix
+	glm::mat4 projectionMatrix = GetSceneCamera()->GetProjectionMatrix();
+	int loc_projection_matrix = glGetUniformLocation(shader->program, "Projection");
+	glUniformMatrix4fv(loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+	// Activate texture location 0
+	glActiveTexture(GL_TEXTURE0);
+
+	// Bind the texture1 ID
+	glBindTexture(GL_TEXTURE_2D, texture->GetTextureID());
+
+	// Send texture uniform value
+	glUniform1i(glGetUniformLocation(shader->program, "texture_1"), 0);
+
+	// Draw the object
+	glBindVertexArray(mesh->GetBuffers()->VAO);
+	glDrawElements(mesh->GetDrawMode(), static_cast<int>(mesh->indices.size()), GL_UNSIGNED_SHORT, 0);
 }
 
 GLboolean FlappyBird::CheckBirdInMap()
