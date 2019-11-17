@@ -45,7 +45,7 @@ void Laborator7::Init()
 		shaders[shader->GetName()] = shader;
 	}
 
-	//Light & material properties
+	// Light & material properties
 	{
 		lightPosition = glm::vec3(0, 1, 1);
 		materialShininess = 30;
@@ -113,7 +113,9 @@ void Laborator7::FrameEnd()
 void Laborator7::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & modelMatrix, const glm::vec3 &color)
 {
 	if (!mesh || !shader || !shader->GetProgramID())
+	{
 		return;
+	}
 
 	// render an object using the specified shader and the specified position
 	glUseProgram(shader->program);
@@ -128,7 +130,7 @@ void Laborator7::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & 
 	GLint locEyePos = glGetUniformLocation(shader->program, "eye_position");
 	glUniform3fv(locEyePos, 1, glm::value_ptr(eyePosition));
 
-	// TODO: Set material property uniforms (shininess, kd, ks, object color) 
+	// Set material property uniforms (shininess, kd, ks, object color) 
 	GLint locMaterial = glGetUniformLocation(shader->program, "material_shininess");
 	glUniform1i(locMaterial, materialShininess);
 

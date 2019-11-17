@@ -30,6 +30,7 @@ void main()
 	vec3 V = normalize(eye_position - world_position);
 	vec3 L = normalize(light_position - world_position);
 	vec3 H = normalize(L + V);
+	vec3 R = reflect()
 
 	// Define ambient light component
 	float ambient_light = 0.25;
@@ -42,7 +43,7 @@ void main()
 
 	if (diffuse_light > 0)
 	{
-		specular_light = material_ks * pow(max(dot(world_normal, L), 0), material_shininess);
+		specular_light = material_ks * pow(max(dot(world_normal, H), 0), material_shininess);
 	}
 
 	// Compute light
