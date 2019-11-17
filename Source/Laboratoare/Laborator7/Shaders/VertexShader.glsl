@@ -30,7 +30,7 @@ void main()
 	vec3 V = normalize(eye_position - world_position);
 	vec3 L = normalize(light_position - world_position);
 	vec3 H = normalize(L + V);
-	vec3 R = reflect(L, world_normal);
+	vec3 R = normalize(reflect(L, world_normal));
 
 	// Define ambient light component
 	float ambient_light = 0.25;
