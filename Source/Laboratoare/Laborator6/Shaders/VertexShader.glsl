@@ -22,11 +22,11 @@ void main()
 {
 	// send output to fragment shader
 	frag_position	= v_position;
-	frag_normal		= v_normal + vec3(sin(Time), cos(Time), 1.0);
+	frag_normal		= v_normal + vec3(sin(Time), cos(Time), sin(Time) + cos(Time));
 	frag_texture	= v_texture;
 	frag_color		= v_color;
 
 	// compute gl_Position
-	vec3 v_pos_final = v_position + vec3(sin(Time), 0, cos(Time));
-	gl_Position = Projection * View * Model * vec4(v_pos_final, 1.0);
+	vec4 vec_final_position = Model * vec4(v_position, 1.f) + vec4(0.f, cos(Time), 0.f, 0.f) * 2.f;
+	gl_Position	= Projection * View * vec_final_position;
 }

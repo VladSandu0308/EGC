@@ -87,22 +87,21 @@ Mesh* Laborator6::CreateMesh(const char *name, const std::vector<VertexFormat> &
 	// ========================================================================
 	// This section describes how the GPU Shader Vertex Shader program receives data
 
-	// set vertex position attribute
+	// Set vertex position attribute
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), 0);
 
-	// set vertex normal attribute
+	// Set vertex normal attribute
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3) + sizeof(glm::vec2)));
-	
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(sizeof(glm::vec3)));
 
-	// set texture coordinate attribute
+	// Set texture coordinate attribute
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3)));
 
-	// set vertex color attribute
+	// Set vertex color attribute
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(sizeof(glm::vec3)));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3) + sizeof(glm::vec2)));
 	
 	// OBSERVATION: after interchanging the colour and normal pipes, the colours appear altered
 	// ========================================================================
@@ -124,12 +123,12 @@ Mesh* Laborator6::CreateMesh(const char *name, const std::vector<VertexFormat> &
 
 void Laborator6::FrameStart()
 {
-	// clears the color buffer (using the previously set color) and depth buffer
+	// Clears the color buffer (using the previously set color) and depth buffer
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::ivec2 resolution = window->GetResolution();
-	// sets the screen area where to draw
+	// Sets the screen area where to draw
 	glViewport(0, 0, resolution.x, resolution.y);
 }
 
@@ -167,35 +166,37 @@ void Laborator6::FrameEnd()
 void Laborator6::RenderSimpleMesh(Mesh* mesh, Shader* shader, const glm::mat4 & modelMatrix)
 {
 	if (!mesh || !shader || !shader->GetProgramID())
+	{
 		return;
+	}
 
-	// render an object using the specified shader and the specified position
+	// Render an object using the specified shader and the specified position
 	glUseProgram(shader->program);
 
-	// get shader location for uniform mat4 "Model"
+	// Get shader location for uniform mat4 "Model"
 	GLint modelLocation = glGetUniformLocation(shader->GetProgramID(), "Model");
 
-	// set shader uniform "Model" to modelMatrix
+	// Set shader uniform "Model" to modelMatrix
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
-	// get shader location for uniform mat4 "View"
+	// Get shader location for uniform mat4 "View"
 	GLint viewLocation = glGetUniformLocation(shader->GetProgramID(), "View");
 
-	// set shader uniform "View" to viewMatrix
+	// Set shader uniform "View" to viewMatrix
 	glm::mat4 viewMatrix = GetSceneCamera()->GetViewMatrix();
 	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
-	// get shader location for uniform mat4 "Projection"
+	// Get shader location for uniform mat4 "Projection"
 	GLint projLocation = glGetUniformLocation(shader->GetProgramID(), "Projection");
 
-	// set shader uniform "Projection" to projectionMatrix
+	// Set shader uniform "Projection" to projectionMatrix
 	glm::mat4 projectionMatrix = GetSceneCamera()->GetProjectionMatrix();
 	glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-	// get shader location for "Time"
+	// Get shader location for "Time"
 	GLint timeLocation = glGetUniformLocation(shader->GetProgramID(), "Time");
 	
-	// set shader uniform "Time" to elapsed time
+	// Set shader uniform "Time" to elapsed time
 	glUniform1f(timeLocation, (GLfloat)Engine::GetElapsedTime());
 
 	// Draw the object
