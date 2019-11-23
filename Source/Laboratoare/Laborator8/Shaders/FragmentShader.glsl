@@ -25,23 +25,25 @@ void main()
 	vec3 L = normalize(light_position - world_position);
 	vec3 V = normalize(eye_position - world_position);
 	vec3 H = normalize(L + V);
+	vec3 R = normalize(reflect(L, world_normal));
 
 	// Define ambient light component
-	float ambient_light = 0.25;
+	float ambient_light = 0.25f;
 
 	// Compute diffuse light component
-	float diffuse_light = material_kd * max(dot(normalize(N), L), 0);
+	float diffuse_light = material_kd * max(dot(normalize(N), L), 0.f);
 
 	// Compute specular light component
-	float specular_light = 0;
+	float specular_light = 0.f;
 
-	if (diffuse_light > 0)
+	if (diffuse_light > 0.f)
 	{
-		specular_light = material_ks * pow(max(dot(normalize(N), H), 0), material_shininess);
+		// specular_light = material_ks * pow(max(dot(N, H), 0), material_shininess);
+		specular_light = material_ks * pow(max(dot(V, R), 0), material_shininess);
 	}
 
 	// Compute light
-	float light = 0;
+	float light = 0.f;
 
 	if (type_of_light == 1)
 	{
@@ -52,8 +54,8 @@ void main()
 		if (spot_light > spot_light_limit)
 		{	 
 			// Quadratic attenuation
-			float linear_att		= (spot_light - spot_light_limit) / (1 - spot_light_limit);
-			float light_att_factor	= pow(linear_att, 2);
+			float linear_att		= (spot_light - spot_light_limit) / (1.f - spot_light_limit);
+			float light_att_factor	= linear_att * linear_att;
 			light					= ambient_light + light_att_factor * (diffuse_light + specular_light);
 		} else
 		{
@@ -61,11 +63,13 @@ void main()
 		}
 	} else
 	{
-		light = ambient_light + diffuse_light + specular_light;
+		float d						= distance(light_position, world_position);
+		float attenuation_factor	= 1.f / max(d * d, 1.f);
+		light						= ambient_light + attenuation_factor * (diffuse_light + specular_light);
 	}
 
 	// Write pixel out color
 	vec3 colour = object_color * light;
 
-	out_color = vec4(colour, 1);
+	out_color = vec4(colour, 1.f);
 }
