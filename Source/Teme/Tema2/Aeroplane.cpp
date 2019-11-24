@@ -36,7 +36,7 @@ Aeroplane::Aeroplane() :
 			2, 6, 4,		0, 2, 4,
 		};
 
-		propeller = CreateMesh("propeller", vertices, indices);
+		propeller = Utils::CreateMesh("propeller", vertices, indices);
 	}
 
 	/* Create the plane's nose */
@@ -63,7 +63,7 @@ Aeroplane::Aeroplane() :
 			2, 6, 4,		0, 2, 4,
 		};
 
-		nose = CreateMesh("nose", vertices, indices);
+		nose = Utils::CreateMesh("nose", vertices, indices);
 	}
 
 	/* Create the plane's body */
@@ -90,7 +90,7 @@ Aeroplane::Aeroplane() :
 			2, 6, 4,		0, 2, 4,
 		};
 
-		body = CreateMesh("body", vertices, indices);
+		body = Utils::CreateMesh("body", vertices, indices);
 	}
 
 	/* Create the plane's cockpit */
@@ -117,7 +117,7 @@ Aeroplane::Aeroplane() :
 			2, 6, 4,		0, 2, 4,
 		};
 
-		cockpit = CreateMesh("cockpit", vertices, indices);
+		cockpit = Utils::CreateMesh("cockpit", vertices, indices);
 	}
 
 	/* Create the plane's tail */
@@ -144,7 +144,7 @@ Aeroplane::Aeroplane() :
 			2, 6, 4,		0, 2, 4,
 		};
 
-		tail = CreateMesh("tail", vertices, indices);
+		tail = Utils::CreateMesh("tail", vertices, indices);
 	}
 
 	/* Create the plane's rudder */
@@ -171,7 +171,7 @@ Aeroplane::Aeroplane() :
 			2, 6, 4,		0, 2, 4,
 		};
 
-		rudder = CreateMesh("rudder", vertices, indices);
+		rudder = Utils::CreateMesh("rudder", vertices, indices);
 	}
 
 	/* Create the plane's wing */
@@ -198,7 +198,7 @@ Aeroplane::Aeroplane() :
 			2, 6, 4,		0, 2, 4,
 		};
 
-		wing = CreateMesh("wing", vertices, indices);
+		wing = Utils::CreateMesh("wing", vertices, indices);
 	}
 
 	/* Create the plane's rudder wing */
@@ -225,7 +225,7 @@ Aeroplane::Aeroplane() :
 			2, 6, 4,		0, 2, 4,
 		};
 
-		rudderWing = CreateMesh("rudderWing", vertices, indices);
+		rudderWing = Utils::CreateMesh("rudderWing", vertices, indices);
 	}
 }
 
@@ -239,66 +239,6 @@ Aeroplane::~Aeroplane()
 	delete wing;
 	delete rudder;
 	delete rudderWing;
-}
-
-Mesh* Aeroplane::CreateMesh(
-	const GLchar* name,
-	const std::vector<VertexFormat>& vertices,
-	const std::vector<GLushort>& indices)
-{
-	unsigned int VAO = 0;
-	// Create the VAO and bind it
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	// Create the VBO and bind it
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	// Send vertices data into the VBO buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
-	// Crete the IBO and bind it
-	unsigned int IBO;
-	glGenBuffers(1, &IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-
-	// Send indices data into the IBO buffer
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);
-
-	// ========================================================================
-	// This section describes how the GPU Shader Vertex Shader program receives data
-
-	// Set vertex position attribute
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), 0);
-
-	// Set vertex normal attribute
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(sizeof(glm::vec3)));
-
-	// Set texture coordinate attribute
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3)));
-
-	// Set vertex color attribute
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3) + sizeof(glm::vec2)));
-
-	// Unbind the VAO
-	glBindVertexArray(0);
-
-	// Check for OpenGL errors
-	CheckOpenGLError();
-
-	// Mesh information is saved into a Mesh object
-	Mesh* mesh = new Mesh(name);
-	mesh->InitFromBuffer(VAO, static_cast<GLushort>(indices.size()));
-	mesh->vertices = vertices;
-	mesh->indices = indices;
-	
-	return mesh;
 }
 
 Mesh* Aeroplane::GetPropeller(

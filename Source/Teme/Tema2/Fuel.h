@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Component/SimpleScene.h>
 #include <Core/Engine.h>
 #include <Core/GPU/Mesh.h>
 

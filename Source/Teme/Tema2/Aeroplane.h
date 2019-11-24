@@ -1,7 +1,8 @@
 #pragma once
 
 #include <Component/SimpleScene.h>
-#include <Core/GPU/Mesh.h>
+
+#include "Utils.h"
 
 class Aeroplane
 {
@@ -20,12 +21,6 @@ public:
 	Mesh* GetRudderWing(GLfloat& offsetX, GLfloat& offsetY, GLfloat& offsetZ);
 
 private:
-	/* Creates a mesh with the given vertices, indices and name */
-	Mesh* CreateMesh(
-		const GLchar* name,
-		const std::vector<VertexFormat>& vertices,
-		const std::vector<GLushort>& indices);
-
 	const GLfloat offsetPropellerX, offsetPropellerY, offsetPropellerZ;
 	const GLfloat offsetNoseX, offsetNoseY, offsetNoseZ;
 	const GLfloat offsetBodyX, offsetBodyY, offsetBodyZ;

@@ -100,8 +100,8 @@ GLvoid Obstacle::Init()
 	texture->Load2D("Source/Teme/Tema2/Textures/rock.jpg");
 
 	shader = new Shader("ObstacleShader");
-	shader->AddShader("Source/Teme/Tema2/Shaders/ObjecVertex.glsl", GL_VERTEX_SHADER);
-	shader->AddShader("Source/Teme/Tema2/Shaders/ObjecFragment.glsl", GL_FRAGMENT_SHADER);
+	shader->AddShader("Source/Teme/Tema2/Shaders/ObjectVertex.glsl", GL_VERTEX_SHADER);
+	shader->AddShader("Source/Teme/Tema2/Shaders/ObjectFragment.glsl", GL_FRAGMENT_SHADER);
 	shader->CreateAndLink();
 }
 

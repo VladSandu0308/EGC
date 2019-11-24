@@ -1,12 +1,11 @@
 #pragma once
 
 #include <Component/SimpleScene.h>
-#include <Core/Engine.h>
-#include <Core/GPU/Mesh.h>
 
 #include "Aeroplane.h"
 #include "Obstacle.h"
 #include "Fuel.h"
+#include "FuelBar.h"
 
 #include "Transform3D.h"
 #include "LabCamera.h"
@@ -30,6 +29,7 @@ private:
 		const glm::mat4& modelMatrix
 	);
 
+	/* Renders a given mesh by applying a custom texture to it */
 	GLvoid RenderTexturedMesh(
 		Mesh* mesh,
 		Shader* shader,
@@ -53,6 +53,9 @@ private:
 
 	/* Renders the fuel cans one by one */
 	GLvoid RenderFuelCans(GLfloat deltaTimeSeconds);
+
+	/* Renders the fuel bar */
+	GLvoid RenderFuelBar(GLfloat deltaTimeSeconds);
 
 	GLvoid OnInputUpdate(float deltaTime, int mods) override;
 	GLvoid OnKeyPress(int key, int mods) override;
@@ -83,6 +86,7 @@ protected:
 	GLfloat planeSpeed;
 
 	Aeroplane* plane;
+	FuelBar* fuelBar;
 
 	std::vector<Obstacle> obstacles;
 	std::vector<Fuel> fuelCans;

@@ -18,6 +18,9 @@ PlaneRunner::PlaneRunner() :
 
 PlaneRunner::~PlaneRunner()
 {
+	delete camera;
+	delete plane;
+	delete fuelBar;
 }
 
 void PlaneRunner::Init()
@@ -25,6 +28,7 @@ void PlaneRunner::Init()
 	glm::ivec2 resolution = window->GetResolution();
 
 	plane			= new Aeroplane();
+	fuelBar			= new FuelBar();
 
 	angle			= 0.f;
 	propellerAngle	= 0.f;
@@ -32,15 +36,6 @@ void PlaneRunner::Init()
 	planeSpeed		= 4.f;
 	propellerSpeed	= 100.f;
 	render			= GL_TRUE;
-
-	// Create a shader program for drawing face polygon with the color of the normal
-	{
-		/*Shader* shader = new Shader("ShaderLab6");
-		shader->AddShader("Source/Laboratoare/PlaneRunner/Shaders/VertexShader.glsl", GL_VERTEX_SHADER);
-		shader->AddShader("Source/Laboratoare/PlaneRunner/Shaders/FragmentShader.glsl", GL_FRAGMENT_SHADER);
-		shader->CreateAndLink();
-		shaders[shader->GetName()] = shader;*/
-	}
 
 	camera = new Plane::Camera();
 	camera->Set(
@@ -57,6 +52,7 @@ void PlaneRunner::Init()
 	);
 
 	Obstacle::Init();
+	Fuel::Init();
 
 	obstacles.emplace_back(
 		10.f,
@@ -67,8 +63,6 @@ void PlaneRunner::Init()
 		0.5f,
 		GL_TRUE
 	);
-
-	Fuel::Init();
 
 	fuelCans.emplace_back(
 		8.f,
@@ -100,12 +94,14 @@ void PlaneRunner::Update(float deltaTimeSeconds)
 		RenderPlane(deltaTimeSeconds);
 		RenderFuelCans(deltaTimeSeconds);
 		RenderObstacles(deltaTimeSeconds);
+		RenderFuelBar(deltaTimeSeconds);
 	}
 	else
 	{
 		RenderPlane(0.f);
 		RenderFuelCans(0.f);
 		RenderObstacles(0.f);
+		RenderFuelBar(0.f);
 	}
 }
 
@@ -214,6 +210,26 @@ GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 	}
 }
 
+GLvoid PlaneRunner::RenderFuelBar(GLfloat deltaTimeSeconds)
+{
+	GLfloat scaleFactor;
+
+	RenderSimpleMesh(
+		fuelBar->GetBackground(),
+		shaders["VertexColor"],
+		Transform3D::Translate(-1.5f, 5.5f, 0.f)
+	);
+
+	Mesh* fuel = fuelBar->GetFuel(0.f, deltaTimeSeconds, scaleFactor);
+
+	RenderSimpleMesh(
+		fuel,
+		shaders["VertexColor"],
+		Transform3D::Translate(-1.5f, 5.5f, 0.001f)
+		* Transform3D::Scale(scaleFactor, 1.f, 1.f)
+	);
+}
+
 void PlaneRunner::FrameEnd()
 {
 	DrawCoordinatSystem(camera->GetViewMatrix(), projectionMatrix);
@@ -275,7 +291,11 @@ GLvoid PlaneRunner::RenderTexturedMesh(
 		0);
 }
 
-void PlaneRunner::RenderSimpleMesh(Mesh* mesh, Shader* shader, const glm::mat4& modelMatrix)
+void PlaneRunner::RenderSimpleMesh(
+	Mesh* mesh,
+	Shader* shader,
+	const glm::mat4& modelMatrix
+)
 {
 	if (!mesh || !shader || !shader->GetProgramID())
 	{
