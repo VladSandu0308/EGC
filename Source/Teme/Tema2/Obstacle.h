@@ -9,29 +9,43 @@ class Obstacle
 {
 public:
 	Obstacle(
+		GLfloat _radiusOX,
+		GLfloat _radiusOY,
 		GLfloat _speed,
-		GLfloat _amplitude,
 		GLfloat _acceleration,
 		GLfloat _scale,
+		GLfloat _scaleSpeed,
 		GLboolean _variable);
 	~Obstacle();
 
 	glm::mat4& GetModelMatrix(GLfloat deltaTimeSeconds);
-	Mesh* GetMesh();
+	static Mesh* GetMesh();
+	static Texture2D* GetTexture();
+	static Shader* GetShader();
+
+	static GLvoid Init();
 
 private:
 	glm::mat4 modelMatrix;
 
-	Mesh* obstacle;
+	static Mesh* obstacle;
+	static Texture2D* texture;
+	static Shader* shader;
 
 	static const GLfloat maxScale;
+	static const GLfloat minScale;
+
 	const GLfloat acceleration;
 	const GLboolean variable;
+	const GLfloat radiusOX, radiusOY;
+	const GLfloat scaleSpeed;
+
+	const GLfloat speedOX, speedOY, speedOZ;
 
 	GLfloat scaleType;
 	GLfloat scale;
-	GLfloat amplitude;
 	GLfloat speed;
 	GLfloat angle;
-	GLfloat angleOY;
+
+	GLfloat angleOX, angleOY, angleOZ;
 };

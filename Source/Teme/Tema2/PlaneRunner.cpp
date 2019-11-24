@@ -33,6 +33,7 @@ void PlaneRunner::Init()
 	centreY			= 1.75f;
 	planeSpeed		= 4.f;
 	propellerSpeed	= 100.f;
+	render			= true;
 
 	// Create a shader program for drawing face polygon with the color of the normal
 	{
@@ -57,12 +58,16 @@ void PlaneRunner::Init()
 		zFar
 	);
 
+	Obstacle::Init();
+
 	obstacles.emplace_back(
-		50.f,
-		1.f,
+		10.f,
+		5.f,
+		20.f,
 		1.f,
 		0.5f,
-		false
+		0.5f,
+		true
 	);
 }
 
@@ -79,9 +84,17 @@ void PlaneRunner::FrameStart()
 
 void PlaneRunner::Update(float deltaTimeSeconds)
 {
-	MovePlane(deltaTimeSeconds);
-	RenderPlane(deltaTimeSeconds);
-	RenderObstacles(deltaTimeSeconds);
+	if (render == true)
+	{
+		MovePlane(deltaTimeSeconds);
+		RenderPlane(deltaTimeSeconds);
+		RenderObstacles(deltaTimeSeconds);
+	}
+	else
+	{
+		RenderPlane(0.f);
+		RenderObstacles(0.f);
+	}
 }
 
 GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
@@ -167,10 +180,16 @@ GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 {
 	for (Obstacle& obs : obstacles)
 	{
-		RenderSimpleMesh(
+		/*RenderSimpleMesh(
 			obs.GetMesh(),
 			shaders["VertexColor"],
 			obs.GetModelMatrix(deltaTimeSeconds)
+		);*/
+		RenderTexturedMesh(
+			Obstacle::GetMesh(),
+			Obstacle::GetShader(),
+			obs.GetModelMatrix(deltaTimeSeconds),
+			Obstacle::GetTexture()
 		);
 	}
 }
@@ -179,6 +198,62 @@ GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 void PlaneRunner::FrameEnd()
 {
 	DrawCoordinatSystem(camera->GetViewMatrix(), projectionMatrix);
+}
+
+GLvoid PlaneRunner::RenderTexturedMesh(
+	Mesh* mesh,
+	Shader* shader,
+	const glm::mat4& modelMatrix,
+	Texture2D* texture
+)
+{
+	if (!mesh || !shader || !shader->GetProgramID())
+	{
+		return;
+	}
+
+	// render an object using the specified shader and the specified position
+	glUseProgram(shader->program);
+
+	// Bind model matrix
+	GLint loc_model_matrix = glGetUniformLocation(shader->program, "Model");
+	glUniformMatrix4fv(loc_model_matrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+	// Bind view matrix
+	glm::mat4 viewMatrix = camera->GetViewMatrix();
+	int loc_view_matrix = glGetUniformLocation(shader->program, "View");
+	glUniformMatrix4fv(
+		loc_view_matrix,
+		1,
+		GL_FALSE,
+		glm::value_ptr(viewMatrix));
+
+	// Bind projection matrix
+	int loc_projection_matrix = glGetUniformLocation(
+		shader->program,
+		"Projection");
+	glUniformMatrix4fv(
+		loc_projection_matrix,
+		1,
+		GL_FALSE,
+		glm::value_ptr(projectionMatrix));
+
+	// Activate texture location 0
+	glActiveTexture(GL_TEXTURE0);
+
+	// Bind the texture1 ID
+	glBindTexture(GL_TEXTURE_2D, texture->GetTextureID());
+
+	// Send texture uniform value
+	glUniform1i(glGetUniformLocation(shader->program, "texture"), 0);
+
+	// Draw the object
+	glBindVertexArray(mesh->GetBuffers()->VAO);
+	glDrawElements(
+		mesh->GetDrawMode(),
+		static_cast<int>(mesh->indices.size()),
+		GL_UNSIGNED_SHORT,
+		0);
 }
 
 void PlaneRunner::RenderSimpleMesh(Mesh* mesh, Shader* shader, const glm::mat4& modelMatrix)
@@ -269,6 +344,10 @@ void PlaneRunner::OnInputUpdate(float deltaTime, int mods)
 void PlaneRunner::OnKeyPress(int key, int mods)
 {
 	// add key press event
+	if (key == GLFW_KEY_P)
+	{
+		render = !render;
+	}
 }
 
 void PlaneRunner::OnKeyRelease(int key, int mods)

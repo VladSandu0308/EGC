@@ -29,6 +29,12 @@ private:
 		const glm::mat4& modelMatrix
 	);
 
+	GLvoid RenderTexturedMesh(
+		Mesh* mesh,
+		Shader* shader,
+		const glm::mat4& modelMatrix,
+		Texture2D* texture);
+
 	/* Calculates the plane's movement */
 	GLvoid MovePlane(GLfloat deltaTimeSeconds);
 
@@ -75,4 +81,6 @@ protected:
 	Aeroplane* plane;
 
 	std::vector<Obstacle> obstacles;
+
+	GLboolean render;
 };
