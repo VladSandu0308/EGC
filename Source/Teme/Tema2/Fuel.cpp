@@ -1,13 +1,13 @@
-#include "Obstacle.h"
+#include "Fuel.h"
 
-const GLfloat Obstacle::maxScale = 1.5f;
-const GLfloat Obstacle::minScale = 0.5f;
+const GLfloat Fuel::maxScale = 1.5f;
+const GLfloat Fuel::minScale = 0.5f;
 
-Mesh* Obstacle::obstacle = nullptr;
-Texture2D* Obstacle::texture = nullptr;
-Shader* Obstacle::shader = nullptr;
+Mesh* Fuel::obstacle = nullptr;
+Texture2D* Fuel::texture = nullptr;
+Shader* Fuel::shader = nullptr;
 
-Obstacle::Obstacle(
+Fuel::Fuel(
 	GLfloat _radiusOX,
 	GLfloat _radiusOY,
 	GLfloat _speed,
@@ -31,16 +31,17 @@ Obstacle::Obstacle(
 	angleOX		= 0.f;
 	angleOY		= 0.f;
 	angleOZ		= 0.f;
+	fuelAmount	= 0.f;
 }
 
-Obstacle::~Obstacle()
+Fuel::~Fuel()
 {
 	delete obstacle;
 	delete texture;
 	delete shader;
 }
 
-glm::mat4& Obstacle::GetModelMatrix(GLfloat deltaTimeSeconds)
+glm::mat4& Fuel::GetModelMatrix(GLfloat deltaTimeSeconds)
 {
 	speed += acceleration * deltaTimeSeconds;
 	angle += speed * deltaTimeSeconds;
@@ -53,6 +54,7 @@ glm::mat4& Obstacle::GetModelMatrix(GLfloat deltaTimeSeconds)
 	if (variable)
 	{
 		scale += scaleType * scaleSpeed * deltaTimeSeconds;
+		fuelAmount += scaleType * scaleSpeed * deltaTimeSeconds * 100.f;
 
 		if (scale >= maxScale || scale <= minScale)
 		{
@@ -91,31 +93,31 @@ glm::mat4& Obstacle::GetModelMatrix(GLfloat deltaTimeSeconds)
 	return modelMatrix;
 }
 
-GLvoid Obstacle::Init()
+GLvoid Fuel::Init()
 {
-	obstacle = new Mesh("sphere");
-	obstacle->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "sphere.obj");
+	obstacle = new Mesh("jerry_can");
+	obstacle->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "jerry_can.obj");
 
 	texture = new Texture2D();
-	texture->Load2D("Source/Teme/Tema2/Textures/rock.jpg");
+	texture->Load2D("Source/Teme/Tema2/Textures/canister.png");
 
-	shader = new Shader("ObstacleShader");
+	shader = new Shader("FuelShader");
 	shader->AddShader("Source/Teme/Tema2/Shaders/ObjecVertex.glsl", GL_VERTEX_SHADER);
 	shader->AddShader("Source/Teme/Tema2/Shaders/ObjecFragment.glsl", GL_FRAGMENT_SHADER);
 	shader->CreateAndLink();
 }
 
-Mesh* Obstacle::GetMesh()
+Mesh* Fuel::GetMesh()
 {
 	return obstacle;
 }
 
-Texture2D* Obstacle::GetTexture()
+Texture2D* Fuel::GetTexture()
 {
 	return texture;
 }
 
-Shader* Obstacle::GetShader()
+Shader* Fuel::GetShader()
 {
 	return shader;
 }

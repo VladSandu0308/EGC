@@ -1,11 +1,12 @@
 #pragma once
 
 #include <Component/SimpleScene.h>
+#include <Core/Engine.h>
 #include <Core/GPU/Mesh.h>
 
 #include "Aeroplane.h"
 #include "Obstacle.h"
-#include "Obstacle.h"
+#include "Fuel.h"
 
 #include "Transform3D.h"
 #include "LabCamera.h"
@@ -50,6 +51,9 @@ private:
 	/* Renders the obstacles one by one */
 	GLvoid RenderObstacles(GLfloat deltaTimeSeconds);
 
+	/* Renders the fuel cans one by one */
+	GLvoid RenderFuelCans(GLfloat deltaTimeSeconds);
+
 	GLvoid OnInputUpdate(float deltaTime, int mods) override;
 	GLvoid OnKeyPress(int key, int mods) override;
 	GLvoid OnKeyRelease(int key, int mods) override;
@@ -81,6 +85,7 @@ protected:
 	Aeroplane* plane;
 
 	std::vector<Obstacle> obstacles;
+	std::vector<Fuel> fuelCans;
 
 	GLboolean render;
 };

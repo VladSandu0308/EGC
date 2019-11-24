@@ -6,10 +6,10 @@
 
 #include "Transform3D.h"
 
-class Obstacle
+class Fuel
 {
 public:
-	Obstacle(
+	Fuel(
 		GLfloat _radiusOX,
 		GLfloat _radiusOY,
 		GLfloat _speed,
@@ -17,7 +17,7 @@ public:
 		GLfloat _scale,
 		GLfloat _scaleSpeed,
 		GLboolean _variable);
-	~Obstacle();
+	~Fuel();
 
 	glm::mat4& GetModelMatrix(GLfloat deltaTimeSeconds);
 	static Mesh* GetMesh();
@@ -47,6 +47,7 @@ private:
 	GLfloat scale;
 	GLfloat speed;
 	GLfloat angle;
+	GLfloat fuelAmount;
 
 	GLfloat angleOX, angleOY, angleOZ;
 };

@@ -6,8 +6,6 @@
 #include <string>
 #include <iostream>
 
-#include <Core/Engine.h>
-
 using namespace std;
 
 PlaneRunner::PlaneRunner() :
@@ -33,7 +31,7 @@ void PlaneRunner::Init()
 	centreY			= 1.75f;
 	planeSpeed		= 4.f;
 	propellerSpeed	= 100.f;
-	render			= true;
+	render			= GL_TRUE;
 
 	// Create a shader program for drawing face polygon with the color of the normal
 	{
@@ -67,7 +65,19 @@ void PlaneRunner::Init()
 		1.f,
 		0.5f,
 		0.5f,
-		true
+		GL_TRUE
+	);
+
+	Fuel::Init();
+
+	fuelCans.emplace_back(
+		8.f,
+		4.f,
+		30.f,
+		2.f,
+		0.5f,
+		0.5f,
+		GL_TRUE
 	);
 }
 
@@ -84,15 +94,17 @@ void PlaneRunner::FrameStart()
 
 void PlaneRunner::Update(float deltaTimeSeconds)
 {
-	if (render == true)
+	if (render == GL_TRUE)
 	{
 		MovePlane(deltaTimeSeconds);
 		RenderPlane(deltaTimeSeconds);
+		RenderFuelCans(deltaTimeSeconds);
 		RenderObstacles(deltaTimeSeconds);
 	}
 	else
 	{
 		RenderPlane(0.f);
+		RenderFuelCans(0.f);
 		RenderObstacles(0.f);
 	}
 }
@@ -176,15 +188,23 @@ GLvoid PlaneRunner::RenderPlanePart(
 	RenderSimpleMesh(planePart, shaders["VertexColor"], modelMatrix);
 }
 
+GLvoid PlaneRunner::RenderFuelCans(GLfloat deltaTimeSeconds)
+{
+	for (Fuel& fuel : fuelCans)
+	{
+		RenderTexturedMesh(
+			Fuel::GetMesh(),
+			Fuel::GetShader(),
+			fuel.GetModelMatrix(deltaTimeSeconds),
+			Fuel::GetTexture()
+		);
+	}
+}
+
 GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 {
 	for (Obstacle& obs : obstacles)
 	{
-		/*RenderSimpleMesh(
-			obs.GetMesh(),
-			shaders["VertexColor"],
-			obs.GetModelMatrix(deltaTimeSeconds)
-		);*/
 		RenderTexturedMesh(
 			Obstacle::GetMesh(),
 			Obstacle::GetShader(),
@@ -193,7 +213,6 @@ GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 		);
 	}
 }
-
 
 void PlaneRunner::FrameEnd()
 {
