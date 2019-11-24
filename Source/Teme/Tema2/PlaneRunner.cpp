@@ -56,6 +56,14 @@ void PlaneRunner::Init()
 		zNear,
 		zFar
 	);
+
+	obstacles.emplace_back(
+		50.f,
+		1.f,
+		1.f,
+		0.5f,
+		false
+	);
 }
 
 void PlaneRunner::FrameStart()
@@ -73,6 +81,7 @@ void PlaneRunner::Update(float deltaTimeSeconds)
 {
 	MovePlane(deltaTimeSeconds);
 	RenderPlane(deltaTimeSeconds);
+	RenderObstacles(deltaTimeSeconds);
 }
 
 GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
@@ -97,7 +106,7 @@ GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
 
 GLvoid PlaneRunner::RenderPlane(GLfloat deltaTimeSeconds)
 {
-	GLfloat offsetX, offsetY, offsetZ;
+	GLfloat offsetX = 0.f, offsetY = 0.f, offsetZ = 0.f;
 
 	RenderPlanePart(
 		plane->GetPropeller(offsetX, offsetY, offsetZ),
@@ -153,6 +162,19 @@ GLvoid PlaneRunner::RenderPlanePart(
 
 	RenderSimpleMesh(planePart, shaders["VertexColor"], modelMatrix);
 }
+
+GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
+{
+	for (Obstacle& obs : obstacles)
+	{
+		RenderSimpleMesh(
+			obs.GetMesh(),
+			shaders["VertexColor"],
+			obs.GetModelMatrix(deltaTimeSeconds)
+		);
+	}
+}
+
 
 void PlaneRunner::FrameEnd()
 {

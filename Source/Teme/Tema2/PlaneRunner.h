@@ -4,6 +4,8 @@
 #include <Core/GPU/Mesh.h>
 
 #include "Aeroplane.h"
+#include "Obstacle.h"
+#include "Obstacle.h"
 
 #include "Transform3D.h"
 #include "LabCamera.h"
@@ -39,6 +41,9 @@ private:
 		GLfloat offsetZ
 	);
 
+	/* Renders the obstacles one by one */
+	GLvoid RenderObstacles(GLfloat deltaTimeSeconds);
+
 	GLvoid OnInputUpdate(float deltaTime, int mods) override;
 	GLvoid OnKeyPress(int key, int mods) override;
 	GLvoid OnKeyRelease(int key, int mods) override;
@@ -68,4 +73,6 @@ protected:
 	GLfloat planeSpeed;
 
 	Aeroplane* plane;
+
+	std::vector<Obstacle> obstacles;
 };
