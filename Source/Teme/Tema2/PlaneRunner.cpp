@@ -53,6 +53,7 @@ void PlaneRunner::Init()
 
 	Obstacle::Init();
 	Fuel::Init();
+	Cloud::Init();
 
 	obstacles.emplace_back(
 		10.f,
@@ -73,6 +74,12 @@ void PlaneRunner::Init()
 		0.5f,
 		GL_TRUE
 	);
+
+	clouds.emplace_back();
+	clouds.emplace_back();
+	clouds.emplace_back();
+	clouds.emplace_back();
+	clouds.emplace_back();
 }
 
 void PlaneRunner::FrameStart()
@@ -88,21 +95,23 @@ void PlaneRunner::FrameStart()
 
 void PlaneRunner::Update(float deltaTimeSeconds)
 {
+	GLfloat deltaTime;
+
 	if (render == GL_TRUE)
 	{
 		MovePlane(deltaTimeSeconds);
-		RenderPlane(deltaTimeSeconds);
-		RenderFuelCans(deltaTimeSeconds);
-		RenderObstacles(deltaTimeSeconds);
-		RenderFuelBar(deltaTimeSeconds);
+		deltaTime = deltaTimeSeconds;
 	}
 	else
 	{
-		RenderPlane(0.f);
-		RenderFuelCans(0.f);
-		RenderObstacles(0.f);
-		RenderFuelBar(0.f);
+		deltaTime = 0.f;
 	}
+
+	RenderPlane(deltaTime);
+	RenderFuelCans(deltaTime);
+	RenderObstacles(deltaTime);
+	RenderFuelBar(deltaTime);
+	RenderClouds(deltaTime);
 }
 
 GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
@@ -123,7 +132,6 @@ GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
 		propellerAngle = 0.f;
 	}
 }
-
 
 GLvoid PlaneRunner::RenderPlane(GLfloat deltaTimeSeconds)
 {
@@ -228,6 +236,30 @@ GLvoid PlaneRunner::RenderFuelBar(GLfloat deltaTimeSeconds)
 		Transform3D::Translate(-1.5f, 5.5f, 0.001f)
 		* Transform3D::Scale(scaleFactor, 1.f, 1.f)
 	);
+}
+
+GLvoid PlaneRunner::RenderClouds(GLfloat deltaTimeSeconds)
+{
+	Mesh* cloudMesh			= Cloud::GetMesh();
+	Texture2D* cloudTexture = Cloud::GetTexture();
+	Shader* cloudShader		= Cloud::GetShader();
+
+	GLushort numParts;
+
+	for (Cloud& cloud : clouds)
+	{
+		numParts = cloud.GetPartsNumber(deltaTimeSeconds);
+
+		for (int i = 0; i != numParts; ++i)
+		{
+			RenderTexturedMesh(
+				cloudMesh,
+				cloudShader,
+				cloud.GetModelMatrix(i),
+				cloudTexture
+			);
+		}
+	}
 }
 
 void PlaneRunner::FrameEnd()

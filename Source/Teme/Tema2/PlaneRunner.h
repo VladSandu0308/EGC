@@ -6,6 +6,7 @@
 #include "Obstacle.h"
 #include "Fuel.h"
 #include "FuelBar.h"
+#include "Cloud.h"
 
 #include "Transform3D.h"
 #include "LabCamera.h"
@@ -57,6 +58,9 @@ private:
 	/* Renders the fuel bar */
 	GLvoid RenderFuelBar(GLfloat deltaTimeSeconds);
 
+	/* Renders the clouds one by one */
+	GLvoid RenderClouds(GLfloat deltaTimeSeconds);
+
 	GLvoid OnInputUpdate(float deltaTime, int mods) override;
 	GLvoid OnKeyPress(int key, int mods) override;
 	GLvoid OnKeyRelease(int key, int mods) override;
@@ -90,6 +94,7 @@ protected:
 
 	std::vector<Obstacle> obstacles;
 	std::vector<Fuel> fuelCans;
+	std::vector<Cloud> clouds;
 
 	GLboolean render;
 };
