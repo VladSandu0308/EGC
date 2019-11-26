@@ -17,7 +17,7 @@ Cloud::Cloud()
 	std::uniform_real_distribution<GLfloat> radiusDistOX(7.f, 15.f);
 	std::uniform_real_distribution<GLfloat> radiusDistOY(5.f, 8.f);
 	std::uniform_real_distribution<GLfloat> deltaRadiusDist(-1.f, 1.f);
-	std::uniform_real_distribution<GLfloat> deltaAngleDist(-10.f, 10.f);
+	std::uniform_real_distribution<GLfloat> deltaAngleDist(-5.f, 5.f);
 	std::uniform_real_distribution<GLfloat> scaleDist(.75f, 1.5f);
 
 	numParts	= partsDist(gen);
@@ -33,10 +33,6 @@ Cloud::Cloud()
 		deltaRadiiOY.push_back(deltaRadiusDist(gen));
 		scales.push_back(scaleDist(gen));
 	}
-}
-
-Cloud::~Cloud()
-{
 }
 
 GLushort Cloud::GetPartsNumber(GLfloat deltaTimeSeconds)

@@ -43,12 +43,20 @@ FuelBar::FuelBar() :
 
 		fuel = Utils::CreateMesh("fuel", vertices, indices);
 	}
+
+	{
+		shader = new Shader("CloudShader");
+		shader->AddShader("Source/Teme/Tema2/Shaders/FuelBarVertex.glsl", GL_VERTEX_SHADER);
+		shader->AddShader("Source/Teme/Tema2/Shaders/FuelBarFragment.glsl", GL_FRAGMENT_SHADER);
+		shader->CreateAndLink();
+	}
 }
 
 FuelBar::~FuelBar()
 {
 	delete background;
 	delete fuel;
+	delete shader;
 }
 
 Mesh* FuelBar::GetBackground()
@@ -69,4 +77,9 @@ Mesh* FuelBar::GetFuel(
 	scaleFactor = crtFuel / maxFuel;
 
 	return fuel;
+}
+
+Shader* FuelBar::GetShader()
+{
+	return shader;
 }

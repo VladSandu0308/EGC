@@ -19,6 +19,14 @@ public:
 	Mesh* GetWing(GLfloat& offsetX, GLfloat& offsetY, GLfloat& offsetZ);
 	Mesh* GetRudder(GLfloat& offsetX, GLfloat& offsetY, GLfloat& offsetZ);
 	Mesh* GetRudderWing(GLfloat& offsetX, GLfloat& offsetY, GLfloat& offsetZ);
+	Mesh* GetLight(GLfloat& offsetX, GLfloat& offsetY, GLfloat& offsetZ);
+
+	/* Returns the shader used by the plane */
+	Shader* GetShader();
+
+	Mesh* fmmm(GLfloat& offsetX, GLfloat& offsetY, GLfloat& offsetZ);
+
+	Mesh* fmm;
 
 private:
 	const GLfloat offsetPropellerX, offsetPropellerY, offsetPropellerZ;
@@ -29,6 +37,11 @@ private:
 	const GLfloat offsetWingX, offsetWingY, offsetWingZ;
 	const GLfloat offsetRudderX, offsetRudderY, offsetRudderZ;
 	const GLfloat offsetRudderWingX, offsetRudderWingY, offsetRudderWingZ;
+	const GLfloat offsetLightX, offsetLightY, offsetLightZ;
+	const GLfloat fmmx, fmmy, fmmz;
+
+
+	Shader* shader;
 
 	Mesh* propeller;
 	Mesh* nose;
@@ -38,4 +51,7 @@ private:
 	Mesh* wing;
 	Mesh* rudder;
 	Mesh* rudderWing;
+	Mesh* light;
+
+
 };

@@ -2,45 +2,50 @@
 
 #include <Core/Engine.h>
 #include <Core/GPU/Mesh.h>
+#include <random>
 
 #include "Transform3D.h"
 
 class Fuel
 {
 public:
-	Fuel(
-		GLfloat _radiusOX,
-		GLfloat _radiusOY,
-		GLfloat _speed,
-		GLfloat _acceleration,
-		GLfloat _scale,
-		GLfloat _scaleSpeed,
-		GLboolean _variable);
-	~Fuel();
+	Fuel();
+	~Fuel() = default;
 
+	/**
+	* Calculates the movement of the jerry can as a maodel matrix and returns
+	* it
+	*/
 	glm::mat4& GetModelMatrix(GLfloat deltaTimeSeconds);
+	
+	/* Returns the jerry can mesh */
 	static Mesh* GetMesh();
+
+	/* Returns the jerry can texture */
 	static Texture2D* GetTexture();
+
+	/* Returns the jerry can shader */
 	static Shader* GetShader();
 
+	/* Initialises the mesh, shader and texture used to render the jerry can */
 	static GLvoid Init();
 
 private:
 	glm::mat4 modelMatrix;
 
-	static Mesh* obstacle;
+	static Mesh* mesh;
 	static Texture2D* texture;
 	static Shader* shader;
 
 	static const GLfloat maxScale;
 	static const GLfloat minScale;
 
-	const GLfloat acceleration;
-	const GLboolean variable;
-	const GLfloat radiusOX, radiusOY;
-	const GLfloat scaleSpeed;
+	GLfloat acceleration;
+	GLboolean variable;
+	GLfloat radiusOX, radiusOY;
+	GLfloat scaleSpeed;
 
-	const GLfloat speedOX, speedOY, speedOZ;
+	GLfloat speedOX, speedOY, speedOZ;
 
 	GLfloat scaleType;
 	GLfloat scale;

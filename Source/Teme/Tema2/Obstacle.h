@@ -2,45 +2,50 @@
 
 #include <Core/Engine.h>
 #include <Core/GPU/Mesh.h>
+#include <random>
 
 #include "Transform3D.h"
 
 class Obstacle
 {
 public:
-	Obstacle(
-		GLfloat _radiusOX,
-		GLfloat _radiusOY,
-		GLfloat _speed,
-		GLfloat _acceleration,
-		GLfloat _scale,
-		GLfloat _scaleSpeed,
-		GLboolean _variable);
-	~Obstacle();
+	Obstacle();
+	~Obstacle() = default;
 
+	/**
+	* Calculates the movement of the obstacle as a maodel matrix and returns
+	* it
+	*/
 	glm::mat4& GetModelMatrix(GLfloat deltaTimeSeconds);
+
+	/* Returns the obstacle mesh */
 	static Mesh* GetMesh();
+
+	/* Returns the obstacle texture */
 	static Texture2D* GetTexture();
+
+	/* Returns the obstacle shader */
 	static Shader* GetShader();
 
+	/* Initialises the mesh, shader and texture used to render the jerry can */
 	static GLvoid Init();
 
 private:
 	glm::mat4 modelMatrix;
 
-	static Mesh* obstacle;
+	static Mesh* mesh;
 	static Texture2D* texture;
 	static Shader* shader;
 
 	static const GLfloat maxScale;
 	static const GLfloat minScale;
 
-	const GLfloat acceleration;
-	const GLboolean variable;
-	const GLfloat radiusOX, radiusOY;
-	const GLfloat scaleSpeed;
+	GLfloat acceleration;
+	GLboolean variable;
+	GLfloat radiusOX, radiusOY;
+	GLfloat scaleSpeed;
 
-	const GLfloat speedOX, speedOY, speedOZ;
+	GLfloat speedOX, speedOY, speedOZ;
 
 	GLfloat scaleType;
 	GLfloat scale;

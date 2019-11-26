@@ -10,9 +10,7 @@ class Cloud
 {
 public:
 	Cloud();
-	~Cloud();
-
-	static GLvoid Init();
+	~Cloud() = default;
 
 	/* Returns the global mesh used for each component */
 	static Mesh* GetMesh();
@@ -22,6 +20,9 @@ public:
 
 	/* Returns the global shader used for each component */
 	static Shader* GetShader();
+
+	/* Initialises the mesh, shader and texture used by the cloud */
+	static GLvoid Init();
 
 	/**
 	* Returns the number of components so PlaneRunner knows how many meshes to

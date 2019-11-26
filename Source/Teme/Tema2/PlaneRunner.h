@@ -97,4 +97,14 @@ protected:
 	std::vector<Cloud> clouds;
 
 	GLboolean render;
+
+	glm::vec3 lightPosition;
+	glm::vec3 lightDirection;
+	unsigned int materialShininess;
+	float materialKd;
+	float materialKs;
+
+	GLint typeOfLight;
+	GLfloat angleOX, angleOY;
+	GLfloat cutoffAngle;
 };

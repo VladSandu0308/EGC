@@ -25,9 +25,14 @@ public:
 		GLfloat deltaTimeSeconds,
 		GLfloat& scaleFactor);
 
+	/* Returns the shader used by the fuel bar */
+	Shader* GetShader();
+
 private:
 	Mesh* background;
 	Mesh* fuel;
+
+	Shader* shader;
 
 	const GLfloat maxFuel;
 	const GLfloat decay;

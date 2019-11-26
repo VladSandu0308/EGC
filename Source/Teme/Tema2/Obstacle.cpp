@@ -1,54 +1,48 @@
 #include "Obstacle.h"
 
-const GLfloat Obstacle::maxScale = 1.5f;
+const GLfloat Obstacle::maxScale = 1.25f;
 const GLfloat Obstacle::minScale = 0.5f;
 
-Mesh* Obstacle::obstacle = nullptr;
+Mesh* Obstacle::mesh = nullptr;
 Texture2D* Obstacle::texture = nullptr;
 Shader* Obstacle::shader = nullptr;
 
-Obstacle::Obstacle(
-	GLfloat _radiusOX,
-	GLfloat _radiusOY,
-	GLfloat _speed,
-	GLfloat _acceleration,
-	GLfloat _scale,
-	GLfloat _scaleSpeed,
-	GLboolean _variable
-) :
-	acceleration(_acceleration),
-	variable(_variable),
-	radiusOX(_radiusOX),
-	radiusOY(_radiusOY),
-	scaleSpeed(_scaleSpeed),
-	speedOX(50.f), speedOY(50.f), speedOZ(50.f)
+Obstacle::Obstacle()
 {
-	speed		= _speed;
-	scale		= _scale;
-	speed		= _speed;
-	angle		= -90.f;
-	scaleType	= 1.f;
-	angleOX		= 0.f;
-	angleOY		= 0.f;
-	angleOZ		= 0.f;
-}
+	std::random_device rd;
+	std::mt19937 gen(rd());
 
-Obstacle::~Obstacle()
-{
-	delete obstacle;
-	delete texture;
-	delete shader;
+	std::uniform_real_distribution<GLfloat> angleDist(180.f, 360.f);
+	std::uniform_real_distribution<GLfloat> speedDist(10.f, 40.f);
+	std::uniform_real_distribution<GLfloat> radiusDistOX(5.f, 10.f);
+	std::uniform_real_distribution<GLfloat> radiusDistOY(2.f, 5.f);
+	std::uniform_real_distribution<GLfloat> accelerationDist(.5f, 2.f);
+	std::uniform_real_distribution<GLfloat> scaleSpeedDist(.5f, 1.f);
+	std::uniform_real_distribution<GLfloat> scaleDist(minScale, maxScale);
+	std::uniform_real_distribution<GLfloat> rotSpeedDist(10.f, 100.f);
+
+	radiusOX = radiusDistOX(gen);
+	radiusOY = radiusDistOY(gen);
+	angle = angleDist(gen);
+	scale = scaleDist(gen);
+	speed = speedDist(gen);
+	acceleration = accelerationDist(gen);
+	scaleSpeed = scaleSpeedDist(gen);
+	speedOX = rotSpeedDist(gen);
+	speedOY = rotSpeedDist(gen);
+	speedOZ = rotSpeedDist(gen);
+	variable = rand() % 2;
+	scaleType = 1.f;
+	angleOX = 0.f;
+	angleOY = 0.f;
+	angleOZ = 0.f;
 }
 
 glm::mat4& Obstacle::GetModelMatrix(GLfloat deltaTimeSeconds)
 {
 	speed += acceleration * deltaTimeSeconds;
 	angle += speed * deltaTimeSeconds;
-
-	if (angle >= 360.f)
-	{
-		angle = 0.f;
-	}
+	angle = angle > 360.f ? 0.f : angle;
 
 	if (variable)
 	{
@@ -61,22 +55,13 @@ glm::mat4& Obstacle::GetModelMatrix(GLfloat deltaTimeSeconds)
 	}
 
 	angleOX += speedOX * deltaTimeSeconds;
-	if (angleOX >= 360.f)
-	{
-		angleOX = 0.f;
-	}
+	angleOX = angleOX > 360.f ? 0.f : angleOX;
 
 	angleOY += speedOY * deltaTimeSeconds;
-	if (angleOY >= 360.f)
-	{
-		angleOY = 0.f;
-	}
+	angleOY = angleOY > 360.f ? 0.f : angleOY;
 
 	angleOZ += speedOZ * deltaTimeSeconds;
-	if (angleOZ >= 360.f)
-	{
-		angleOZ = 0.f;
-	}
+	angleOZ = angleOZ > 360.f ? 0.f : angleOZ;
 
 	modelMatrix = Transform3D::Translate(
 		cos(RADIANS(angle)) * radiusOX,
@@ -93,8 +78,8 @@ glm::mat4& Obstacle::GetModelMatrix(GLfloat deltaTimeSeconds)
 
 GLvoid Obstacle::Init()
 {
-	obstacle = new Mesh("sphere");
-	obstacle->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "sphere.obj");
+	mesh = new Mesh("sphere");
+	mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "sphere.obj");
 
 	texture = new Texture2D();
 	texture->Load2D("Source/Teme/Tema2/Textures/rock.jpg");
@@ -107,7 +92,7 @@ GLvoid Obstacle::Init()
 
 Mesh* Obstacle::GetMesh()
 {
-	return obstacle;
+	return mesh;
 }
 
 Texture2D* Obstacle::GetTexture()

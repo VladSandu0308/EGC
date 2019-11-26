@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <ctime>
 
 using namespace std;
 
@@ -26,6 +27,7 @@ PlaneRunner::~PlaneRunner()
 void PlaneRunner::Init()
 {
 	glm::ivec2 resolution = window->GetResolution();
+	srand(time(NULL));
 
 	plane			= new Aeroplane();
 	fuelBar			= new FuelBar();
@@ -51,35 +53,42 @@ void PlaneRunner::Init()
 		zFar
 	);
 
-	Obstacle::Init();
-	Fuel::Init();
-	Cloud::Init();
+	{
+		Obstacle::Init();
+		Fuel::Init();
+		Cloud::Init();
 
-	obstacles.emplace_back(
-		10.f,
-		5.f,
-		20.f,
-		1.f,
-		0.5f,
-		0.5f,
-		GL_TRUE
-	);
+		obstacles.emplace_back();
+		obstacles.emplace_back();
+		obstacles.emplace_back();
+		obstacles.emplace_back();
 
-	fuelCans.emplace_back(
-		8.f,
-		4.f,
-		30.f,
-		2.f,
-		0.5f,
-		0.5f,
-		GL_TRUE
-	);
+		fuelCans.emplace_back();
+		fuelCans.emplace_back();
+		fuelCans.emplace_back();
 
-	clouds.emplace_back();
-	clouds.emplace_back();
-	clouds.emplace_back();
-	clouds.emplace_back();
-	clouds.emplace_back();
+		clouds.emplace_back();
+		clouds.emplace_back();
+		clouds.emplace_back();
+		clouds.emplace_back();
+		clouds.emplace_back();
+		clouds.emplace_back();
+		clouds.emplace_back();
+		clouds.emplace_back();
+	}
+
+	{
+		lightPosition = glm::vec3(0, 1, 1);
+		lightDirection = glm::vec3(0, -1, 0);
+		materialShininess = 30;
+		materialKd = 0.5;
+		materialKs = 0.5;
+
+		typeOfLight = 0;
+		angleOX = 0.f;
+		angleOY = 0.f;
+		cutoffAngle = 30.f;
+	}
 }
 
 void PlaneRunner::FrameStart()
@@ -116,7 +125,6 @@ void PlaneRunner::Update(float deltaTimeSeconds)
 
 GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
 {
-	// TODO: fa-o corect
 	angle = 5.f * atan(
 		(mouseCrtX - centreX)
 		/ (mouseCrtY - centreY + FLT_EPSILON)
@@ -169,6 +177,14 @@ GLvoid PlaneRunner::RenderPlane(GLfloat deltaTimeSeconds)
 		plane->GetRudderWing(offsetX, offsetY, offsetZ),
 		offsetX, offsetY, offsetZ
 	);
+	RenderPlanePart(
+		plane->GetLight(offsetX, offsetY, offsetZ),
+		offsetX, offsetY, offsetZ
+	);
+	RenderPlanePart(
+		plane->fmmm(offsetX, offsetY, offsetZ),
+		offsetX, offsetY, offsetZ
+	);
 }
 
 GLvoid PlaneRunner::RenderPlanePart(
@@ -189,7 +205,16 @@ GLvoid PlaneRunner::RenderPlanePart(
 		modelMatrix *= Transform3D::RotateOX(RADIANS(propellerAngle));
 	}
 
-	RenderSimpleMesh(planePart, shaders["VertexColor"], modelMatrix);
+	if (!strcmp(planePart->GetMeshID(), "light"))
+	{
+		glm::vec4 pos = modelMatrix * glm::vec4(0.f, 0.f, 0.f, 1.f);
+
+		lightPosition.x = pos.x;
+		lightPosition.y = pos.y;
+		lightPosition.z = pos.z;
+	}
+
+	RenderSimpleMesh(planePart, plane->GetShader(), modelMatrix);
 }
 
 GLvoid PlaneRunner::RenderFuelCans(GLfloat deltaTimeSeconds)
@@ -224,7 +249,7 @@ GLvoid PlaneRunner::RenderFuelBar(GLfloat deltaTimeSeconds)
 
 	RenderSimpleMesh(
 		fuelBar->GetBackground(),
-		shaders["VertexColor"],
+		fuelBar->GetShader(),
 		Transform3D::Translate(-1.5f, 5.5f, 0.f)
 	);
 
@@ -232,7 +257,7 @@ GLvoid PlaneRunner::RenderFuelBar(GLfloat deltaTimeSeconds)
 
 	RenderSimpleMesh(
 		fuel,
-		shaders["VertexColor"],
+		fuelBar->GetShader(),
 		Transform3D::Translate(-1.5f, 5.5f, 0.001f)
 		* Transform3D::Scale(scaleFactor, 1.f, 1.f)
 	);
@@ -245,6 +270,9 @@ GLvoid PlaneRunner::RenderClouds(GLfloat deltaTimeSeconds)
 	Shader* cloudShader		= Cloud::GetShader();
 
 	GLushort numParts;
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for (Cloud& cloud : clouds)
 	{
@@ -260,6 +288,8 @@ GLvoid PlaneRunner::RenderClouds(GLfloat deltaTimeSeconds)
 			);
 		}
 	}
+
+	glDisable(GL_BLEND);
 }
 
 void PlaneRunner::FrameEnd()
@@ -334,35 +364,50 @@ void PlaneRunner::RenderSimpleMesh(
 		return;
 	}
 
-	// render an object using the specified shader and the specified position
+	// Render an object using the specified shader and the specified position
 	glUseProgram(shader->program);
 
-	// get shader location for uniform mat4 "Model"
-	GLint modelLocation = glGetUniformLocation(shader->GetProgramID(), "Model");
+	// Set shader uniforms for light & material properties
+	// Set light position uniform
+	int light_position = glGetUniformLocation(shader->program, "light_position");
+	glUniform3f(light_position, lightPosition.x, lightPosition.y, lightPosition.z);
 
-	// set shader uniform "Model" to modelMatrix
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+	int light_direction = glGetUniformLocation(shader->program, "light_direction");
+	glUniform3f(light_direction, lightDirection.x, lightDirection.y, lightDirection.z);
 
-	// get shader location for uniform mat4 "View"
-	GLint viewLocation = glGetUniformLocation(shader->GetProgramID(), "View");
+	// Set eye position (camera position) uniform
+	glm::vec3 eyePosition = camera->position;
+	int eye_position = glGetUniformLocation(shader->program, "eye_position");
+	glUniform3f(eye_position, eyePosition.x, eyePosition.y, eyePosition.z);
 
-	// set shader uniform "View" to viewMatrix
+	// Set material property uniforms (shininess, kd, ks, object color) 
+	int material_shininess = glGetUniformLocation(shader->program, "material_shininess");
+	glUniform1i(material_shininess, materialShininess);
+
+	int material_kd = glGetUniformLocation(shader->program, "material_kd");
+	glUniform1f(material_kd, materialKd);
+
+	int material_ks = glGetUniformLocation(shader->program, "material_ks");
+	glUniform1f(material_ks, materialKs);
+
+	// Bind model matrix
+	GLint loc_model_matrix = glGetUniformLocation(shader->program, "Model");
+	glUniformMatrix4fv(loc_model_matrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+	// Bind view matrix
 	glm::mat4 viewMatrix = camera->GetViewMatrix();
-	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	int loc_view_matrix = glGetUniformLocation(shader->program, "View");
+	glUniformMatrix4fv(loc_view_matrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
-	// get shader location for uniform mat4 "Projection"
-	GLint projLocation = glGetUniformLocation(shader->GetProgramID(), "Projection");
+	// Bind projection matrix
+	int loc_projection_matrix = glGetUniformLocation(shader->program, "Projection");
+	glUniformMatrix4fv(loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-	// set shader uniform "Projection" to projectionMatrix
-	glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	GLint type = glGetUniformLocation(shader->program, "type_of_light");
+	glUniform1i(type, typeOfLight);
 
-	// get shader location for "Time"
-	GLint timeLocation = glGetUniformLocation(shader->GetProgramID(), "Time");
-
-	// set shader uniform "Time" to elapsed time
-	glUniform1f(timeLocation, (GLfloat)Engine::GetElapsedTime());
-
-	//glm::vec3 eyePosition = camera->position;
+	GLint cut_off_angle = glGetUniformLocation(shader->program, "cut_off_angle");
+	glUniform1f(cut_off_angle, cutoffAngle);
 
 	// Draw the object
 	glBindVertexArray(mesh->GetBuffers()->VAO);
