@@ -217,10 +217,12 @@ void Laborator8::OnInputUpdate(float deltaTime, int mods)
 		if (window->KeyHold(GLFW_KEY_R))
 		{
 			cutoffAngle += deltaTime * ANGLE_SPEEDUP;
+			cutoffAngle = cutoffAngle > 360.f ? 360.f : cutoffAngle;
 		}
 		if (window->KeyHold(GLFW_KEY_T))
 		{
 			cutoffAngle -= deltaTime * ANGLE_SPEEDUP;
+			cutoffAngle = cutoffAngle < 0.f ? 0.f : cutoffAngle;
 		}
 
 		glm::mat4 turn	= glm::mat4(1);
