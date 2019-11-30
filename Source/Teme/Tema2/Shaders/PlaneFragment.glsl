@@ -28,7 +28,7 @@ void main()
 	vec3 R = normalize(reflect(L, world_normal));
 
 	// Define ambient light component
-	float ambient_light = 0.25f;
+	float ambient_light = 1.f;
 
 	// Compute diffuse light component
 	float diffuse_light = material_kd * max(dot(normalize(N), L), 0.f);

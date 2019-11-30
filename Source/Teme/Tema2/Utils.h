@@ -10,7 +10,14 @@ public:
 	static Mesh* CreateMesh(
 		const GLchar* name,
 		const std::vector<VertexFormat>& vertices,
-		const std::vector<GLushort>& indices);
+		const std::vector<GLushort>& indices
+	);
+
+	static Mesh* CreateSeaMesh(
+		std::string name,
+		const std::vector<VertexFormat>& vertices,
+		const std::vector<GLushort>& indices
+	);
 
 private:
 	Utils() = default;

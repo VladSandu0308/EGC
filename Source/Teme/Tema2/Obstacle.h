@@ -13,10 +13,13 @@ public:
 	~Obstacle() = default;
 
 	/**
-	* Calculates the movement of the obstacle as a maodel matrix and returns
+	* Calculates the movement of the obstacle as a model matrix and returns
 	* it
 	*/
 	glm::mat4& GetModelMatrix(GLfloat deltaTimeSeconds);
+
+	/* Returns the radius of the obstacle */
+	GLfloat GetRadius();
 
 	/* Returns the obstacle mesh */
 	static Mesh* GetMesh();

@@ -17,6 +17,12 @@ public:
 	* it
 	*/
 	glm::mat4& GetModelMatrix(GLfloat deltaTimeSeconds);
+
+	/* Returns the radius of the fuel can */
+	GLfloat GetRadius();
+
+	/* Returns the amount of fuel in the jerry can */
+	GLfloat GetFuelAmount();
 	
 	/* Returns the jerry can mesh */
 	static Mesh* GetMesh();

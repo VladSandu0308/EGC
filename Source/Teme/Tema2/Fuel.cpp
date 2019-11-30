@@ -1,11 +1,11 @@
 #include "Fuel.h"
 
-const GLfloat Fuel::maxScale = 1.25f;
-const GLfloat Fuel::minScale = 0.5f;
+const GLfloat Fuel::maxScale = .7f;
+const GLfloat Fuel::minScale = .5f;
 
-Mesh* Fuel::mesh = nullptr;
-Texture2D* Fuel::texture = nullptr;
-Shader* Fuel::shader = nullptr;
+Mesh* Fuel::mesh			= nullptr;
+Texture2D* Fuel::texture	= nullptr;
+Shader* Fuel::shader		= nullptr;
 
 Fuel::Fuel()
 {
@@ -13,9 +13,9 @@ Fuel::Fuel()
 	std::mt19937 gen(rd());
 
 	std::uniform_real_distribution<GLfloat> angleDist(180.f, 360.f);
-	std::uniform_real_distribution<GLfloat> speedDist(10.f, 40.f);
-	std::uniform_real_distribution<GLfloat> radiusDistOX(5.f, 10.f);
-	std::uniform_real_distribution<GLfloat> radiusDistOY(2.f, 5.f);
+	std::uniform_real_distribution<GLfloat> speedDist(10.f, 20.f);
+	std::uniform_real_distribution<GLfloat> radiusDistOX(10.f, 20.f);
+	std::uniform_real_distribution<GLfloat> radiusDistOY(2.f, 6.f);
 	std::uniform_real_distribution<GLfloat> accelerationDist(.5f, 2.f);
 	std::uniform_real_distribution<GLfloat> scaleSpeedDist(.5f, 1.f);
 	std::uniform_real_distribution<GLfloat> scaleDist(minScale, maxScale);
@@ -105,4 +105,14 @@ Texture2D* Fuel::GetTexture()
 Shader* Fuel::GetShader()
 {
 	return shader;
+}
+
+GLfloat Fuel::GetFuelAmount()
+{
+	return fuelAmount;
+}
+
+GLfloat Fuel::GetRadius()
+{
+	return scale / 2.f;
 }

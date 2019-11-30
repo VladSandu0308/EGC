@@ -1,11 +1,11 @@
 #include "Obstacle.h"
 
-const GLfloat Obstacle::maxScale = 1.25f;
-const GLfloat Obstacle::minScale = 0.5f;
+const GLfloat Obstacle::maxScale = 1.f;
+const GLfloat Obstacle::minScale = 0.3f;
 
-Mesh* Obstacle::mesh = nullptr;
-Texture2D* Obstacle::texture = nullptr;
-Shader* Obstacle::shader = nullptr;
+Mesh* Obstacle::mesh			= nullptr;
+Texture2D* Obstacle::texture	= nullptr;
+Shader* Obstacle::shader		= nullptr;
 
 Obstacle::Obstacle()
 {
@@ -13,29 +13,29 @@ Obstacle::Obstacle()
 	std::mt19937 gen(rd());
 
 	std::uniform_real_distribution<GLfloat> angleDist(180.f, 360.f);
-	std::uniform_real_distribution<GLfloat> speedDist(10.f, 40.f);
-	std::uniform_real_distribution<GLfloat> radiusDistOX(5.f, 10.f);
-	std::uniform_real_distribution<GLfloat> radiusDistOY(2.f, 5.f);
+	std::uniform_real_distribution<GLfloat> speedDist(10.f, 20.f);
+	std::uniform_real_distribution<GLfloat> radiusDistOX(10.f, 20.f);
+	std::uniform_real_distribution<GLfloat> radiusDistOY(2.f, 6.f);
 	std::uniform_real_distribution<GLfloat> accelerationDist(.5f, 2.f);
 	std::uniform_real_distribution<GLfloat> scaleSpeedDist(.5f, 1.f);
 	std::uniform_real_distribution<GLfloat> scaleDist(minScale, maxScale);
 	std::uniform_real_distribution<GLfloat> rotSpeedDist(10.f, 100.f);
 
-	radiusOX = radiusDistOX(gen);
-	radiusOY = radiusDistOY(gen);
-	angle = angleDist(gen);
-	scale = scaleDist(gen);
-	speed = speedDist(gen);
-	acceleration = accelerationDist(gen);
-	scaleSpeed = scaleSpeedDist(gen);
-	speedOX = rotSpeedDist(gen);
-	speedOY = rotSpeedDist(gen);
-	speedOZ = rotSpeedDist(gen);
-	variable = rand() % 2;
-	scaleType = 1.f;
-	angleOX = 0.f;
-	angleOY = 0.f;
-	angleOZ = 0.f;
+	radiusOX		= radiusDistOX(gen);
+	radiusOY		= radiusDistOY(gen);
+	angle			= angleDist(gen);
+	scale			= scaleDist(gen);
+	speed			= speedDist(gen);
+	acceleration	= accelerationDist(gen);
+	scaleSpeed		= scaleSpeedDist(gen);
+	speedOX			= rotSpeedDist(gen);
+	speedOY			= rotSpeedDist(gen);
+	speedOZ			= rotSpeedDist(gen);
+	variable		= rand() % 2;
+	scaleType		= 1.f;
+	angleOX			= 0.f;
+	angleOY			= 0.f;
+	angleOZ			= 0.f;
 }
 
 glm::mat4& Obstacle::GetModelMatrix(GLfloat deltaTimeSeconds)
@@ -103,4 +103,9 @@ Texture2D* Obstacle::GetTexture()
 Shader* Obstacle::GetShader()
 {
 	return shader;
+}
+
+GLfloat Obstacle::GetRadius()
+{
+	return scale / 2.f;
 }

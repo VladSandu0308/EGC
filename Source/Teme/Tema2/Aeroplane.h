@@ -10,6 +10,14 @@ public:
 	Aeroplane();
 	~Aeroplane();
 
+	/* Places the limits of the bounding box in the given parameters */
+	GLvoid GetBBoxOffsets(
+		GLfloat& deltaXRight,
+		GLfloat& deltaXLeft,
+		GLfloat& deltaYUp,
+		GLfloat& deltaYDown
+	);
+
 	/* Getters for the various aerolane parts */
 	Mesh* GetPropeller(GLfloat& offsetX, GLfloat& offsetY, GLfloat& offsetZ);
 	Mesh* GetNose(GLfloat& offsetX, GLfloat& offsetY, GLfloat& offsetZ);

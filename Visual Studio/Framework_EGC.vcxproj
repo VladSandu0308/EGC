@@ -45,6 +45,18 @@
     <ClCompile Include="..\Source\Laboratoare\Laborator8\Laborator8.cpp" />
     <ClCompile Include="..\Source\Laboratoare\Laborator9\Laborator9.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema1\Bird.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema1\FlappyBird.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema1\TexturedRectangle.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema2\Aeroplane.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema2\Cloud.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema2\Fuel.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema2\FuelBar.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema2\Heart.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema2\Obstacle.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema2\PlaneRunner.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema2\Sea.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema2\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Component\CameraInput.h" />
@@ -80,12 +92,28 @@
     <ClInclude Include="..\Source\Laboratoare\Laborator7\Laborator7.h" />
     <ClInclude Include="..\Source\Laboratoare\Laborator8\Laborator8.h" />
     <ClInclude Include="..\Source\Laboratoare\Laborator9\Laborator9.h" />
+    <ClInclude Include="..\Source\Teme\Tema1\Bird.h" />
+    <ClInclude Include="..\Source\Teme\Tema1\FlappyBird.h" />
+    <ClInclude Include="..\Source\Teme\Tema1\TexturedRectangle.h" />
+    <ClInclude Include="..\Source\Teme\Tema1\Transform2D.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\Aeroplane.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\Cloud.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\Fuel.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\FuelBar.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\Heart.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\LabCamera.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\Obstacle.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\PlaneRunner.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\Sea.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\Transform3D.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\Utils.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
     <None Include="..\Source\Laboratoare\Laborator1\README.md" />
     <None Include="..\Source\Laboratoare\Laborator3\README.md" />
+    <None Include="..\Source\Laboratoare\Laborator4\README.md" />
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\VertexShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator7\Shaders\FragmentShader.glsl" />
@@ -94,16 +122,26 @@
     <None Include="..\Source\Laboratoare\Laborator8\Shaders\VertexShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator9\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator9\Shaders\VertexShader.glsl" />
+    <None Include="..\Source\Teme\Tema1\README.md" />
+    <None Include="..\Source\Teme\Tema1\Shaders\FragmentShader.glsl" />
+    <None Include="..\Source\Teme\Tema1\Shaders\VertexShader.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\CloudFragment.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\CloudVertex.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\FuelBarFragment.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\FuelBarVertex.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\ObjectFragment.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\ObjectVertex.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\PlaneFragment.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\PlaneVertex.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\SeaFragment.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\SeaVertex.glsl" />
     <None Include="ClassDiagram.cd" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Framework_EGC.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FB43B467-42CC-458C-9556-597B025830F7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Framework_EGC</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

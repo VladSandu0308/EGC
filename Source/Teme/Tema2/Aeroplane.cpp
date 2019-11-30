@@ -1,16 +1,16 @@
 #include "Aeroplane.h"
 
 Aeroplane::Aeroplane() :
-	offsetPropellerX(3.f),		offsetPropellerY(0.f),	offsetPropellerZ(0.f),
-	offsetNoseX(2.7f),			offsetNoseY(0.f),		offsetNoseZ(0.f),
-	offsetBodyX(1.f),			offsetBodyY(0.f),		offsetBodyZ(0.f),
-	offsetCockpitX(1.f),		offsetCockpitY(1.25f),	offsetCockpitZ(0.f),
-	offsetTailX(-2.f),			offsetTailY(0.f),		offsetTailZ(0.f),
-	offsetWingX(0.f),			offsetWingY(0.f),		offsetWingZ(1.f),
-	offsetRudderX(-3.45f),		offsetRudderY(0.f),		offsetRudderZ(0.f),
-	offsetRudderWingX(-3.45f),	offsetRudderWingY(0.f), offsetRudderWingZ(.5f),
+	offsetPropellerX(3.175f),	offsetPropellerY(0.f),	offsetPropellerZ(0.f),
+	offsetNoseX(2.875f),		offsetNoseY(0.f),		offsetNoseZ(0.f),
+	offsetBodyX(1.175f),		offsetBodyY(0.f),		offsetBodyZ(0.f),
+	offsetCockpitX(1.175f),		offsetCockpitY(1.25f),	offsetCockpitZ(0.f),
+	offsetTailX(-1.825f),		offsetTailY(0.f),		offsetTailZ(0.f),
+	offsetWingX(-.175f),		offsetWingY(0.f),		offsetWingZ(1.f),
+	offsetRudderX(-3.275f),		offsetRudderY(0.f),		offsetRudderZ(0.f),
+	offsetRudderWingX(-3.275f),	offsetRudderWingY(0.f), offsetRudderWingZ(.5f),
 	offsetLightX(-4.5f),		offsetLightY(2.f),		offsetLightZ(0.f),
-	fmmx(-4.5f), fmmy(0.f), fmmz(0.f)
+	fmmx(-4.5f),				fmmy(0.f),				fmmz(0.f)
 {
 	/* Create the plane's propeller */
 	{
@@ -256,6 +256,19 @@ Aeroplane::~Aeroplane()
 	delete rudderWing;
 	delete light;
 	delete shader;
+}
+
+GLvoid Aeroplane::GetBBoxOffsets(
+	GLfloat& deltaXRight,
+	GLfloat& deltaXLeft,
+	GLfloat& deltaYUp,
+	GLfloat& deltaYDown
+)
+{
+	deltaXRight	= 3.275f;
+	deltaXLeft	= -3.275f;
+	deltaYUp	= 1.75f;
+	deltaYDown	= -1.f;
 }
 
 Mesh* Aeroplane::GetPropeller(

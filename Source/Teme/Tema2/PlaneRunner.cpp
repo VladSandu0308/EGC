@@ -11,33 +11,43 @@ using namespace std;
 
 PlaneRunner::PlaneRunner() :
 	zNear(0.01f), zFar(200.f),
-	centreX(-5.f), centreZ(0.f),
-	propellerAcceleration(20.f),
-	planeAcceleration(10.f)
+	centreX(-4.5f), centreZ(0.f),
+	propellerAcceleration(50.f),
+	planeAcceleration(10.f),
+	numClouds(10), numFuelCans(4), numObstacles(6)
 {
 }
 
 PlaneRunner::~PlaneRunner()
-{
+{	
 	delete camera;
 	delete plane;
 	delete fuelBar;
+	delete sea;
+	delete revSea;
+	delete heart;
 }
 
 void PlaneRunner::Init()
 {
-	glm::ivec2 resolution = window->GetResolution();
-	srand(time(NULL));
+	//glm::ivec2 resolution = window->GetResolution();
+	srand((unsigned int)time(NULL));
 
 	plane			= new Aeroplane();
 	fuelBar			= new FuelBar();
+	sea				= new Sea(.35f, "Sea");
+	revSea			= new Sea(.7f, "RevSea");
+	heart			= new Heart();
 
 	angle			= 0.f;
 	propellerAngle	= 0.f;
 	centreY			= 1.75f;
 	planeSpeed		= 4.f;
-	propellerSpeed	= 100.f;
+	propellerSpeed	= 300.f;
 	render			= GL_TRUE;
+	numLives		= 3;
+
+	plane->GetBBoxOffsets(deltaXRight, deltaXLeft, deltaYUp, deltaYDown);
 
 	camera = new Plane::Camera();
 	camera->Set(
@@ -58,27 +68,24 @@ void PlaneRunner::Init()
 		Fuel::Init();
 		Cloud::Init();
 
-		obstacles.emplace_back();
-		obstacles.emplace_back();
-		obstacles.emplace_back();
-		obstacles.emplace_back();
+		for (GLushort i = 0; i != numObstacles; ++i)
+		{
+			obstacles.emplace_back();
+		}
 
-		fuelCans.emplace_back();
-		fuelCans.emplace_back();
-		fuelCans.emplace_back();
+		for (GLushort i = 0; i != numFuelCans; ++i)
+		{
+			fuelCans.emplace_back();
+		}
 
-		clouds.emplace_back();
-		clouds.emplace_back();
-		clouds.emplace_back();
-		clouds.emplace_back();
-		clouds.emplace_back();
-		clouds.emplace_back();
-		clouds.emplace_back();
-		clouds.emplace_back();
+		for (GLushort i = 0; i != numClouds; ++i)
+		{
+			clouds.emplace_back();
+		}
 	}
 
 	{
-		lightPosition = glm::vec3(0, 1, 1);
+		lightPosition = glm::vec3(-10.f, 11.5f, -20.f);
 		lightDirection = glm::vec3(0, -1, 0);
 		materialShininess = 30;
 		materialKd = 0.5;
@@ -94,7 +101,7 @@ void PlaneRunner::Init()
 void PlaneRunner::FrameStart()
 {
 	// clears the color buffer (using the previously set color) and depth buffer
-	glClearColor(.529f, .808f, 1.f, 1.f);
+	glClearColor(1.f, .6f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::ivec2 resolution = window->GetResolution();
@@ -116,21 +123,32 @@ void PlaneRunner::Update(float deltaTimeSeconds)
 		deltaTime = 0.f;
 	}
 
-	RenderPlane(deltaTime);
 	RenderFuelCans(deltaTime);
 	RenderObstacles(deltaTime);
 	RenderFuelBar(deltaTime);
 	RenderClouds(deltaTime);
+	RenderSea(deltaTime);
+	RenderLives(deltaTime);
+	RenderPlane(deltaTime);
 }
 
 GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
 {
-	angle = 5.f * atan(
-		(mouseCrtX - centreX)
-		/ (mouseCrtY - centreY + FLT_EPSILON)
-	);
+	if (numLives > 0)
+	{
+		angle = 5.f * atan(
+			(mouseCrtX - centreX)
+			/ (mouseCrtY - centreY + FLT_EPSILON)
+		);
 
-	centreY += planeSpeed * deltaTimeSeconds * sin(angle);
+		centreY += planeSpeed * deltaTimeSeconds * sin(angle);
+	} else if (centreY > -5.f)
+	{
+		angle -= 10.f * deltaTimeSeconds;
+		angle = angle > 360.f ? 0.f : angle;
+
+		centreY -= 1.f * deltaTimeSeconds;
+	}
 
 	propellerSpeed += propellerAcceleration * deltaTimeSeconds;
 	propellerAngle += propellerSpeed * deltaTimeSeconds;
@@ -177,14 +195,14 @@ GLvoid PlaneRunner::RenderPlane(GLfloat deltaTimeSeconds)
 		plane->GetRudderWing(offsetX, offsetY, offsetZ),
 		offsetX, offsetY, offsetZ
 	);
-	RenderPlanePart(
-		plane->GetLight(offsetX, offsetY, offsetZ),
-		offsetX, offsetY, offsetZ
-	);
-	RenderPlanePart(
-		plane->fmmm(offsetX, offsetY, offsetZ),
-		offsetX, offsetY, offsetZ
-	);
+	//RenderPlanePart(
+	//	plane->GetLight(offsetX, offsetY, offsetZ),
+	//	offsetX, offsetY, offsetZ
+	//);
+	//RenderPlanePart(
+	//	plane->fmmm(offsetX, offsetY, offsetZ),
+	//	offsetX, offsetY, offsetZ
+	//);
 }
 
 GLvoid PlaneRunner::RenderPlanePart(
@@ -205,14 +223,14 @@ GLvoid PlaneRunner::RenderPlanePart(
 		modelMatrix *= Transform3D::RotateOX(RADIANS(propellerAngle));
 	}
 
-	if (!strcmp(planePart->GetMeshID(), "light"))
-	{
-		glm::vec4 pos = modelMatrix * glm::vec4(0.f, 0.f, 0.f, 1.f);
+	//if (!strcmp(planePart->GetMeshID(), "light"))
+	//{
+	//	glm::vec4 pos = modelMatrix * glm::vec4(0.f, 0.f, 0.f, 1.f);
 
-		lightPosition.x = pos.x;
-		lightPosition.y = pos.y;
-		lightPosition.z = pos.z;
-	}
+	//	lightPosition.x = pos.x;
+	//	lightPosition.y = pos.y;
+	//	lightPosition.z = pos.z;
+	//}
 
 	RenderSimpleMesh(planePart, plane->GetShader(), modelMatrix);
 }
@@ -232,14 +250,31 @@ GLvoid PlaneRunner::RenderFuelCans(GLfloat deltaTimeSeconds)
 
 GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 {
-	for (Obstacle& obs : obstacles)
+	GLushort numCollisions = 0;
+	glm::mat4 model;
+
+	for (GLushort i = 0; i != numObstacles; ++i)
 	{
+		model = obstacles[i].GetModelMatrix(deltaTimeSeconds);
+
 		RenderTexturedMesh(
 			Obstacle::GetMesh(),
 			Obstacle::GetShader(),
-			obs.GetModelMatrix(deltaTimeSeconds),
+			model,
 			Obstacle::GetTexture()
 		);
+
+		if (CheckCollision(model, obstacles[i].GetRadius()))
+		{
+			obstacles.erase(obstacles.begin() + i);
+			++numCollisions;
+			--numLives;
+		}
+	}
+
+	for (GLushort i = 0; i != numCollisions; ++i)
+	{
+		obstacles.emplace_back();
 	}
 }
 
@@ -290,6 +325,60 @@ GLvoid PlaneRunner::RenderClouds(GLfloat deltaTimeSeconds)
 	}
 
 	glDisable(GL_BLEND);
+}
+
+GLvoid PlaneRunner::RenderLives(GLfloat deltaTimeSeconds)
+{
+	GLfloat posX	= -1.f;
+	glm::mat4 aux	= heart->GetModelMatrix(deltaTimeSeconds);
+
+	for (GLushort i = 0; i < numLives; ++i, posX += 1.f)
+	{
+		modelMatrix = Transform3D::Translate(posX, 4.5f, 0.f);
+		modelMatrix *= Transform3D::Scale(.02f, .02f, .02f);
+		modelMatrix *= aux;
+
+		RenderTexturedMesh(
+			heart->GetMesh(),
+			heart->GetShader(),
+			modelMatrix,
+			heart->GetTexture()
+		);
+	}
+}
+
+GLvoid PlaneRunner::RenderSea(GLfloat deltaTimeSeconds)
+{
+	modelMatrix = sea->GetModelMatrix(deltaTimeSeconds);
+	RenderMesh(sea->GetMesh(), sea->GetShader(), modelMatrix);
+
+	modelMatrix = revSea->GetModelMatrix(deltaTimeSeconds);
+	RenderMesh(revSea->GetMesh(), revSea->GetShader(), modelMatrix);
+}
+
+GLboolean PlaneRunner::CheckCollision(glm::mat4& model, GLfloat radius)
+{
+	bBoxMaxX		= centreX + deltaXRight * .1f;
+	bBoxMinX		= centreX + deltaXLeft * .1f;
+	bBoxMaxY		= centreY + deltaYUp * .1f;
+	bBoxMinY		= centreY + deltaYDown * .1f;
+
+	model			*= Transform3D::Translate(centreX, centreY, 0.f);
+	model			*= Transform3D::RotateOZ(RADIANS(-angle));
+	model			*= Transform3D::Translate(-centreX, -centreY, 0.f);
+
+	glm::vec4 pos	= model * glm::vec4(0.f, 0.f, 0.f, 1.f);
+	
+	GLfloat posX	= pos[0];
+	GLfloat posY	= pos[1];
+
+	GLfloat projX	= MAX(bBoxMinX, MIN(posX, bBoxMaxX));
+	GLfloat projY	= MAX(bBoxMinY, MIN(posY, bBoxMaxY));
+
+	GLfloat dist	= (projX - posX) * (projX - posX) +
+					  (projY - posY) * (projY - posY);
+
+	return dist < radius * radius;
 }
 
 void PlaneRunner::FrameEnd()
@@ -350,7 +439,32 @@ GLvoid PlaneRunner::RenderTexturedMesh(
 		mesh->GetDrawMode(),
 		static_cast<int>(mesh->indices.size()),
 		GL_UNSIGNED_SHORT,
-		0);
+		0
+	);
+}
+
+GLvoid PlaneRunner::RenderMesh(
+	Mesh* mesh,
+	Shader* shader,
+	const glm::mat4& modelMatrix
+)
+{
+	if (!mesh || !shader || !shader->program)
+	{
+		return;
+	}
+
+	shader->Use();
+
+	glUniformMatrix4fv(shader->loc_view_matrix, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
+	glUniformMatrix4fv(shader->loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	glUniformMatrix4fv(shader->loc_model_matrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+	glUniform1f(glGetUniformLocation(shader->program, "time"), (GLfloat)Engine::GetElapsedTime());
+	
+	glUniform3fv(glGetUniformLocation(shader->program, "lightSea"), 1, glm::value_ptr(lightPosition));
+	glUniform3fv(glGetUniformLocation(shader->program, "viewPos"), 1, glm::value_ptr(camera->position));
+	
+	mesh->Render();
 }
 
 void PlaneRunner::RenderSimpleMesh(

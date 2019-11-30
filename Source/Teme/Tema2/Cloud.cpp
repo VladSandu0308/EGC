@@ -13,11 +13,11 @@ Cloud::Cloud()
 	
 	std::uniform_int_distribution<GLushort> partsDist(3, 7);
 	std::uniform_real_distribution<GLfloat> angleDist(0.f, 360.f);
-	std::uniform_real_distribution<GLfloat> speedDist(1.f, 2.f);
-	std::uniform_real_distribution<GLfloat> radiusDistOX(7.f, 15.f);
-	std::uniform_real_distribution<GLfloat> radiusDistOY(5.f, 8.f);
-	std::uniform_real_distribution<GLfloat> deltaRadiusDist(-1.f, 1.f);
-	std::uniform_real_distribution<GLfloat> deltaAngleDist(-5.f, 5.f);
+	std::uniform_real_distribution<GLfloat> speedDist(.5f, 1.f);
+	std::uniform_real_distribution<GLfloat> radiusDistOX(15.f, 25.f);
+	std::uniform_real_distribution<GLfloat> radiusDistOY(4.f, 8.f);
+	std::uniform_real_distribution<GLfloat> deltaRadiusDist(-.5f, .5f);
+	std::uniform_real_distribution<GLfloat> deltaAngleDist(-3.f, 3.f);
 	std::uniform_real_distribution<GLfloat> scaleDist(.75f, 1.5f);
 
 	numParts	= partsDist(gen);

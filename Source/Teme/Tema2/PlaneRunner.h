@@ -7,6 +7,8 @@
 #include "Fuel.h"
 #include "FuelBar.h"
 #include "Cloud.h"
+#include "Sea.h"
+#include "Heart.h"
 
 #include "Transform3D.h"
 #include "LabCamera.h"
@@ -25,6 +27,12 @@ private:
 	GLvoid FrameEnd() override;
 
 	GLvoid RenderSimpleMesh(
+		Mesh* mesh,
+		Shader* shader,
+		const glm::mat4& modelMatrix
+	);
+
+	GLvoid RenderMesh(
 		Mesh* mesh,
 		Shader* shader,
 		const glm::mat4& modelMatrix
@@ -52,6 +60,9 @@ private:
 	/* Renders the obstacles one by one */
 	GLvoid RenderObstacles(GLfloat deltaTimeSeconds);
 
+	/* Checks if the object with the given model matrix collides with the plane */
+	GLboolean CheckCollision(glm::mat4& model, GLfloat radius);
+
 	/* Renders the fuel cans one by one */
 	GLvoid RenderFuelCans(GLfloat deltaTimeSeconds);
 
@@ -60,6 +71,12 @@ private:
 
 	/* Renders the clouds one by one */
 	GLvoid RenderClouds(GLfloat deltaTimeSeconds);
+
+	/* Renders the seas (both of them) */
+	GLvoid RenderSea(GLfloat deltaTimeSeconds);
+
+	/* Renders the remaining lives */
+	GLvoid RenderLives(GLfloat deltaTimeSeconds);
 
 	GLvoid OnInputUpdate(float deltaTime, int mods) override;
 	GLvoid OnKeyPress(int key, int mods) override;
@@ -72,6 +89,8 @@ private:
 
 protected:
 	const GLfloat zNear, zFar;
+	const GLushort numFuelCans, numObstacles, numClouds;
+
 	Plane::Camera* camera;
 	glm::mat4 projectionMatrix;
 	glm::mat4 modelMatrix;
@@ -91,6 +110,9 @@ protected:
 
 	Aeroplane* plane;
 	FuelBar* fuelBar;
+	Sea* sea;
+	Sea* revSea;
+	Heart* heart;
 
 	std::vector<Obstacle> obstacles;
 	std::vector<Fuel> fuelCans;
@@ -100,11 +122,19 @@ protected:
 
 	glm::vec3 lightPosition;
 	glm::vec3 lightDirection;
-	unsigned int materialShininess;
-	float materialKd;
-	float materialKs;
+	GLuint materialShininess;
+	GLfloat materialKd;
+	GLfloat materialKs;
 
 	GLint typeOfLight;
 	GLfloat angleOX, angleOY;
 	GLfloat cutoffAngle;
+
+	GLint numLives;
+
+	GLfloat deltaXLeft, deltaXRight;
+	GLfloat deltaYDown, deltaYUp;
+
+	GLfloat bBoxMinX, bBoxMaxX;
+	GLfloat bBoxMinY, bBoxMaxY;
 };
