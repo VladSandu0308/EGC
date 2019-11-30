@@ -38,8 +38,7 @@ void main()
 
 	if (diffuse_light > 0.f)
 	{
-		// specular_light = material_ks * pow(max(dot(N, H), 0), material_shininess);
-		specular_light = material_ks * pow(max(dot(V, R), 0), material_shininess);
+		specular_light = material_ks * pow(max(dot(N, H), 0), material_shininess);
 	}
 
 	// Compute light
