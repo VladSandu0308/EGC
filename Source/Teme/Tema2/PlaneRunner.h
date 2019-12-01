@@ -26,12 +26,7 @@ private:
 	GLvoid Update(float deltaTimeSeconds) override;
 	GLvoid FrameEnd() override;
 
-	GLvoid RenderSimpleMesh(
-		Mesh* mesh,
-		Shader* shader,
-		const glm::mat4& modelMatrix
-	);
-
+	/* Renders a given mesh */
 	GLvoid RenderMesh(
 		Mesh* mesh,
 		Shader* shader,
@@ -78,14 +73,8 @@ private:
 	/* Renders the remaining lives */
 	GLvoid RenderLives(GLfloat deltaTimeSeconds);
 
-	GLvoid OnInputUpdate(float deltaTime, int mods) override;
 	GLvoid OnKeyPress(int key, int mods) override;
-	GLvoid OnKeyRelease(int key, int mods) override;
 	GLvoid OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY) override;
-	GLvoid OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) override;
-	GLvoid OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods) override;
-	GLvoid OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
-	GLvoid OnWindowResize(int width, int height) override;
 
 protected:
 	const GLfloat zNear, zFar;
@@ -94,12 +83,13 @@ protected:
 	Plane::Camera* camera;
 	glm::mat4 projectionMatrix;
 	glm::mat4 modelMatrix;
+	glm::mat4 cockpitMatrix;
+	glm::mat4 targetMatrix;
 
 	const GLfloat centreX, centreZ;
 	const GLfloat propellerAcceleration;
 	const GLfloat planeAcceleration;
 
-	GLfloat mouseStartX, mouseStartY;
 	GLfloat mouseCrtX, mouseCrtY;
 
 	GLfloat centreY;
@@ -119,16 +109,9 @@ protected:
 	std::vector<Cloud> clouds;
 
 	GLboolean render;
+	GLushort cameraType;
 
 	glm::vec3 lightPosition;
-	glm::vec3 lightDirection;
-	GLuint materialShininess;
-	GLfloat materialKd;
-	GLfloat materialKs;
-
-	GLint typeOfLight;
-	GLfloat angleOX, angleOY;
-	GLfloat cutoffAngle;
 
 	GLint numLives;
 

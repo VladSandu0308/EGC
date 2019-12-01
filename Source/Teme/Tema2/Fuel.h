@@ -36,6 +36,9 @@ public:
 	/* Initialises the mesh, shader and texture used to render the jerry can */
 	static GLvoid Init();
 
+	/* Destroys the mesh, shader and texture used to render the jerry can */
+	static GLvoid Destroy();
+
 private:
 	glm::mat4 modelMatrix;
 
@@ -57,7 +60,6 @@ private:
 	GLfloat scale;
 	GLfloat speed;
 	GLfloat angle;
-	GLfloat fuelAmount;
 
 	GLfloat angleOX, angleOY, angleOZ;
 };

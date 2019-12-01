@@ -69,6 +69,13 @@ GLvoid Cloud::Init()
 	shader->CreateAndLink();
 }
 
+GLvoid Cloud::Destroy()
+{
+	delete mesh;
+	delete texture;
+	delete shader;
+}
+
 Mesh* Cloud::GetMesh()
 {
 	return mesh;

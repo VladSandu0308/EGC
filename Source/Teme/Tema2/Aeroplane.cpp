@@ -8,22 +8,20 @@ Aeroplane::Aeroplane() :
 	offsetTailX(-1.825f),		offsetTailY(0.f),		offsetTailZ(0.f),
 	offsetWingX(-.175f),		offsetWingY(0.f),		offsetWingZ(1.f),
 	offsetRudderX(-3.275f),		offsetRudderY(0.f),		offsetRudderZ(0.f),
-	offsetRudderWingX(-3.275f),	offsetRudderWingY(0.f), offsetRudderWingZ(.5f),
-	offsetLightX(-4.5f),		offsetLightY(2.f),		offsetLightZ(0.f),
-	fmmx(-4.5f),				fmmy(0.f),				fmmz(0.f)
+	offsetRudderWingX(-3.275f),	offsetRudderWingY(0.f), offsetRudderWingZ(.5f)
 {
 	/* Create the plane's propeller */
 	{
 		std::vector<VertexFormat> vertices
 		{
-			VertexFormat(glm::vec3(-0.1f, -1.2f, .2f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(.1f, -1.2f, .2f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 1.f)),
-			VertexFormat(glm::vec3(-0.1f, 1.2f, .2f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
-			VertexFormat(glm::vec3(.1f, 1.2f, .2f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(-0.1f, -1.2f, -.2f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(.1f, -1.2f, -.2f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(-0.1f, 1.2f, -.2f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(.1f, 1.2f, -.2f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 1.f)),
+			VertexFormat(glm::vec3(-0.1f, -1.2f, .2f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(.1f, -1.2f, .2f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(-0.1f, 1.2f, .2f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(.1f, 1.2f, .2f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(-0.1f, -1.2f, -.2f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(.1f, -1.2f, -.2f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(-0.1f, 1.2f, -.2f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(.1f, 1.2f, -.2f), glm::vec3(0.f, 0.f, 0.f))
 		};
 
 		std::vector<GLushort> indices =
@@ -43,14 +41,14 @@ Aeroplane::Aeroplane() :
 	{
 		std::vector<VertexFormat> vertices
 		{
-			VertexFormat(glm::vec3(-.2f, -.2f, .2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(.2f, -.2f, .2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 1.f)),
-			VertexFormat(glm::vec3(-.2f, .2f, .2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
-			VertexFormat(glm::vec3(.2f, .2f, .2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(-.2f, -.2f, -.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(.2f, -.2f, -.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(-.2f, .2f, -.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(.2f, .2f, -.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f))
+			VertexFormat(glm::vec3(-.2f, -.2f, .2f), glm::vec3(0.5f, 0.5f, 0.5f)),
+			VertexFormat(glm::vec3(.2f, -.2f, .2f), glm::vec3(0.5f, 0.5f, 0.5f)),
+			VertexFormat(glm::vec3(-.2f, .2f, .2f), glm::vec3(0.5f, 0.5f, 0.5f)),
+			VertexFormat(glm::vec3(.2f, .2f, .2f), glm::vec3(0.5f, 0.5f, 0.5f)),
+			VertexFormat(glm::vec3(-.2f, -.2f, -.2f), glm::vec3(0.5f, 0.5f, 0.5f)),
+			VertexFormat(glm::vec3(.2f, -.2f, -.2f), glm::vec3(0.5f, 0.5f, 0.5f)),
+			VertexFormat(glm::vec3(-.2f, .2f, -.2f), glm::vec3(0.5f, 0.5f, 0.5f)),
+			VertexFormat(glm::vec3(.2f, .2f, -.2f), glm::vec3(0.5f, 0.5f, 0.5f))
 		};
 
 		std::vector<GLushort> indices =
@@ -70,14 +68,14 @@ Aeroplane::Aeroplane() :
 	{
 		std::vector<VertexFormat> vertices
 		{
-			VertexFormat(glm::vec3(-1.5f, -1.f,  1.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.5f, -1.f,  1.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 0.f, 1.f)),
-			VertexFormat(glm::vec3(-1.5f,  1.f,  1.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
-			VertexFormat(glm::vec3(1.5f,  1.f,  1.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(-1.5f, -1.f, -1.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.5f, -1.f, -1.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(-1.5f,  1.f, -1.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(1.5f,  1.f, -1.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 0.f, 1.f))
+			VertexFormat(glm::vec3(-1.5f, -1.f,  1.f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, -1.f,  1.f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(-1.5f,  1.f,  1.f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f,  1.f,  1.f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(-1.5f, -1.f, -1.f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, -1.f, -1.f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(-1.5f,  1.f, -1.f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f,  1.f, -1.f), glm::vec3(1.f, 1.f, 1.f))
 		};
 
 		std::vector<GLushort> indices =
@@ -97,14 +95,14 @@ Aeroplane::Aeroplane() :
 	{
 		std::vector<VertexFormat> vertices
 		{
-			VertexFormat(glm::vec3(-1.f, -.5f, .5f), glm::vec3(.659f, .8f, .843f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.f, -.5f, .5f), glm::vec3(.659f, .8f, .843f), glm::vec3(1.f, 0.f, 1.f)),
-			VertexFormat(glm::vec3(-1.f, .5f, .5f), glm::vec3(.659f, .8f, .843f), glm::vec3(1.f, 0.f, 0.f)),
-			VertexFormat(glm::vec3(1.f, .5f, .5f), glm::vec3(.659f, .8f, .843f), glm::vec3(0.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(-1.f, -.5f, -.5f), glm::vec3(.659f, .8f, .843f), glm::vec3(1.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.f, -.5f, -.5f), glm::vec3(.659f, .8f, .843f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(-1.f, .5f, -.5f), glm::vec3(.659f, .8f, .843f), glm::vec3(1.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(1.f, .5f, -.5f), glm::vec3(.659f, .8f, .843f), glm::vec3(0.f, 0.f, 1.f))
+			VertexFormat(glm::vec3(-1.f, -.5f, .5f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(1.f, -.5f, .5f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(-1.f, .5f, .5f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(1.f, .5f, .5f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(-1.f, -.5f, -.5f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(1.f, -.5f, -.5f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(-1.f, .5f, -.5f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(1.f, .5f, -.5f), glm::vec3(1.f, 1.f, 1.f))
 		};
 
 		std::vector<GLushort> indices =
@@ -124,14 +122,14 @@ Aeroplane::Aeroplane() :
 	{
 		std::vector<VertexFormat> vertices
 		{
-			VertexFormat(glm::vec3(-1.5f, -.5f, .5f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.5f, -1.f, 1.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 1.f)),
-			VertexFormat(glm::vec3(-1.5f, .5f, .5f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
-			VertexFormat(glm::vec3(1.5f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(-1.5f, -.5f, -.5f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.5f, -1.f, -1.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(-1.5f, .5f, -.5f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(1.5f, 1.f, -1.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 1.f))
+			VertexFormat(glm::vec3(-1.5f, -.5f, .5f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, -1.f, 1.f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(-1.5f, .5f, .5f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, 1.f, 1.f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(-1.5f, -.5f, -.5f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, -1.f, -1.f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(-1.5f, .5f, -.5f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, 1.f, -1.f), glm::vec3(1.f, 0.f, 0.f))
 		};
 
 		std::vector<GLushort> indices =
@@ -151,14 +149,14 @@ Aeroplane::Aeroplane() :
 	{
 		std::vector<VertexFormat> vertices
 		{
-			VertexFormat(glm::vec3(0.f, 0.f, .1f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.5f, 0.f, .1f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 1.f)),
-			VertexFormat(glm::vec3(0.f, 2.f, .1f), glm::vec3(1.f, 1.f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
-			VertexFormat(glm::vec3(.75f, 2.f, .1f), glm::vec3(1.f, 1.f, 0.f), glm::vec3(0.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(0.f, 0.f, -.1f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.5f, 0.f, -.1f), glm::vec3(1.f, 1.f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(0.f, 2.f, -.1f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(.75f, 2.f, -.1f), glm::vec3(1.f, 1.f, 0.f), glm::vec3(0.f, 0.f, 1.f)),
+			VertexFormat(glm::vec3(0.f, 0.f, .1f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, 0.f, .1f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(0.f, 2.f, .1f), glm::vec3(1.f, 1.f, 0.f)),
+			VertexFormat(glm::vec3(.75f, 2.f, .1f), glm::vec3(1.f, 1.f, 0.f)),
+			VertexFormat(glm::vec3(0.f, 0.f, -.1f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, 0.f, -.1f), glm::vec3(1.f, 1.f, 0.f)),
+			VertexFormat(glm::vec3(0.f, 2.f, -.1f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(.75f, 2.f, -.1f), glm::vec3(1.f, 1.f, 0.f)),
 		};
 
 		std::vector<GLushort> indices =
@@ -178,14 +176,14 @@ Aeroplane::Aeroplane() :
 	{
 		std::vector<VertexFormat> vertices
 		{
-			VertexFormat(glm::vec3(1.5f, -.1f, 3.f), glm::vec3(.612f, .102f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(2.f, -.1f, 3.f), glm::vec3(.612f, .102f, 0.f), glm::vec3(1.f, 0.f, 1.f)),
-			VertexFormat(glm::vec3(1.5f, .1f, 3.f), glm::vec3(.612f, .102f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
-			VertexFormat(glm::vec3(2.f, .1f, 3.f), glm::vec3(.612f, .102f, 0.f), glm::vec3(0.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(0.f, -.1f, 0.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(2.f, -.1f, 0.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(0.f, .1f, 0.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(2.f, .1f, 0.f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(0.f, 0.f, 1.f))
+			VertexFormat(glm::vec3(1.5f, -.1f, 3.f), glm::vec3(.612f, .102f, 0.f)),
+			VertexFormat(glm::vec3(2.f, -.1f, 3.f), glm::vec3(.612f, .102f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, .1f, 3.f), glm::vec3(.612f, .102f, 0.f)),
+			VertexFormat(glm::vec3(2.f, .1f, 3.f), glm::vec3(.612f, .102f, 0.f)),
+			VertexFormat(glm::vec3(0.f, -.1f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(2.f, -.1f, 0.f), glm::vec3(1.f, 1.f, 1.f)),
+			VertexFormat(glm::vec3(0.f, .1f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(2.f, .1f, 0.f), glm::vec3(1.f, 1.f, 1.f))
 		};
 
 		std::vector<GLushort> indices =
@@ -205,14 +203,14 @@ Aeroplane::Aeroplane() :
 	{
 		std::vector<VertexFormat> vertices
 		{
-			VertexFormat(glm::vec3(1.f, -.1f, 1.5f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.5f, -.1f, 1.5f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 1.f)),
-			VertexFormat(glm::vec3(1.f, .1f, 1.5f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 0.f)),
-			VertexFormat(glm::vec3(1.5f, .1f, 1.5f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(0.f, -.1f, 0.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(1.5f, -.1f, 0.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 1.f)),
-			VertexFormat(glm::vec3(0.f, .1f, 0.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.f)),
-			VertexFormat(glm::vec3(1.5f, .1f, 0.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 1.f))
+			VertexFormat(glm::vec3(1.f, -.1f, 1.5f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, -.1f, 1.5f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.f, .1f, 1.5f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, .1f, 1.5f), glm::vec3(1.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(0.f, -.1f, 0.f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, -.1f, 0.f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(0.f, .1f, 0.f), glm::vec3(0.f, 0.f, 0.f)),
+			VertexFormat(glm::vec3(1.5f, .1f, 0.f), glm::vec3(0.f, 0.f, 0.f))
 		};
 
 		std::vector<GLushort> indices =
@@ -229,18 +227,10 @@ Aeroplane::Aeroplane() :
 	}
 
 	{
-		light = new Mesh("light");
-		light->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "sphere.obj");
-
-		fmm = new Mesh("fmm");
-		fmm->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "box.obj");
-	}
-
-	{
-		shader = new Shader("PlaneShader");
-		shader->AddShader("Source/Teme/Tema2/Shaders/PlaneVertex.glsl", GL_VERTEX_SHADER);
-		shader->AddShader("Source/Teme/Tema2/Shaders/PlaneFragment.glsl", GL_FRAGMENT_SHADER);
-		shader->CreateAndLink();
+		cockpitShader = new Shader("cockpitShader");
+		cockpitShader->AddShader("Source/Teme/Tema2/Shaders/CockpitVertex.glsl", GL_VERTEX_SHADER);
+		cockpitShader->AddShader("Source/Teme/Tema2/Shaders/CockpitFragment.glsl", GL_FRAGMENT_SHADER);
+		cockpitShader->CreateAndLink();
 	}
 }
 
@@ -254,8 +244,7 @@ Aeroplane::~Aeroplane()
 	delete wing;
 	delete rudder;
 	delete rudderWing;
-	delete light;
-	delete shader;
+	delete cockpitShader;
 }
 
 GLvoid Aeroplane::GetBBoxOffsets(
@@ -267,7 +256,7 @@ GLvoid Aeroplane::GetBBoxOffsets(
 {
 	deltaXRight	= 3.275f;
 	deltaXLeft	= -3.275f;
-	deltaYUp	= 1.75f;
+	deltaYUp	= 1.5f;
 	deltaYDown	= -1.f;
 }
 
@@ -375,33 +364,7 @@ Mesh* Aeroplane::GetRudderWing(
 	return rudderWing;
 }
 
-Mesh* Aeroplane::GetLight(
-	GLfloat& offsetX,
-	GLfloat& offsetY,
-	GLfloat& offsetZ
-)
+Shader* Aeroplane::GetCockpitShader()
 {
-	offsetX = offsetLightX;
-	offsetY = offsetLightY;
-	offsetZ = offsetLightZ;
-
-	return light;
-}
-
-Mesh* Aeroplane::fmmm(
-	GLfloat& offsetX,
-	GLfloat& offsetY,
-	GLfloat& offsetZ
-)
-{
-	offsetX = fmmx;
-	offsetY = fmmy;
-	offsetZ = fmmz;
-
-	return fmm;
-}
-
-Shader* Aeroplane::GetShader()
-{
-	return shader;
+	return cockpitShader;
 }

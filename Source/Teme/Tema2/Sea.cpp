@@ -2,9 +2,7 @@
 
 #include "Sea.h"
 
-// CreateSea("Sea", 10, 40, 100, 100, sea, glm::vec3(0.3, 1.0, 0.9));
-
-Sea::Sea(GLfloat _speed, const std::string& name) :
+Sea::Sea(GLfloat _speed, const char* name) :
 	speed(_speed), radius(10.f), height(40.f), angle(0.f)
 {
 	GLushort levelGranulation	= 100;
@@ -22,70 +20,76 @@ Sea::Sea(GLfloat _speed, const std::string& name) :
 	std::vector<VertexFormat> vertices;
 	std::vector<GLushort>indices;
 
-	vertices.push_back(VertexFormat(glm::vec3(0.f, 0.f, startZ), colour));
+	vertices.emplace_back(glm::vec3(0.f, 0.f, startZ), colour);
 
 	GLfloat angle;
 
-	for (GLushort levelStep = 0; levelStep <= levelGranulation; ++levelStep)
+	for (GLushort i = 0; i <= levelGranulation; ++i)
 	{
-		GLfloat posZ = startZ + deltaLevelStep * levelStep;
+		GLfloat posZ = startZ + deltaLevelStep * i;
 
 		angle = 0.f;
-		for (GLushort angularStep = 1; angularStep <= angularGranulation; ++angularStep)
+		for (GLushort j = 0; j < angularGranulation; ++j)
 		{
 			GLfloat percent = (GLfloat)rand() / (RAND_MAX);
-			percent = (percent < .8f) ? .8f : percent;
+			percent			= (percent < .8f) ? .8f : percent;
 
-			GLfloat posX = radius * cos(angle);
-			GLfloat posY = percent * radius * sin(angle);
+			GLfloat posX	= radius * cos(angle);
+			GLfloat posY	= percent * radius * sin(angle);
 
 			vertices.emplace_back(glm::vec3(posX, posY, posZ), colour);
 			angle += deltaAngularStep;
 		}
 
-		if (levelStep == 0)
+		if (i == 0)
 		{
-			for (GLushort crtIndex = 1; crtIndex <= angularGranulation; ++crtIndex)
+			for (GLushort j = 1; j <= angularGranulation; ++j)
 			{
 				indices.push_back(0);
-				indices.push_back(crtIndex);
-				indices.push_back((crtIndex + 1) % angularGranulation);
+				indices.push_back(j);
+				indices.push_back((j + 1) % angularGranulation);
 			}
 
 			continue;
 		}
 
-		GLushort crtLevel = levelStep * angularGranulation;
-		GLushort prevLevel = crtLevel - angularGranulation;
+		GLushort crtLevel	= i * angularGranulation;
+		GLushort prevLevel	= crtLevel - angularGranulation;
 
-		for (GLushort crtIndex = 1; crtIndex <= angularGranulation; ++crtIndex)
+		for (GLushort j = 1; j <= angularGranulation; ++j)
 		{
-			indices.push_back(crtIndex + crtLevel);
-			indices.push_back((crtIndex + 1) % angularGranulation + prevLevel);
-			indices.push_back(crtIndex + prevLevel);
-			indices.push_back(crtIndex + crtLevel);
-			indices.push_back((crtIndex + 1) % angularGranulation + crtLevel);
-			indices.push_back((crtIndex + 1) % angularGranulation + prevLevel);
+			indices.push_back(j + crtLevel);
+			indices.push_back((j + 1) % angularGranulation + prevLevel);
+			indices.push_back(j + prevLevel);
+			indices.push_back(j + crtLevel);
+			indices.push_back((j + 1) % angularGranulation + crtLevel);
+			indices.push_back((j + 1) % angularGranulation + prevLevel);
 		}
 
-		if (levelStep == levelGranulation)
+		if (i == levelGranulation)
 		{
 			vertices.emplace_back(glm::vec3(0.f, 0.f, startZ + height), colour);
 
-			for (GLushort crtIndex = 1; crtIndex <= angularGranulation; ++crtIndex)
+			for (GLushort j = 1; j <= angularGranulation; ++j)
 			{
 				indices.push_back(crtLevel + angularGranulation + 1);
-				indices.push_back(crtIndex + crtLevel);
-				indices.push_back((crtIndex + 1) % angularGranulation + crtLevel);
+				indices.push_back(j + crtLevel);
+				indices.push_back((j + 1) % angularGranulation + crtLevel);
 			}
 		}
 	}
 
-	mesh = Utils::CreateSeaMesh(name, vertices, indices);
+	mesh = Utils::CreateMesh(name, vertices, indices);
 
 	shader = new Shader("Sea");
-	shader->AddShader("Source/Teme/Tema2/Shaders/SeaVertex.glsl", GL_VERTEX_SHADER);
-	shader->AddShader("Source/Teme/Tema2/Shaders/SeaFragment.glsl", GL_FRAGMENT_SHADER);
+	shader->AddShader(
+		"Source/Teme/Tema2/Shaders/SeaVertex.glsl",
+		GL_VERTEX_SHADER
+	);
+	shader->AddShader(
+		"Source/Teme/Tema2/Shaders/SeaFragment.glsl",
+		GL_FRAGMENT_SHADER
+	);
 	shader->CreateAndLink();
 }
 

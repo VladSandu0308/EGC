@@ -24,6 +24,9 @@ public:
 	/* Initialises the mesh, shader and texture used by the cloud */
 	static GLvoid Init();
 
+	/* Initialises the mesh, shader and texture used by the cloud */
+	static GLvoid Destroy();
+
 	/**
 	* Returns the number of components so PlaneRunner knows how many meshes to
 	* render

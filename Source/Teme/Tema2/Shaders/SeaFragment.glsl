@@ -1,6 +1,5 @@
 #version 330
 
-in vec2 frag_coord;
 in vec3 frag_normal;
 in vec3 frag_color;
 in vec3 frag_position;

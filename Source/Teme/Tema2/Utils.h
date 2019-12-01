@@ -13,12 +13,6 @@ public:
 		const std::vector<GLushort>& indices
 	);
 
-	static Mesh* CreateSeaMesh(
-		std::string name,
-		const std::vector<VertexFormat>& vertices,
-		const std::vector<GLushort>& indices
-	);
-
 private:
 	Utils() = default;
 	~Utils() = default;

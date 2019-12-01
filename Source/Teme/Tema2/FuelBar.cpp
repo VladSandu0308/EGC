@@ -43,20 +43,18 @@ FuelBar::FuelBar() :
 
 		fuel = Utils::CreateMesh("fuel", vertices, indices);
 	}
-
-	{
-		shader = new Shader("CloudShader");
-		shader->AddShader("Source/Teme/Tema2/Shaders/FuelBarVertex.glsl", GL_VERTEX_SHADER);
-		shader->AddShader("Source/Teme/Tema2/Shaders/FuelBarFragment.glsl", GL_FRAGMENT_SHADER);
-		shader->CreateAndLink();
-	}
 }
 
 FuelBar::~FuelBar()
 {
 	delete background;
 	delete fuel;
-	delete shader;
+}
+
+GLvoid FuelBar::AddFuel(GLfloat amount)
+{
+	crtFuel += amount;
+	crtFuel = crtFuel > maxFuel ? maxFuel : crtFuel;
 }
 
 Mesh* FuelBar::GetBackground()
@@ -64,22 +62,21 @@ Mesh* FuelBar::GetBackground()
 	return background;
 }
 
+GLboolean FuelBar::HasFuel(GLfloat deltaTimeSeconds)
+{
+	crtFuel -= decay * deltaTimeSeconds;
+	crtFuel = crtFuel > maxFuel ? maxFuel : crtFuel;
+	crtFuel = crtFuel < 0.f ? 0.f : crtFuel;
+
+	return crtFuel > 0.f;
+}
+
 Mesh* FuelBar::GetFuel(
-	GLfloat update,
 	GLfloat deltaTimeSeconds,
 	GLfloat& scaleFactor
 )
 {
-	crtFuel -= decay * deltaTimeSeconds - update;
-	crtFuel = crtFuel > maxFuel ? maxFuel : crtFuel;
-	crtFuel = crtFuel < 0.f ? 0.f : crtFuel;
-
 	scaleFactor = crtFuel / maxFuel;
 
 	return fuel;
-}
-
-Shader* FuelBar::GetShader()
-{
-	return shader;
 }

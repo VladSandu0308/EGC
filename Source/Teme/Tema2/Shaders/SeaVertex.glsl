@@ -2,7 +2,6 @@
 
 layout(location = 0) in vec3 v_position;
 layout(location = 1) in vec3 v_normal;
-layout(location = 2) in vec2 v_coord;
 layout(location = 3) in vec3 v_color;
 
 uniform mat4 Model;
@@ -22,7 +21,6 @@ void main()
 {
 	frag_color = v_color;
 	frag_normal = mat3(transpose(inverse(Model))) * v_normal;
-	frag_coord = v_coord;
 
 	float maxim = max(abs(v_position.x), abs(v_position.y));
 	float radius = abs(maxim - 10);

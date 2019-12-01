@@ -36,7 +36,6 @@ Fuel::Fuel()
 	angleOX			= 0.f;
 	angleOY			= 0.f;
 	angleOZ			= 0.f;
-	fuelAmount		= scale / maxScale * 100.f;
 }
 
 glm::mat4& Fuel::GetModelMatrix(GLfloat deltaTimeSeconds)
@@ -48,7 +47,6 @@ glm::mat4& Fuel::GetModelMatrix(GLfloat deltaTimeSeconds)
 	if (variable)
 	{
 		scale += scaleType * scaleSpeed * deltaTimeSeconds;
-		fuelAmount += scaleType * scaleSpeed * deltaTimeSeconds * 100.f;
 
 		if (scale >= maxScale || scale <= minScale)
 		{
@@ -92,6 +90,13 @@ GLvoid Fuel::Init()
 	shader->CreateAndLink();
 }
 
+GLvoid Fuel::Destroy()
+{
+	delete mesh;
+	delete texture;
+	delete shader;
+}
+
 Mesh* Fuel::GetMesh()
 {
 	return mesh;
@@ -109,7 +114,7 @@ Shader* Fuel::GetShader()
 
 GLfloat Fuel::GetFuelAmount()
 {
-	return fuelAmount;
+	return 150.f * scale - 55.f;
 }
 
 GLfloat Fuel::GetRadius()

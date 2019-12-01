@@ -9,7 +9,7 @@
 class Sea
 {
 public:
-	Sea(GLfloat _speed, const std::string& name);
+	Sea(GLfloat _speed, const char* name);
 	~Sea();
 
 	/* Returns the matrix that models the movement of the sea */

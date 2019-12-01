@@ -26,12 +26,15 @@ PlaneRunner::~PlaneRunner()
 	delete sea;
 	delete revSea;
 	delete heart;
+
+	Fuel::Destroy();
+	Obstacle::Destroy();
+	Cloud::Destroy();
 }
 
 void PlaneRunner::Init()
 {
-	//glm::ivec2 resolution = window->GetResolution();
-	srand((unsigned int)time(NULL));
+	srand((GLuint)time(NULL));
 
 	plane			= new Aeroplane();
 	fuelBar			= new FuelBar();
@@ -46,6 +49,7 @@ void PlaneRunner::Init()
 	propellerSpeed	= 300.f;
 	render			= GL_TRUE;
 	numLives		= 3;
+	cameraType		= 0;
 
 	plane->GetBBoxOffsets(deltaXRight, deltaXLeft, deltaYUp, deltaYDown);
 
@@ -63,49 +67,36 @@ void PlaneRunner::Init()
 		zFar
 	);
 
+	Obstacle::Init();
+	Fuel::Init();
+	Cloud::Init();
+
+	for (GLushort i = 0; i != numObstacles; ++i)
 	{
-		Obstacle::Init();
-		Fuel::Init();
-		Cloud::Init();
-
-		for (GLushort i = 0; i != numObstacles; ++i)
-		{
-			obstacles.emplace_back();
-		}
-
-		for (GLushort i = 0; i != numFuelCans; ++i)
-		{
-			fuelCans.emplace_back();
-		}
-
-		for (GLushort i = 0; i != numClouds; ++i)
-		{
-			clouds.emplace_back();
-		}
+		obstacles.emplace_back();
 	}
 
+	for (GLushort i = 0; i != numFuelCans; ++i)
 	{
-		lightPosition = glm::vec3(-10.f, 11.5f, -20.f);
-		lightDirection = glm::vec3(0, -1, 0);
-		materialShininess = 30;
-		materialKd = 0.5;
-		materialKs = 0.5;
-
-		typeOfLight = 0;
-		angleOX = 0.f;
-		angleOY = 0.f;
-		cutoffAngle = 30.f;
+		fuelCans.emplace_back();
 	}
+
+	for (GLushort i = 0; i != numClouds; ++i)
+	{
+		clouds.emplace_back();
+	}
+
+	lightPosition = glm::vec3(-10.f, 11.5f, -20.f);
 }
 
 void PlaneRunner::FrameStart()
 {
-	// clears the color buffer (using the previously set color) and depth buffer
+	// Clears the color buffer (using the previously set color) and depth buffer
 	glClearColor(1.f, .6f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::ivec2 resolution = window->GetResolution();
-	// sets the screen area where to draw
+	// Sets the screen area where to draw
 	glViewport(0, 0, resolution.x, resolution.y);
 }
 
@@ -123,18 +114,27 @@ void PlaneRunner::Update(float deltaTimeSeconds)
 		deltaTime = 0.f;
 	}
 
+	bBoxMaxX = centreX + deltaXRight * .3f;
+	bBoxMinX = centreX + deltaXLeft * .3f;
+	bBoxMaxY = centreY + deltaYUp * .3f;
+	bBoxMinY = centreY + deltaYDown * .3f;
+
 	RenderFuelCans(deltaTime);
 	RenderObstacles(deltaTime);
-	RenderFuelBar(deltaTime);
 	RenderClouds(deltaTime);
 	RenderSea(deltaTime);
-	RenderLives(deltaTime);
 	RenderPlane(deltaTime);
+
+	if (numLives > 0 && cameraType != 2)
+	{
+		RenderLives(deltaTime);
+		RenderFuelBar(deltaTime);
+	}
 }
 
 GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
 {
-	if (numLives > 0)
+	if (numLives > 0 && fuelBar->HasFuel(deltaTimeSeconds))
 	{
 		angle = 5.f * atan(
 			(mouseCrtX - centreX)
@@ -148,6 +148,7 @@ GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
 		angle = angle > 360.f ? 0.f : angle;
 
 		centreY -= 1.f * deltaTimeSeconds;
+		numLives = 0;
 	}
 
 	propellerSpeed += propellerAcceleration * deltaTimeSeconds;
@@ -164,6 +165,20 @@ GLvoid PlaneRunner::RenderPlane(GLfloat deltaTimeSeconds)
 	GLfloat offsetX = 0.f, offsetY = 0.f, offsetZ = 0.f;
 
 	RenderPlanePart(
+		plane->GetCockpit(offsetX, offsetY, offsetZ),
+		offsetX, offsetY, offsetZ
+	);
+
+	if (cameraType == 2)
+	{
+		camera->Set(
+			glm::vec3(cockpitMatrix[3][0], cockpitMatrix[3][1], cockpitMatrix[3][2]),
+			glm::vec3(targetMatrix[3][0], targetMatrix[3][1], targetMatrix[3][2]),
+			glm::vec3(0.f, 1.f, 0.f)
+		);
+	}
+
+	RenderPlanePart(
 		plane->GetPropeller(offsetX, offsetY, offsetZ),
 		offsetX, offsetY, offsetZ
 	);
@@ -173,10 +188,6 @@ GLvoid PlaneRunner::RenderPlane(GLfloat deltaTimeSeconds)
 	);
 	RenderPlanePart(
 		plane->GetBody(offsetX, offsetY, offsetZ),
-		offsetX, offsetY, offsetZ
-	);
-	RenderPlanePart(
-		plane->GetCockpit(offsetX, offsetY, offsetZ),
 		offsetX, offsetY, offsetZ
 	);
 	RenderPlanePart(
@@ -195,14 +206,6 @@ GLvoid PlaneRunner::RenderPlane(GLfloat deltaTimeSeconds)
 		plane->GetRudderWing(offsetX, offsetY, offsetZ),
 		offsetX, offsetY, offsetZ
 	);
-	//RenderPlanePart(
-	//	plane->GetLight(offsetX, offsetY, offsetZ),
-	//	offsetX, offsetY, offsetZ
-	//);
-	//RenderPlanePart(
-	//	plane->fmmm(offsetX, offsetY, offsetZ),
-	//	offsetX, offsetY, offsetZ
-	//);
 }
 
 GLvoid PlaneRunner::RenderPlanePart(
@@ -221,36 +224,75 @@ GLvoid PlaneRunner::RenderPlanePart(
 		|| !strcmp(planePart->GetMeshID(), "nose"))
 	{
 		modelMatrix *= Transform3D::RotateOX(RADIANS(propellerAngle));
+	} else if (!strcmp(planePart->GetMeshID(), "cockpit") && cameraType == 2)
+	{
+		cockpitMatrix = Transform3D::Translate(centreX, centreY, centreZ);
+		cockpitMatrix *= Transform3D::RotateOZ(angle);
+		cockpitMatrix *= Transform3D::Scale(0.3f, 0.3f, 0.3f);
+		cockpitMatrix *= Transform3D::Translate(offsetX + .5f, offsetY, offsetZ);
+
+		targetMatrix = Transform3D::Translate(centreX, centreY, centreZ);
+		targetMatrix *= Transform3D::RotateOZ(angle);
+		targetMatrix *= Transform3D::Scale(0.3f, 0.3f, 0.3f);
+		targetMatrix *= Transform3D::Translate(offsetX + 10.f, offsetY, offsetZ);
 	}
 
-	//if (!strcmp(planePart->GetMeshID(), "light"))
-	//{
-	//	glm::vec4 pos = modelMatrix * glm::vec4(0.f, 0.f, 0.f, 1.f);
+	if (!strcmp(planePart->GetMeshID(), "cockpit"))
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//	lightPosition.x = pos.x;
-	//	lightPosition.y = pos.y;
-	//	lightPosition.z = pos.z;
-	//}
+		RenderMesh(planePart, plane->GetCockpitShader(), modelMatrix);
+		
+		glDisable(GL_BLEND);
+	} else
+	{
+		RenderMesh(planePart, shaders["VertexColor"], modelMatrix);
+	}
 
-	RenderSimpleMesh(planePart, plane->GetShader(), modelMatrix);
 }
 
 GLvoid PlaneRunner::RenderFuelCans(GLfloat deltaTimeSeconds)
 {
-	for (Fuel& fuel : fuelCans)
+	GLushort numCollisions = 0;
+	std::vector<GLushort> collided;
+	glm::mat4 model;
+
+	for (GLushort i = 0; i != numFuelCans; ++i)
 	{
+		model = fuelCans[i].GetModelMatrix(deltaTimeSeconds);
+
 		RenderTexturedMesh(
 			Fuel::GetMesh(),
 			Fuel::GetShader(),
-			fuel.GetModelMatrix(deltaTimeSeconds),
+			model,
 			Fuel::GetTexture()
 		);
+
+		if (CheckCollision(model, fuelCans[i].GetRadius()))
+		{
+			fuelBar->AddFuel(fuelCans[i].GetFuelAmount());
+			collided.push_back(i);
+
+			++numCollisions;
+		}
+	}
+
+	for (GLushort i = 0; i != numCollisions; ++i)
+	{
+		fuelCans.erase(fuelCans.begin() + collided[i]);
+	}
+
+	for (GLushort i = 0; i != numCollisions; ++i)
+	{
+		fuelCans.emplace_back();
 	}
 }
 
 GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 {
 	GLushort numCollisions = 0;
+	std::vector<GLushort> collided;
 	glm::mat4 model;
 
 	for (GLushort i = 0; i != numObstacles; ++i)
@@ -266,10 +308,15 @@ GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 
 		if (CheckCollision(model, obstacles[i].GetRadius()))
 		{
-			obstacles.erase(obstacles.begin() + i);
+			collided.push_back(i);
 			++numCollisions;
 			--numLives;
 		}
+	}
+
+	for (GLushort i = 0; i != numCollisions; ++i)
+	{
+		obstacles.erase(obstacles.begin() + collided[i]);
 	}
 
 	for (GLushort i = 0; i != numCollisions; ++i)
@@ -282,17 +329,17 @@ GLvoid PlaneRunner::RenderFuelBar(GLfloat deltaTimeSeconds)
 {
 	GLfloat scaleFactor;
 
-	RenderSimpleMesh(
+	RenderMesh(
 		fuelBar->GetBackground(),
-		fuelBar->GetShader(),
+		shaders["VertexColor"],
 		Transform3D::Translate(-1.5f, 5.5f, 0.f)
 	);
 
-	Mesh* fuel = fuelBar->GetFuel(0.f, deltaTimeSeconds, scaleFactor);
+	Mesh* fuel = fuelBar->GetFuel(deltaTimeSeconds, scaleFactor);
 
-	RenderSimpleMesh(
+	RenderMesh(
 		fuel,
-		fuelBar->GetShader(),
+		shaders["VertexColor"],
 		Transform3D::Translate(-1.5f, 5.5f, 0.001f)
 		* Transform3D::Scale(scaleFactor, 1.f, 1.f)
 	);
@@ -305,9 +352,6 @@ GLvoid PlaneRunner::RenderClouds(GLfloat deltaTimeSeconds)
 	Shader* cloudShader		= Cloud::GetShader();
 
 	GLushort numParts;
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for (Cloud& cloud : clouds)
 	{
@@ -323,8 +367,6 @@ GLvoid PlaneRunner::RenderClouds(GLfloat deltaTimeSeconds)
 			);
 		}
 	}
-
-	glDisable(GL_BLEND);
 }
 
 GLvoid PlaneRunner::RenderLives(GLfloat deltaTimeSeconds)
@@ -358,11 +400,6 @@ GLvoid PlaneRunner::RenderSea(GLfloat deltaTimeSeconds)
 
 GLboolean PlaneRunner::CheckCollision(glm::mat4& model, GLfloat radius)
 {
-	bBoxMaxX		= centreX + deltaXRight * .1f;
-	bBoxMinX		= centreX + deltaXLeft * .1f;
-	bBoxMaxY		= centreY + deltaYUp * .1f;
-	bBoxMinY		= centreY + deltaYDown * .1f;
-
 	model			*= Transform3D::Translate(centreX, centreY, 0.f);
 	model			*= Transform3D::RotateOZ(RADIANS(-angle));
 	model			*= Transform3D::Translate(-centreX, -centreY, 0.f);
@@ -412,7 +449,8 @@ GLvoid PlaneRunner::RenderTexturedMesh(
 		loc_view_matrix,
 		1,
 		GL_FALSE,
-		glm::value_ptr(viewMatrix));
+		glm::value_ptr(viewMatrix)
+	);
 
 	// Bind projection matrix
 	int loc_projection_matrix = glGetUniformLocation(
@@ -422,12 +460,13 @@ GLvoid PlaneRunner::RenderTexturedMesh(
 		loc_projection_matrix,
 		1,
 		GL_FALSE,
-		glm::value_ptr(projectionMatrix));
+		glm::value_ptr(projectionMatrix)
+	);
 
 	// Activate texture location 0
 	glActiveTexture(GL_TEXTURE0);
 
-	// Bind the texture1 ID
+	// Bind the texture ID
 	glBindTexture(GL_TEXTURE_2D, texture->GetTextureID());
 
 	// Send texture uniform value
@@ -456,120 +495,48 @@ GLvoid PlaneRunner::RenderMesh(
 
 	shader->Use();
 
-	glUniformMatrix4fv(shader->loc_view_matrix, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
-	glUniformMatrix4fv(shader->loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-	glUniformMatrix4fv(shader->loc_model_matrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-	glUniform1f(glGetUniformLocation(shader->program, "time"), (GLfloat)Engine::GetElapsedTime());
+	glUniformMatrix4fv(
+		shader->loc_view_matrix,
+		1,
+		GL_FALSE,
+		glm::value_ptr(camera->GetViewMatrix())
+	);
+	glUniformMatrix4fv(
+		shader->loc_projection_matrix,
+		1,
+		GL_FALSE,
+		glm::value_ptr(projectionMatrix)
+	);
+	glUniformMatrix4fv(
+		shader->loc_model_matrix,
+		1,
+		GL_FALSE,
+		glm::value_ptr(modelMatrix)
+	);
 	
-	glUniform3fv(glGetUniformLocation(shader->program, "lightSea"), 1, glm::value_ptr(lightPosition));
-	glUniform3fv(glGetUniformLocation(shader->program, "viewPos"), 1, glm::value_ptr(camera->position));
+	if (!strcmp(mesh->GetMeshID(), "Sea") || !strcmp(mesh->GetMeshID(), "RevSea"))
+	{
+		glUniform1f(
+			glGetUniformLocation(shader->program, "time"),
+			(GLfloat)Engine::GetElapsedTime()
+		);
+		glUniform3fv(
+			glGetUniformLocation(shader->program, "lightSea"),
+			1,
+			glm::value_ptr(lightPosition)
+		);
+		glUniform3fv(
+			glGetUniformLocation(shader->program, "viewPos"),
+			1,
+			glm::value_ptr(camera->position)
+		);
+	}
 	
 	mesh->Render();
 }
 
-void PlaneRunner::RenderSimpleMesh(
-	Mesh* mesh,
-	Shader* shader,
-	const glm::mat4& modelMatrix
-)
-{
-	if (!mesh || !shader || !shader->GetProgramID())
-	{
-		return;
-	}
-
-	// Render an object using the specified shader and the specified position
-	glUseProgram(shader->program);
-
-	// Set shader uniforms for light & material properties
-	// Set light position uniform
-	int light_position = glGetUniformLocation(shader->program, "light_position");
-	glUniform3f(light_position, lightPosition.x, lightPosition.y, lightPosition.z);
-
-	int light_direction = glGetUniformLocation(shader->program, "light_direction");
-	glUniform3f(light_direction, lightDirection.x, lightDirection.y, lightDirection.z);
-
-	// Set eye position (camera position) uniform
-	glm::vec3 eyePosition = camera->position;
-	int eye_position = glGetUniformLocation(shader->program, "eye_position");
-	glUniform3f(eye_position, eyePosition.x, eyePosition.y, eyePosition.z);
-
-	// Set material property uniforms (shininess, kd, ks, object color) 
-	int material_shininess = glGetUniformLocation(shader->program, "material_shininess");
-	glUniform1i(material_shininess, materialShininess);
-
-	int material_kd = glGetUniformLocation(shader->program, "material_kd");
-	glUniform1f(material_kd, materialKd);
-
-	int material_ks = glGetUniformLocation(shader->program, "material_ks");
-	glUniform1f(material_ks, materialKs);
-
-	// Bind model matrix
-	GLint loc_model_matrix = glGetUniformLocation(shader->program, "Model");
-	glUniformMatrix4fv(loc_model_matrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-
-	// Bind view matrix
-	glm::mat4 viewMatrix = camera->GetViewMatrix();
-	int loc_view_matrix = glGetUniformLocation(shader->program, "View");
-	glUniformMatrix4fv(loc_view_matrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-	// Bind projection matrix
-	int loc_projection_matrix = glGetUniformLocation(shader->program, "Projection");
-	glUniformMatrix4fv(loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-
-	GLint type = glGetUniformLocation(shader->program, "type_of_light");
-	glUniform1i(type, typeOfLight);
-
-	GLint cut_off_angle = glGetUniformLocation(shader->program, "cut_off_angle");
-	glUniform1f(cut_off_angle, cutoffAngle);
-
-	// Draw the object
-	glBindVertexArray(mesh->GetBuffers()->VAO);
-	glDrawElements(mesh->GetDrawMode(), static_cast<int>(mesh->indices.size()), GL_UNSIGNED_SHORT, 0);
-}
-
 // Documentation for the input functions can be found in: "/Source/Core/Window/InputController.h" or
 // https://github.com/UPB-Graphics/Framework-EGC/blob/master/Source/Core/Window/InputController.h
-
-void PlaneRunner::OnInputUpdate(float deltaTime, int mods)
-{
-	// move the camera only if MOUSE_RIGHT button is pressed
-	if (window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
-	{
-		float cameraSpeed = 2.0f;
-
-		if (window->KeyHold(GLFW_KEY_W))
-		{
-			// Translate the camera forward
-			camera->TranslateForward(deltaTime * cameraSpeed);
-		}
-		if (window->KeyHold(GLFW_KEY_A))
-		{
-			// Translate the camera to the left
-			camera->TranslateRight(-deltaTime * cameraSpeed);
-		}
-		if (window->KeyHold(GLFW_KEY_S))
-		{
-			// Translate the camera backwards
-			camera->TranslateForward(-deltaTime * cameraSpeed);
-		}
-		if (window->KeyHold(GLFW_KEY_D))
-		{
-			// Translate the camera to the right
-			camera->TranslateRight(deltaTime * cameraSpeed);
-		}
-		if (window->KeyHold(GLFW_KEY_Q))
-		{
-			// Translate the camera down
-			camera->TranslateUpward(-deltaTime * cameraSpeed);
-		}
-		if (window->KeyHold(GLFW_KEY_E))
-		{
-			// Translate the camera up
-			camera->TranslateUpward(deltaTime * cameraSpeed);
-		}
-	}
-}
 
 void PlaneRunner::OnKeyPress(int key, int mods)
 {
@@ -578,58 +545,55 @@ void PlaneRunner::OnKeyPress(int key, int mods)
 	{
 		render = !render;
 	}
-}
 
-void PlaneRunner::OnKeyRelease(int key, int mods)
-{
-	// add key release event
+	if (key == GLFW_KEY_F)
+	{
+		cameraType = (cameraType + 1) % 3;
+
+		switch (cameraType)
+		{
+		case 0:
+
+			projectionMatrix = glm::perspective(
+				RADIANS(60.f),
+				window->props.aspectRatio,
+				zNear,
+				zFar
+			);
+			camera->Set(
+				glm::vec3(0.f, 3.f, 10.f),
+				glm::vec3(0.f, 1.f, 0.f),
+				glm::vec3(0.f, 1.f, 0.f)
+			);
+
+			break;
+		case 1:
+			projectionMatrix = glm::ortho(-8.0f, 8.0f, -3.5f, 5.f, zNear, zFar);
+			camera->Set(
+				glm::vec3(0.f, 2.f, 10.f),
+				glm::vec3(0.f, 1.f, 0.f),
+				glm::vec3(0.f, 1.f, 0.f)
+			);
+
+			break;
+
+		default:
+			projectionMatrix = glm::perspective(
+				RADIANS(90.f),
+				window->props.aspectRatio,
+				zNear,
+				zFar
+			);
+
+			numLives = 1;
+
+			break;
+		}
+	}
 }
 
 void PlaneRunner::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 {
-	// Mouse move event
-
-	if (window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
-	{
-		float sensivityOX = 0.001f;
-		float sensivityOY = 0.001f;
-
-		if (window->GetSpecialKeyState() == 0)
-		{
-			// Rotate the camera in First-person mode around OX and OY using deltaX and deltaY
-			// Use the sensitivity variables for setting up the rotation speed
-			camera->RotateFirstPerson_OX(sensivityOX * -deltaY);
-			camera->RotateFirstPerson_OY(sensivityOY * -deltaX);
-		}
-
-		if (window->GetSpecialKeyState() && GLFW_MOD_CONTROL)
-		{
-			// Rotate the camera in Third-person mode around OX and OY using deltaX and deltaY
-			// Use the sensitivity variables for setting up the rotation speed
-			camera->RotateThirdPerson_OX(sensivityOX * -deltaY);
-			camera->RotateThirdPerson_OY(sensivityOY * -deltaX);
-		}
-	}
-
-	// TODO: transpune din pixeli in pozitii
 	mouseCrtX = (GLfloat)mouseX;
 	mouseCrtY = (GLfloat)mouseY;
-}
-
-void PlaneRunner::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
-{
-	// add mouse button press event
-}
-
-void PlaneRunner::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
-{
-	// add mouse button release event
-}
-
-void PlaneRunner::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
-{
-}
-
-void PlaneRunner::OnWindowResize(int width, int height)
-{
 }

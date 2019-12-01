@@ -90,6 +90,13 @@ GLvoid Obstacle::Init()
 	shader->CreateAndLink();
 }
 
+GLvoid Obstacle::Destroy()
+{
+	delete mesh;
+	delete texture;
+	delete shader;
+}
+
 Mesh* Obstacle::GetMesh()
 {
 	return mesh;

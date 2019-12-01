@@ -21,18 +21,20 @@ public:
 	* fuel
 	*/
 	Mesh* GetFuel(
-		GLfloat update,
 		GLfloat deltaTimeSeconds,
-		GLfloat& scaleFactor);
+		GLfloat& scaleFactor
+	);
 
-	/* Returns the shader used by the fuel bar */
-	Shader* GetShader();
+	/* Updates the amount of fuel and checks if there is any left */
+	GLboolean HasFuel(GLfloat deltaTimeSeconds);
+
+
+	/* Adds an amount of fuel that was collected from a jerry can */
+	GLvoid AddFuel(GLfloat amount);
 
 private:
 	Mesh* background;
 	Mesh* fuel;
-
-	Shader* shader;
 
 	const GLfloat maxFuel;
 	const GLfloat decay;
