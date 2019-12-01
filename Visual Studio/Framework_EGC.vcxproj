@@ -125,14 +125,11 @@
     <None Include="..\Source\Teme\Tema1\README.md" />
     <None Include="..\Source\Teme\Tema1\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Teme\Tema1\Shaders\VertexShader.glsl" />
-    <None Include="..\Source\Teme\Tema2\Shaders\CloudFragment.glsl" />
-    <None Include="..\Source\Teme\Tema2\Shaders\CloudVertex.glsl" />
-    <None Include="..\Source\Teme\Tema2\Shaders\FuelBarFragment.glsl" />
-    <None Include="..\Source\Teme\Tema2\Shaders\FuelBarVertex.glsl" />
+    <None Include="..\Source\Teme\Tema2\README.md" />
+    <None Include="..\Source\Teme\Tema2\Shaders\CockpitFragment.glsl" />
+    <None Include="..\Source\Teme\Tema2\Shaders\CockpitVertex.glsl" />
     <None Include="..\Source\Teme\Tema2\Shaders\ObjectFragment.glsl" />
     <None Include="..\Source\Teme\Tema2\Shaders\ObjectVertex.glsl" />
-    <None Include="..\Source\Teme\Tema2\Shaders\PlaneFragment.glsl" />
-    <None Include="..\Source\Teme\Tema2\Shaders\PlaneVertex.glsl" />
     <None Include="..\Source\Teme\Tema2\Shaders\SeaFragment.glsl" />
     <None Include="..\Source\Teme\Tema2\Shaders\SeaVertex.glsl" />
     <None Include="ClassDiagram.cd" />

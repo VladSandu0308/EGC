@@ -61,6 +61,21 @@
     <Filter Include="Laboratoare\Laborator9\Shaders">
       <UniqueIdentifier>{a7995ec9-7a24-4990-8d42-92088d9a6dfb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Teme">
+      <UniqueIdentifier>{1ba62839-81a9-45eb-bc1b-ba9ccec94a7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Teme\Tema2">
+      <UniqueIdentifier>{3577d956-458e-408e-a713-17ad44df6dd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Teme\Tema2\Shaders">
+      <UniqueIdentifier>{16339749-a219-40db-9dbd-d810ec8ff153}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Teme\Tema1">
+      <UniqueIdentifier>{0e0a07eb-6a8a-4796-9dce-83bcf4a3be7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Teme\Tema1\Shaders">
+      <UniqueIdentifier>{53c89e92-4951-4725-a79d-27c840b9dd0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\Core\Engine.cpp">
@@ -138,6 +153,42 @@
     </ClCompile>
     <ClCompile Include="..\Source\Laboratoare\Laborator9\Laborator9.cpp">
       <Filter>Laboratoare\Laborator9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema2\Aeroplane.cpp">
+      <Filter>Teme\Tema2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema2\Cloud.cpp">
+      <Filter>Teme\Tema2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema2\FuelBar.cpp">
+      <Filter>Teme\Tema2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema2\Heart.cpp">
+      <Filter>Teme\Tema2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema1\Bird.cpp">
+      <Filter>Teme\Tema1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema1\FlappyBird.cpp">
+      <Filter>Teme\Tema1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema2\Obstacle.cpp">
+      <Filter>Teme\Tema2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema2\PlaneRunner.cpp">
+      <Filter>Teme\Tema2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema2\Sea.cpp">
+      <Filter>Teme\Tema2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema2\Utils.cpp">
+      <Filter>Teme\Tema2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema1\TexturedRectangle.cpp">
+      <Filter>Teme\Tema1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema2\Fuel.cpp">
+      <Filter>Teme\Tema2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -241,6 +292,51 @@
       <Filter>Laboratoare\Laborator9</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\Source\Teme\Tema2\Aeroplane.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\Cloud.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\Fuel.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\FuelBar.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\Heart.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\LabCamera.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema1\Bird.h">
+      <Filter>Teme\Tema1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema1\FlappyBird.h">
+      <Filter>Teme\Tema1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\Obstacle.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\PlaneRunner.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\Sea.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\Transform3D.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema2\Utils.h">
+      <Filter>Teme\Tema2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema1\TexturedRectangle.h">
+      <Filter>Teme\Tema1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema1\Transform2D.h">
+      <Filter>Teme\Tema1</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\FragmentShader.glsl">
@@ -275,8 +371,36 @@
     <None Include="..\Source\Laboratoare\Laborator1\README.md">
       <Filter>Laboratoare\Laborator1</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Framework_EGC.rc" />
+    <None Include="..\Source\Laboratoare\Laborator4\README.md" />
+    <None Include="..\Source\Teme\Tema2\Shaders\ObjectFragment.glsl">
+      <Filter>Teme\Tema2\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema2\Shaders\ObjectVertex.glsl">
+      <Filter>Teme\Tema2\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema2\Shaders\SeaVertex.glsl">
+      <Filter>Teme\Tema2\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema2\Shaders\SeaFragment.glsl">
+      <Filter>Teme\Tema2\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema1\Shaders\FragmentShader.glsl">
+      <Filter>Teme\Tema1\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema1\Shaders\VertexShader.glsl">
+      <Filter>Teme\Tema1\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema1\README.md">
+      <Filter>Teme\Tema1</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema2\Shaders\CockpitFragment.glsl">
+      <Filter>Teme\Tema2\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema2\Shaders\CockpitVertex.glsl">
+      <Filter>Teme\Tema2\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema2\README.md">
+      <Filter>Teme\Tema2</Filter>
+    </None>
   </ItemGroup>
 </Project>
