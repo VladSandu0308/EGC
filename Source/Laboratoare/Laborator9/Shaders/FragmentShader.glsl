@@ -22,7 +22,6 @@ void main()
 		out_color = colour1;
 	}
 	
-	
 	if (out_color.a < .5f)
 	{
 		discard;
