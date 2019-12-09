@@ -226,6 +226,7 @@ Aeroplane::Aeroplane() :
 		rudderWing = Utils::CreateMesh("rudderWing", vertices, indices);
 	}
 
+	/* Create the shader for the cockpit */
 	{
 		cockpitShader = new Shader("cockpitShader");
 		cockpitShader->AddShader("Source/Teme/Tema2/Shaders/CockpitVertex.glsl", GL_VERTEX_SHADER);

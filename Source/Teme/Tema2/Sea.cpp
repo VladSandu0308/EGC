@@ -5,17 +5,17 @@
 Sea::Sea(GLfloat _speed, const char* name) :
 	speed(_speed), radius(10.f), height(40.f), angle(0.f)
 {
-	GLushort levelGranulation	= 100;
-	GLushort angularGranulation = 100;
+	const GLushort levelGranulation		= 100;
+	const GLushort angularGranulation	= 100;
 
-	glm::vec3 colour			= glm::vec3(.3f, 1.f, .9f);
+	glm::vec3 colour					= glm::vec3(.3f, 1.f, .9f);
 
-	// Set the step for level
-	GLfloat deltaLevelStep		= height / levelGranulation;
-	GLfloat startZ				= -height / 2.f;
+	/* Set the step for level */
+	GLfloat deltaLevelStep				= height / levelGranulation;
+	GLfloat startZ						= -height / 2.f;
 
-	// Set step for angle
-	GLfloat deltaAngularStep	= 2.f * (GLfloat)M_PI / angularGranulation;
+	/* Set step for angle */
+	GLfloat deltaAngularStep			= 2.f * (GLfloat)M_PI / angularGranulation;
 
 	std::vector<VertexFormat> vertices;
 	std::vector<GLushort>indices;
@@ -24,10 +24,12 @@ Sea::Sea(GLfloat _speed, const char* name) :
 
 	GLfloat angle;
 
+	/* Cenerate the sea level by level */
 	for (GLushort i = 0; i <= levelGranulation; ++i)
 	{
 		GLfloat posZ = startZ + deltaLevelStep * i;
 
+		/* Generate one disk of the level */
 		angle = 0.f;
 		for (GLushort j = 0; j < angularGranulation; ++j)
 		{
@@ -45,9 +47,9 @@ Sea::Sea(GLfloat _speed, const char* name) :
 		{
 			for (GLushort j = 1; j <= angularGranulation; ++j)
 			{
-				indices.push_back(0);
-				indices.push_back(j);
-				indices.push_back((j + 1) % angularGranulation);
+				indices.emplace_back(0);
+				indices.emplace_back(j);
+				indices.emplace_back((j + 1) % angularGranulation);
 			}
 
 			continue;
@@ -56,14 +58,15 @@ Sea::Sea(GLfloat _speed, const char* name) :
 		GLushort crtLevel	= i * angularGranulation;
 		GLushort prevLevel	= crtLevel - angularGranulation;
 
+		/* Add the indices for the current disk */
 		for (GLushort j = 1; j <= angularGranulation; ++j)
 		{
-			indices.push_back(j + crtLevel);
-			indices.push_back((j + 1) % angularGranulation + prevLevel);
-			indices.push_back(j + prevLevel);
-			indices.push_back(j + crtLevel);
-			indices.push_back((j + 1) % angularGranulation + crtLevel);
-			indices.push_back((j + 1) % angularGranulation + prevLevel);
+			indices.emplace_back(j + crtLevel);
+			indices.emplace_back((j + 1) % angularGranulation + prevLevel);
+			indices.emplace_back(j + prevLevel);
+			indices.emplace_back(j + crtLevel);
+			indices.emplace_back((j + 1) % angularGranulation + crtLevel);
+			indices.emplace_back((j + 1) % angularGranulation + prevLevel);
 		}
 
 		if (i == levelGranulation)
@@ -72,13 +75,14 @@ Sea::Sea(GLfloat _speed, const char* name) :
 
 			for (GLushort j = 1; j <= angularGranulation; ++j)
 			{
-				indices.push_back(crtLevel + angularGranulation + 1);
-				indices.push_back(j + crtLevel);
-				indices.push_back((j + 1) % angularGranulation + crtLevel);
+				indices.emplace_back(crtLevel + angularGranulation + 1);
+				indices.emplace_back(j + crtLevel);
+				indices.emplace_back((j + 1) % angularGranulation + crtLevel);
 			}
 		}
 	}
 
+	/* Create the mesh and shader for the sea */
 	mesh = Utils::CreateMesh(name, vertices, indices);
 
 	shader = new Shader("Sea");
@@ -101,6 +105,7 @@ Sea::~Sea()
 
 glm::mat4& Sea::GetModelMatrix(GLfloat deltaTimeSeconds)
 {
+	/* Rotate the sea */
 	angle += deltaTimeSeconds * speed;
 	angle = angle > 2 * M_PI ? 0.f : angle;
 

@@ -9,6 +9,7 @@ Shader* Fuel::shader		= nullptr;
 
 Fuel::Fuel()
 {
+	/* Randomly generate a fuel can */
 	std::random_device rd;
 	std::mt19937 gen(rd());
 
@@ -40,6 +41,7 @@ Fuel::Fuel()
 
 glm::mat4& Fuel::GetModelMatrix(GLfloat deltaTimeSeconds)
 {
+	/* Move and rotate the fuel can */
 	speed += acceleration * deltaTimeSeconds;
 	angle += speed * deltaTimeSeconds;
 	angle = angle > 360.f ? 0.f : angle;
@@ -78,6 +80,7 @@ glm::mat4& Fuel::GetModelMatrix(GLfloat deltaTimeSeconds)
 
 GLvoid Fuel::Init()
 {
+	/* Create the mesh, texture and shader for the fuel can. Called only once */
 	mesh = new Mesh("jerry_can");
 	mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "jerry_can.obj");
 

@@ -5,6 +5,7 @@
 Heart::Heart() :
 	speed(200.f), angle(0.f)
 {
+	/* Create the mesh, texture and shader for the heart */
 	mesh = new Mesh("heart");
 	mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "heart.obj");
 
@@ -19,6 +20,7 @@ Heart::Heart() :
 
 glm::mat4& Heart::GetModelMatrix(GLfloat deltaTimeSeconds)
 {
+	/* Rotate the heart around its centre */
 	angle += speed * deltaTimeSeconds;
 	angle = angle > 360.f ? 0.f : angle;
 

@@ -26,6 +26,7 @@ FuelBar::FuelBar() :
 		background = Utils::CreateMesh("background", vertices, indices);
 	}
 
+	/* Generate the foreground */
 	{
 		std::vector<VertexFormat> vertices
 		{
@@ -64,6 +65,7 @@ Mesh* FuelBar::GetBackground()
 
 GLboolean FuelBar::HasFuel(GLfloat deltaTimeSeconds)
 {
+	/* Decrease the abount of fuel and return whether the plane has any left */
 	crtFuel -= decay * deltaTimeSeconds;
 	crtFuel = crtFuel > maxFuel ? maxFuel : crtFuel;
 	crtFuel = crtFuel < 0.f ? 0.f : crtFuel;

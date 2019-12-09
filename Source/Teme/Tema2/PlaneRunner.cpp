@@ -20,6 +20,7 @@ PlaneRunner::PlaneRunner() :
 
 PlaneRunner::~PlaneRunner()
 {	
+	/* Dealocate all memory */
 	delete camera;
 	delete plane;
 	delete fuelBar;
@@ -27,6 +28,7 @@ PlaneRunner::~PlaneRunner()
 	delete revSea;
 	delete heart;
 
+	/* Dealocate static objects */
 	Fuel::Destroy();
 	Obstacle::Destroy();
 	Cloud::Destroy();
@@ -53,6 +55,7 @@ void PlaneRunner::Init()
 
 	plane->GetBBoxOffsets(deltaXRight, deltaXLeft, deltaYUp, deltaYDown);
 
+	/* The initial camera parameters */
 	camera = new Plane::Camera();
 	camera->Set(
 		glm::vec3(0.f, 3.f, 10.f),
@@ -71,21 +74,25 @@ void PlaneRunner::Init()
 	Fuel::Init();
 	Cloud::Init();
 
+	/* Create the obstacles */
 	for (GLushort i = 0; i != numObstacles; ++i)
 	{
 		obstacles.emplace_back();
 	}
 
+	/* Create the fuel cans */
 	for (GLushort i = 0; i != numFuelCans; ++i)
 	{
 		fuelCans.emplace_back();
 	}
 
+	/* Create the clouds */
 	for (GLushort i = 0; i != numClouds; ++i)
 	{
 		clouds.emplace_back();
 	}
 
+	/* The light that illuminates the sea */
 	lightPosition = glm::vec3(-10.f, 11.5f, -20.f);
 }
 
@@ -114,11 +121,13 @@ void PlaneRunner::Update(float deltaTimeSeconds)
 		deltaTime = 0.f;
 	}
 
+	/* Calculate bounding box coordinates */
 	bBoxMaxX = centreX + deltaXRight * .3f;
 	bBoxMinX = centreX + deltaXLeft * .3f;
 	bBoxMaxY = centreY + deltaYUp * .3f;
 	bBoxMinY = centreY + deltaYDown * .3f;
 
+	/* Render all objects in the scene */
 	RenderFuelCans(deltaTime);
 	RenderObstacles(deltaTime);
 	RenderClouds(deltaTime);
@@ -136,6 +145,7 @@ GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
 {
 	if (numLives > 0 && fuelBar->HasFuel(deltaTimeSeconds))
 	{
+		/* Adjust the plane's angle to follow the mouse */
 		angle = 5.f * atan(
 			(mouseCrtX - centreX)
 			/ (mouseCrtY - centreY + FLT_EPSILON)
@@ -144,6 +154,7 @@ GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
 		centreY += planeSpeed * deltaTimeSeconds * sin(angle);
 	} else if (centreY > -5.f)
 	{
+		/* If the plane is dead, make it spin */
 		angle -= 10.f * deltaTimeSeconds;
 		angle = angle > 360.f ? 0.f : angle;
 
@@ -151,6 +162,7 @@ GLvoid PlaneRunner::MovePlane(GLfloat deltaTimeSeconds)
 		numLives = 0;
 	}
 
+	/* Spin the propeller */
 	propellerSpeed += propellerAcceleration * deltaTimeSeconds;
 	propellerAngle += propellerSpeed * deltaTimeSeconds;
 
@@ -178,6 +190,7 @@ GLvoid PlaneRunner::RenderPlane(GLfloat deltaTimeSeconds)
 		);
 	}
 
+	/* Render the meshes that comprise the plane one by one */
 	RenderPlanePart(
 		plane->GetPropeller(offsetX, offsetY, offsetZ),
 		offsetX, offsetY, offsetZ
@@ -224,8 +237,9 @@ GLvoid PlaneRunner::RenderPlanePart(
 		|| !strcmp(planePart->GetMeshID(), "nose"))
 	{
 		modelMatrix *= Transform3D::RotateOX(RADIANS(propellerAngle));
-	} else if (!strcmp(planePart->GetMeshID(), "cockpit") && cameraType == 2)
+	} else if (cameraType == 2 && !strcmp(planePart->GetMeshID(), "cockpit"))
 	{
+		/* Matrices for the camera in first person mode */
 		cockpitMatrix = Transform3D::Translate(centreX, centreY, centreZ);
 		cockpitMatrix *= Transform3D::RotateOZ(angle);
 		cockpitMatrix *= Transform3D::Scale(0.3f, 0.3f, 0.3f);
@@ -239,6 +253,7 @@ GLvoid PlaneRunner::RenderPlanePart(
 
 	if (!strcmp(planePart->GetMeshID(), "cockpit"))
 	{
+		/* The cockpit is transparent */
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -258,6 +273,7 @@ GLvoid PlaneRunner::RenderFuelCans(GLfloat deltaTimeSeconds)
 	std::vector<GLushort> collided;
 	glm::mat4 model;
 
+	/* Check each fuel can for a collision with the plane */
 	for (GLushort i = 0; i != numFuelCans; ++i)
 	{
 		model = fuelCans[i].GetModelMatrix(deltaTimeSeconds);
@@ -278,6 +294,7 @@ GLvoid PlaneRunner::RenderFuelCans(GLfloat deltaTimeSeconds)
 		}
 	}
 
+	/* Erase and replace used cans */
 	for (GLushort i = 0; i != numCollisions; ++i)
 	{
 		fuelCans.erase(fuelCans.begin() + collided[i]);
@@ -295,6 +312,7 @@ GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 	std::vector<GLushort> collided;
 	glm::mat4 model;
 
+	/* Check each obstacle for a collision with the plane */
 	for (GLushort i = 0; i != numObstacles; ++i)
 	{
 		model = obstacles[i].GetModelMatrix(deltaTimeSeconds);
@@ -314,6 +332,7 @@ GLvoid PlaneRunner::RenderObstacles(GLfloat deltaTimeSeconds)
 		}
 	}
 
+	/* Erase and replace the obstacles that were hit */
 	for (GLushort i = 0; i != numCollisions; ++i)
 	{
 		obstacles.erase(obstacles.begin() + collided[i]);
@@ -329,6 +348,7 @@ GLvoid PlaneRunner::RenderFuelBar(GLfloat deltaTimeSeconds)
 {
 	GLfloat scaleFactor;
 
+	/* Render the background and the forground of the fuel bar */
 	RenderMesh(
 		fuelBar->GetBackground(),
 		shaders["VertexColor"],
@@ -353,6 +373,7 @@ GLvoid PlaneRunner::RenderClouds(GLfloat deltaTimeSeconds)
 
 	GLushort numParts;
 
+	/* Render the clounds one by one, component by component */
 	for (Cloud& cloud : clouds)
 	{
 		numParts = cloud.GetPartsNumber(deltaTimeSeconds);
@@ -391,6 +412,7 @@ GLvoid PlaneRunner::RenderLives(GLfloat deltaTimeSeconds)
 
 GLvoid PlaneRunner::RenderSea(GLfloat deltaTimeSeconds)
 {
+	/* Render both seas */
 	modelMatrix = sea->GetModelMatrix(deltaTimeSeconds);
 	RenderMesh(sea->GetMesh(), sea->GetShader(), modelMatrix);
 
@@ -400,6 +422,7 @@ GLvoid PlaneRunner::RenderSea(GLfloat deltaTimeSeconds)
 
 GLboolean PlaneRunner::CheckCollision(glm::mat4& model, GLfloat radius)
 {
+	/* https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection#Using_a_physics_engine */
 	model			*= Transform3D::Translate(centreX, centreY, 0.f);
 	model			*= Transform3D::RotateOZ(RADIANS(-angle));
 	model			*= Transform3D::Translate(-centreX, -centreY, 0.f);
@@ -540,7 +563,7 @@ GLvoid PlaneRunner::RenderMesh(
 
 void PlaneRunner::OnKeyPress(int key, int mods)
 {
-	// add key press event
+	/* Keyboard controls */
 	if (key == GLFW_KEY_P)
 	{
 		render = !render;

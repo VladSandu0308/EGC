@@ -8,6 +8,7 @@ Shader* Cloud::shader		= nullptr;
 
 Cloud::Cloud()
 {
+	/* Creates a cloud randomly */
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	
@@ -57,6 +58,7 @@ glm::mat4& Cloud::GetModelMatrix(GLushort part)
 
 GLvoid Cloud::Init()
 {
+	/* Creates the mesh, texture and shader used for each cloud. Called only once */
 	mesh = new Mesh("cloud");
 	mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "sphere.obj");
 
