@@ -90,9 +90,9 @@ void Laborator9::Init()
 		vector<glm::vec2> textureCoords
 		{
 			glm::vec2(0.f, 0.f),
-			glm::vec2(1.f, 0.f),
+			glm::vec2(0.f, 1.f),
 			glm::vec2(1.f, 1.f),
-			glm::vec2(0.f, 1.f)
+			glm::vec2(1.f, 0.f)
 		};
 
 		vector<unsigned short> indices =
@@ -158,7 +158,12 @@ void Laborator9::Update(float deltaTimeSeconds)
 		glm::mat4 modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.5f, 0.0f));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5f));
-
+		
+		glm::vec3 oY = glm::mat3(GetSceneCamera()->GetViewMatrix()) * glm::vec3(0.f, 0.f, 1.f);
+		GLfloat angle = acos(glm::dot(oY, glm::vec3(0.f, 0.f, 1.f)));
+		modelMatrix = glm::rotate(modelMatrix, angle, glm::vec3(0.f, 1.f, 0.f));
+		//modelMatrix = glm::rotate(modelMatrix, GetSceneCamera()->transform->GetRotationEulerRad().y, glm::vec3(0.f, 1.f, 0.f));
+		
 		mixTextures = true;
 		RenderSimpleMesh(meshes["square"], shaders["ShaderLab9"], modelMatrix, mapTextures["grass"], mapTextures["earth"]);
 		mixTextures = false;
@@ -200,7 +205,16 @@ void Laborator9::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & 
 	glUniformMatrix4fv(loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
 	// BONUS: Deciding wether to rotate the mesh or not
-	GLint locTime = glGetUniformLocation(shader->program, "time");
+	GLint locTime		= glGetUniformLocation(shader->program, "time");
+	GLboolean isQuad	= false;
+
+	if (mesh == meshes["square"])
+	{
+		isQuad = true;
+	}
+
+	GLint locIsQuad = glGetUniformLocation(shader->program, "is_quad");
+	glUniform1i(locIsQuad, isQuad);
 
 	if (mesh == meshes["sphere"])
 	{
@@ -243,7 +257,6 @@ void Laborator9::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & 
 
 Texture2D* Laborator9::CreateRandomTexture(unsigned int width, unsigned int height)
 {
-	GLuint textureID		= 0;
 	unsigned int channels	= 3;
 	unsigned int size		= width * height * channels;
 	unsigned char* data		= new unsigned char[size];
