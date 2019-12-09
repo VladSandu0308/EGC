@@ -243,12 +243,12 @@ GLvoid PlaneRunner::RenderPlanePart(
 		cockpitMatrix = Transform3D::Translate(centreX, centreY, centreZ);
 		cockpitMatrix *= Transform3D::RotateOZ(angle);
 		cockpitMatrix *= Transform3D::Scale(0.3f, 0.3f, 0.3f);
-		cockpitMatrix *= Transform3D::Translate(offsetX + .5f, offsetY, offsetZ);
+		cockpitMatrix *= Transform3D::Translate(offsetX + 1.f, offsetY + .2f, offsetZ);
 
 		targetMatrix = Transform3D::Translate(centreX, centreY, centreZ);
 		targetMatrix *= Transform3D::RotateOZ(angle);
 		targetMatrix *= Transform3D::Scale(0.3f, 0.3f, 0.3f);
-		targetMatrix *= Transform3D::Translate(offsetX + 10.f, offsetY, offsetZ);
+		targetMatrix *= Transform3D::Translate(offsetX + 10.f, offsetY + .2f, offsetZ);
 	}
 
 	if (!strcmp(planePart->GetMeshID(), "cockpit"))
@@ -443,7 +443,6 @@ GLboolean PlaneRunner::CheckCollision(glm::mat4& model, GLfloat radius)
 
 void PlaneRunner::FrameEnd()
 {
-	DrawCoordinatSystem(camera->GetViewMatrix(), projectionMatrix);
 }
 
 GLvoid PlaneRunner::RenderTexturedMesh(
