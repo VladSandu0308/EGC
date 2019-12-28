@@ -30,7 +30,12 @@ Terrain::Terrain()
 		for (GLushort j = 0; j != terrainWidth; ++j, ++index, posOX += .03f)
 		{
 			/* Set the vertices for this row */
-			vertices.emplace_back(glm::vec3(posOX, 1.f, posOZ));
+			vertices.emplace_back(
+				glm::vec3(posOX, 1.f, posOZ),
+				glm::vec3(.12472f, .4882f, .726356f),
+				glm::vec3(0.f, 1.f, 0.f),
+				glm::vec2((GLfloat)i / terrainHeight, (GLfloat)j / terrainWidth)
+			);
 
 			/* Set the indices */
 			if (i != 0 && (j + 1) % terrainWidth)
@@ -48,8 +53,10 @@ Terrain::Terrain()
 		}
 	}
 
+	/* Create the mesh used for the terrain */
 	mesh = WormsUtils::CreateMesh("TerrainMesh", vertices, indices);
 
+	/* Read and create the shader used for the terrain */
 	shader = new Shader("TerrainShader");
 	shader->AddShader(
 		"Source/Teme/Tema3/Shaders/TerrainVS.glsl",
@@ -63,17 +70,18 @@ Terrain::Terrain()
 
 	CreateHeightMap();
 
-	// TODO: baga textura
-	texture = nullptr;
+	/* Load the terrain texture */
+	texture = new Texture2D();
+	texture->Load2D("Source/Teme/Tema3/Textures/terrain_texture.jpg", GL_REPEAT);
 }
 
 GLvoid Terrain::CreateHeightMap()
 {
-	GLuint randomTextureID;
+	GLuint heightTextureID;
 
 	/* Generate and bind the new texture ID */
-	glGenTextures(1, &randomTextureID);
-	glBindTexture(GL_TEXTURE_2D, randomTextureID);
+	glGenTextures(1, &heightTextureID);
+	glBindTexture(GL_TEXTURE_2D, heightTextureID);
 
 	/**
 	* Set the texture parameters (MIN_FILTER, MAG_FILTER and WRAPPING MODE)
@@ -96,7 +104,7 @@ GLvoid Terrain::CreateHeightMap()
 		0,
 		GL_RED,
 		GL_UNSIGNED_BYTE,
-		(void*)heights
+		(GLvoid*)heights
 	);
 
 	/* Generate texture mip-maps */
@@ -107,7 +115,12 @@ GLvoid Terrain::CreateHeightMap()
 	* during rendering phase
 	*/
 	heightTexture = new Texture2D();
-	heightTexture->Init(randomTextureID, terrainWidth, terrainHeight, numChannels);
+	heightTexture->Init(
+		heightTextureID,
+		terrainWidth,
+		terrainHeight,
+		numChannels
+	);
 }
 
 Terrain::~Terrain()
@@ -119,7 +132,7 @@ Terrain::~Terrain()
 	delete[] heights;
 }
 
-Texture2D* Terrain::GetHeightTexture(GLfloat posX, GLfloat posY)
+Texture2D* Terrain::GetHeightTexture(GLfloat posX, GLfloat posY, GLfloat posZ)
 {
 	// TODO: aplica deformari
 
@@ -140,4 +153,14 @@ Mesh* Terrain::GetMesh()
 Shader* Terrain::GetShader()
 {
 	return shader;
+}
+
+GLint Terrain::GetHeightMapHeight()
+{
+	return terrainHeight;
+}
+
+GLint Terrain::GetHeightMapWidth()
+{
+	return terrainWidth;
 }

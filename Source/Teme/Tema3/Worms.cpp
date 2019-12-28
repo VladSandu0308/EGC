@@ -8,7 +8,8 @@
 
 using namespace std;
 
-Worms::Worms()
+Worms::Worms() :
+	defaultPos(-10.f)
 {
 }
 
@@ -20,16 +21,33 @@ Worms::~Worms()
 void Worms::Init()
 {
 	terrain = new Terrain();
+
+	/* Initial placement of the projectile */
+	{
+		posX = defaultPos;
+		posY = defaultPos;
+		posZ = defaultPos;
+	}
+
+	/* Lighting properties */
+	{
+		lightPosition		= glm::vec3(5.f, 2.f, 5.f);
+		lightDirection		= glm::vec3(0.f, -1.f, 0.f);
+		materialShininess	= 30;
+		materialKd			= .5f;
+		materialKs			= .5f;
+		cutOffAngle			= 30.f;
+	}
 }
 
 void Worms::FrameStart()
 {
-	// clears the color buffer (using the previously set color) and depth buffer
+	// Clears the color buffer (using the previously set color) and depth buffer
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::ivec2 resolution = window->GetResolution();
-	// sets the screen area where to draw
+	// Sets the screen area where to draw
 	glViewport(0, 0, resolution.x, resolution.y);
 }
 
@@ -41,7 +59,7 @@ void Worms::Update(float deltaTimeSeconds)
 	{
 		RenderMesh(
 			terrain->GetMesh(),
-			shaders["VertexColor"],
+			terrain->GetShader(),
 			modelMatrix,
 			terrain->GetTexture()
 		);
@@ -60,29 +78,54 @@ GLvoid Worms::RenderMesh(
 	Texture2D* texture
 )
 {
-	if (!mesh || !shader || !shader->GetProgramID())
+	if (!mesh || !shader || !shader->GetProgramID() || !texture)
 	{
 		return;
 	}
 
-	// render an object using the specified shader and the specified position
+	/* Render an object using the specified shader and the specified position */
 	glUseProgram(shader->program);
 
-	// Bind model matrix
+	/* Set the light parameters */
+	GLint locLightPos = glGetUniformLocation(shader->program, "lightPosition");
+	glUniform3f(locLightPos, lightPosition.x, lightPosition.y, lightPosition.z);
+
+	GLint locLightDir = glGetUniformLocation(shader->program, "lightDirection");
+	glUniform3f(locLightDir, lightDirection.x, lightDirection.y, lightDirection.z);
+
+	GLint locCutOffAngle = glGetUniformLocation(shader->program, "cutOffAngle");
+	glUniform1f(locCutOffAngle, cutOffAngle);
+
+	/* Set eye position (camera position) uniform */
+	glm::vec3 eyePosition = GetSceneCamera()->transform->GetWorldPosition();
+	GLint locEyePos = glGetUniformLocation(shader->program, "eyePosition");
+	glUniform3f(locEyePos, eyePosition.x, eyePosition.y, eyePosition.z);
+
+	/* Set material property uniforms (shininess, kd, ks) */
+	GLint locShininess = glGetUniformLocation(shader->program, "materialShininess");
+	glUniform1i(locShininess, materialShininess);
+
+	GLint locMaterialKD = glGetUniformLocation(shader->program, "materialKd");
+	glUniform1f(locMaterialKD, materialKd);
+
+	GLint locMaterialKS = glGetUniformLocation(shader->program, "materialKs");
+	glUniform1f(locMaterialKS, materialKs);
+
+	/* Bind model matrix */
 	GLint locModelMatrix = glGetUniformLocation(shader->program, "Model");
 	glUniformMatrix4fv(locModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
-	// Bind view matrix
+	/* Bind view matrix */
 	glm::mat4 viewMatrix = GetSceneCamera()->GetViewMatrix();
-	int loc_view_matrix = glGetUniformLocation(shader->program, "View");
+	GLint locViewMatrix = glGetUniformLocation(shader->program, "View");
 	glUniformMatrix4fv(
-		loc_view_matrix,
+		locViewMatrix,
 		1,
 		GL_FALSE,
 		glm::value_ptr(viewMatrix)
 	);
 
-	// Bind projection matrix
+	/* Bind projection matrix */
 	glm::mat4 projectionMatrix = GetSceneCamera()->GetProjectionMatrix();
 	GLint locProjectionMatrix = glGetUniformLocation(
 		shader->program,
@@ -95,19 +138,39 @@ GLvoid Worms::RenderMesh(
 		glm::value_ptr(projectionMatrix)
 	);
 
-	// GLint locHeightMap = glGetUniformLocation(shader->program, "heightMap");
-	//glUniform
+	/* If the mesh is the terrain, then also provide the heightmap */
+	if (!strcmp(mesh->GetMeshID(), "TerrainMesh"))
+	{
+		/* Activate texture location 1 */
+		glActiveTexture(GL_TEXTURE1);
 
-	// Activate texture location 0
-	//glActiveTexture(GL_TEXTURE0);
+		/* Bind the texture ID */
+		glBindTexture(
+			GL_TEXTURE_2D,
+			terrain->GetHeightTexture(posX, posY, posZ)->GetTextureID()
+		);
 
-	//// Bind the texture1 ID
-	//glBindTexture(GL_TEXTURE_2D, texture->GetTextureID());
+		/* Send texture uniform value */
+		glUniform1i(glGetUniformLocation(shader->program, "heightTexture"), 1);
 
-	//// Send texture uniform value
-	//glUniform1i(glGetUniformLocation(shader->program, "texture"), 0);
+		/* Send the height and the width of the terrain */
+		GLint locHeight = glGetUniformLocation(shader->program, "terrainHeight");
+		glUniform1i(locHeight, terrain->GetHeightMapHeight());
 
-	// Draw the object
+		GLint locWidth = glGetUniformLocation(shader->program, "terrainWidth");
+		glUniform1i(locWidth, terrain->GetHeightMapWidth());
+	}
+
+	/* Activate texture location 0 */
+	glActiveTexture(GL_TEXTURE0);
+
+	/* Bind the texture ID */
+	glBindTexture(GL_TEXTURE_2D, texture->GetTextureID());
+
+	/* Send texture uniform value */
+	glUniform1i(glGetUniformLocation(shader->program, "terrainTexture"), 0);
+
+	/* Draw the object */
 	glBindVertexArray(mesh->GetBuffers()->VAO);
 	glDrawElements(
 		mesh->GetDrawMode(),

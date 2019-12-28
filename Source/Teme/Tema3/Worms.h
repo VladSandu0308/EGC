@@ -40,4 +40,15 @@ protected:
 	glm::mat4 modelMatrix;
 
 	Terrain* terrain;
+
+	const GLfloat defaultPos;
+	GLfloat posX, posY, posZ;
+
+	glm::vec3 lightPosition;
+	glm::vec3 lightDirection;
+	GLuint materialShininess;
+	GLfloat materialKd;
+	GLfloat materialKs;
+
+	GLfloat cutOffAngle;
 };

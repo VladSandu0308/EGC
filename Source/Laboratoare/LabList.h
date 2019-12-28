@@ -12,4 +12,5 @@
 #include <Laboratoare/Laborator9/Laborator9.h>
 
 #include <Teme/Tema1/FlappyBird.h>
-#include <Teme/Tema2/PlaneRunner.h>
+//#include <Teme/Tema2/PlaneRunner.h>
+#include <Teme/Tema3/Worms.h>

@@ -10,20 +10,48 @@ uniform mat4 Model;
 uniform mat4 View;
 uniform mat4 Projection;
 
-out vec3 frag_normal;
-out vec3 frag_color;
-out vec3 frag_position;
+uniform sampler2D heightTexture;
+
+uniform int terrainHeight;
+uniform int terrainWidth;
 
 out vec2 frag_coord;
+out vec3 world_position;
+out vec3 world_normal;
+
+/* Constants */
+float texCoordScaleFactor = 2.f;
+float heightScaleFactor = 15.f;
 
 void main()
 {
-	// Pass v_texture_coord as output to Fragment Shader
-	frag_coord = v_texture_coord;
+	/* Apply the height map */
+	float height	= texture2D(heightTexture, v_texture_coord).r;
+	vec3 newPos		= v_position;
 
-	frag_color = v_color;
-	frag_position = v_position;
-	frag_normal = v_normal;
+	newPos.y		= height;
 
-	gl_Position = Projection * View * Model * vec4(v_position, 1.0);
+	/* Compute the new normal */
+	vec2 texelSize		= vec2(1.f / terrainWidth, 1.f / terrainHeight);
+	float heightRight	=  texture2D(
+		heightTexture,
+		vec2(v_texture_coord.x + texelSize.x, v_texture_coord.y)
+	).r;
+	float heightUp		= texture2D(
+		heightTexture,
+		vec2(v_texture_coord.x, texelSize.y + v_texture_coord.y)
+	).r;
+	float heightX		= height - heightRight;
+	float heightZ		= height - heightUp;
+	vec3 normal			= normalize(vec3(
+		heightScaleFactor * heightX,
+		1.f,
+		heightScaleFactor * heightZ
+	));
+
+	frag_coord		= texCoordScaleFactor * v_texture_coord;
+	world_normal	= normalize(mat3(Model) * normalize(normal));
+	world_position	= (Model * vec4(newPos, 1.f)).xyz;
+
+	gl_Position		= Projection * View * Model * vec4(newPos, 1.f);
 }
