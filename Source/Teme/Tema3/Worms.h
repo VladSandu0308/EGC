@@ -44,7 +44,8 @@ protected:
 	const GLfloat defaultPos;
 	GLfloat posX, posY, posZ;
 
-	glm::vec3 lightPosition;
+	glm::vec3 lightPosition1;
+	glm::vec3 lightPosition2;
 	glm::vec3 lightDirection;
 	GLuint materialShininess;
 	GLfloat materialKd;

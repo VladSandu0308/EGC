@@ -31,7 +31,8 @@ void Worms::Init()
 
 	/* Lighting properties */
 	{
-		lightPosition		= glm::vec3(5.f, 2.f, 5.f);
+		lightPosition1		= glm::vec3(5.f, 2.f, 5.f);
+		lightPosition2		= glm::vec3(2.f, 2.f, 2.f);
 		lightDirection		= glm::vec3(0.f, -1.f, 0.f);
 		materialShininess	= 30;
 		materialKd			= .5f;
@@ -87,8 +88,11 @@ GLvoid Worms::RenderMesh(
 	glUseProgram(shader->program);
 
 	/* Set the light parameters */
-	GLint locLightPos = glGetUniformLocation(shader->program, "lightPosition");
-	glUniform3f(locLightPos, lightPosition.x, lightPosition.y, lightPosition.z);
+	GLint locLightPos = glGetUniformLocation(shader->program, "lightPosition1");
+	glUniform3f(locLightPos, lightPosition1.x, lightPosition1.y, lightPosition1.z);
+
+	locLightPos = glGetUniformLocation(shader->program, "lightPosition2");
+	glUniform3f(locLightPos, lightPosition2.x, lightPosition2.y, lightPosition2.z);
 
 	GLint locLightDir = glGetUniformLocation(shader->program, "lightDirection");
 	glUniform3f(locLightDir, lightDirection.x, lightDirection.y, lightDirection.z);

@@ -9,7 +9,8 @@ in vec3 world_normal;
 
 /* Uniforms for light properties */
 uniform vec3 lightDirection;
-uniform vec3 lightPosition;
+uniform vec3 lightPosition1;
+uniform vec3 lightPosition2;
 uniform vec3 eyePosition;
 
 uniform float materialKd;
@@ -25,43 +26,56 @@ void main()
     vec4 texturedColour = texture2D(terrainTexture, frag_coord);
 
     vec3 N = normalize(world_normal);
-	vec3 L = normalize(lightPosition - world_position);
+	vec3 L1 = normalize(lightPosition1 - world_position);
+	vec3 L2 = normalize(lightPosition2 - world_position);
 	vec3 V = normalize(eyePosition - world_position);
-	vec3 H = normalize(L + V);
-	vec3 R = normalize(reflect(L, world_normal));
+	vec3 H1 = normalize(L1 + V);
+	vec3 H2 = normalize(L2 + V);
 
 	/* Define ambient light component */
 	float ambientLight = .25f;
 
-	/* Compute diffuse light component */
-	float diffuseLight = materialKd * max(dot(normalize(N), L), 0.f);
+	/* Compute diffuse light components */
+	float diffuseLight1 = materialKd * max(dot(N, L1), 0.f);
+	float diffuseLight2 = materialKd * max(dot(N, L2), 0.f);
 
 	/* Compute specular light component */
-	float specularLight = 0.f;
+	float specularLight1 = 0.f;
+	float specularLight2 = 0.f;
 
-	if (diffuseLight > 0.f)
+	if (diffuseLight1 > 0.f)
 	{
-		specularLight = materialKs * pow(max(dot(N, H), 0.f), materialShininess);
+		specularLight1 = materialKs * pow(max(dot(N, H1), 0.f), materialShininess);
+	}
+	if (diffuseLight2 > 0.f)
+	{
+		specularLight2 = materialKs * pow(max(dot(N, H2), 0.f), materialShininess);
 	}
 
 	/* Compute light */
-	float light = 0.f;
+	float light1 = 0.f;
+	float light2 = 0.f;
 
 	float cutOffRad			= radians(cutOffAngle);
-	float spotLight			= dot(-L, lightDirection);
+	float spotLight1		= dot(-L1, lightDirection);
+	float spotLight2		= dot(-L2, lightDirection);
 	float spotLightLimit	= cos(cutOffRad);
 		
-	if (spotLight > spotLightLimit)
+	if (spotLight1 > spotLightLimit)
 	{	 
 		/* Quadratic attenuation */
-		float linearAtt			= (spotLight - spotLightLimit) / (1.f - spotLightLimit);
+		float linearAtt			= (spotLight1 - spotLightLimit) / (1.f - spotLightLimit);
 		float lightAttFactor	= linearAtt * linearAtt;
-		light					= ambientLight + lightAttFactor * (diffuseLight + specularLight);
-	} else
-	{
-	   /* There is no spot light, but there is light from other objects */
-		light = ambientLight;
+		light1					= lightAttFactor * (diffuseLight1 + specularLight1);
 	}
 
-	out_color = texturedColour * light;
+	if (spotLight2 > spotLightLimit)
+	{	 
+		/* Quadratic attenuation */
+		float linearAtt			= (spotLight2 - spotLightLimit) / (1.f - spotLightLimit);
+		float lightAttFactor	= linearAtt * linearAtt;
+		light2					= lightAttFactor * (diffuseLight2 + specularLight2);
+	}
+
+	out_color = texturedColour * (light1 + light2 + ambientLight);
 }
