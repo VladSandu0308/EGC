@@ -5,6 +5,7 @@
 
 #include "Worm.h"
 #include "Terrain.h"
+#include "Projectile.h"
 
 class Worms : public SimpleScene
 {
@@ -40,8 +41,8 @@ protected:
 	glm::mat4 modelMatrix;
 
 	Terrain* terrain;
+	Projectile* projectile;
 
-	const GLfloat defaultPos;
 	GLfloat posX, posY, posZ;
 
 	glm::vec3 lightPosition1;

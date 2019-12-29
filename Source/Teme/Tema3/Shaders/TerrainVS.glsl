@@ -20,7 +20,7 @@ out vec3 world_position;
 out vec3 world_normal;
 
 /* Constants */
-float texCoordScaleFactor = 2.f;
+float texCoordScaleFactor = 3.f;
 float heightScaleFactor = 15.f;
 
 void main()

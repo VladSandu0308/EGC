@@ -1,6 +1,6 @@
 #version 330
  
-uniform sampler2D terrainTexture;
+uniform sampler2D texture;
  
 /* Get color value from vertex shader */
 in vec2 frag_coord;
@@ -23,7 +23,7 @@ layout(location = 0) out vec4 out_color;
 
 void main()
 {
-    vec4 texturedColour = texture2D(terrainTexture, frag_coord);
+    vec4 texturedColour = texture2D(texture, frag_coord);
 
     vec3 N = normalize(world_normal);
 	vec3 L1 = normalize(lightPosition1 - world_position);

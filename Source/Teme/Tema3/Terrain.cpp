@@ -32,7 +32,7 @@ Terrain::Terrain()
 			/* Set the vertices for this row */
 			vertices.emplace_back(
 				glm::vec3(posOX, 1.f, posOZ),
-				glm::vec3(.12472f, .4882f, .726356f),
+				glm::vec3(0.f),
 				glm::vec3(0.f, 1.f, 0.f),
 				glm::vec2((GLfloat)i / terrainHeight, (GLfloat)j / terrainWidth)
 			);

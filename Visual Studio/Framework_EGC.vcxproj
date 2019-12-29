@@ -48,6 +48,7 @@
     <ClCompile Include="..\Source\Teme\Tema1\Bird.cpp" />
     <ClCompile Include="..\Source\Teme\Tema1\FlappyBird.cpp" />
     <ClCompile Include="..\Source\Teme\Tema1\TexturedRectangle.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema3\Projectile.cpp" />
     <ClCompile Include="..\Source\Teme\Tema3\Terrain.cpp" />
     <ClCompile Include="..\Source\Teme\Tema3\WormsUtils.cpp" />
     <ClCompile Include="..\Source\Teme\Tema3\Worm.cpp" />
@@ -91,6 +92,7 @@
     <ClInclude Include="..\Source\Teme\Tema1\FlappyBird.h" />
     <ClInclude Include="..\Source\Teme\Tema1\TexturedRectangle.h" />
     <ClInclude Include="..\Source\Teme\Tema1\Transform2D.h" />
+    <ClInclude Include="..\Source\Teme\Tema3\Projectile.h" />
     <ClInclude Include="..\Source\Teme\Tema3\Terrain.h" />
     <ClInclude Include="..\Source\Teme\Tema3\WormsUtils.h" />
     <ClInclude Include="..\Source\Teme\Tema3\Worm.h" />
@@ -113,6 +115,8 @@
     <None Include="..\Source\Teme\Tema1\README.md" />
     <None Include="..\Source\Teme\Tema1\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Teme\Tema1\Shaders\VertexShader.glsl" />
+    <None Include="..\Source\Teme\Tema3\Shaders\ProjectileFS.glsl" />
+    <None Include="..\Source\Teme\Tema3\Shaders\ProjectileVS.glsl" />
     <None Include="..\Source\Teme\Tema3\Shaders\TerrainFS.glsl" />
     <None Include="..\Source\Teme\Tema3\Shaders\TerrainVS.glsl" />
     <None Include="ClassDiagram.cd" />

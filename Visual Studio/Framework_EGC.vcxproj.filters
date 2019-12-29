@@ -175,6 +175,9 @@
     <ClCompile Include="..\Source\Teme\Tema3\WormsUtils.cpp">
       <Filter>Teme\Tema3</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema3\Projectile.cpp">
+      <Filter>Teme\Tema3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Core\World.h">
@@ -301,6 +304,9 @@
     <ClInclude Include="..\Source\Teme\Tema3\WormsUtils.h">
       <Filter>Teme\Tema3</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema3\Projectile.h">
+      <Filter>Teme\Tema3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\FragmentShader.glsl">
@@ -349,6 +355,12 @@
       <Filter>Teme\Tema3\Shaders</Filter>
     </None>
     <None Include="..\Source\Teme\Tema3\Shaders\TerrainFS.glsl">
+      <Filter>Teme\Tema3\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema3\Shaders\ProjectileVS.glsl">
+      <Filter>Teme\Tema3\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Teme\Tema3\Shaders\ProjectileFS.glsl">
       <Filter>Teme\Tema3\Shaders</Filter>
     </None>
   </ItemGroup>

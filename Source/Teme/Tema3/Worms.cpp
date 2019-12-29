@@ -8,25 +8,21 @@
 
 using namespace std;
 
-Worms::Worms() :
-	defaultPos(-10.f)
+Worms::Worms()
 {
 }
 
 Worms::~Worms()
 {
 	delete terrain;
+	delete projectile;
 }
 
 void Worms::Init()
 {
-	terrain = new Terrain();
-
-	/* Initial placement of the projectile */
 	{
-		posX = defaultPos;
-		posY = defaultPos;
-		posZ = defaultPos;
+		terrain		= new Terrain();
+		projectile	= new Projectile();
 	}
 
 	/* Lighting properties */
@@ -57,14 +53,43 @@ void Worms::Update(float deltaTimeSeconds)
 	modelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.f, 0.f, 0.f));
 
 	/* Render the terrain */
+	RenderMesh(
+		terrain->GetMesh(),
+		terrain->GetShader(),
+		modelMatrix,
+		terrain->GetTexture()
+	);
+
+	/* Render the projectile if that is the case */
+	if (projectile->HasBeenFired())
 	{
-		RenderMesh(
-			terrain->GetMesh(),
-			terrain->GetShader(),
-			modelMatrix,
-			terrain->GetTexture()
-		);
+		projectile->MoveProjectile(deltaTimeSeconds);
+		projectile->GetPosition(posX, posY, posZ);
+
+		if (posY >= 0.f)
+		{
+			GLfloat scale	= projectile->GetRadius() * 2.f;
+			modelMatrix		= glm::translate(
+				glm::mat4(1.f),
+				glm::vec3(posX, posY, posZ)
+			);
+			modelMatrix		= glm::scale(
+				modelMatrix,
+				glm::vec3(scale, scale, scale)
+			);
+
+			RenderMesh(
+				projectile->GetMesh(),
+				projectile->GetShader(),
+				modelMatrix,
+				projectile->GetTexture()
+			);
+		} else
+		{
+			projectile->NotFired();
+		}
 	}
+	
 }
 
 void Worms::FrameEnd()
@@ -86,34 +111,6 @@ GLvoid Worms::RenderMesh(
 
 	/* Render an object using the specified shader and the specified position */
 	glUseProgram(shader->program);
-
-	/* Set the light parameters */
-	GLint locLightPos = glGetUniformLocation(shader->program, "lightPosition1");
-	glUniform3f(locLightPos, lightPosition1.x, lightPosition1.y, lightPosition1.z);
-
-	locLightPos = glGetUniformLocation(shader->program, "lightPosition2");
-	glUniform3f(locLightPos, lightPosition2.x, lightPosition2.y, lightPosition2.z);
-
-	GLint locLightDir = glGetUniformLocation(shader->program, "lightDirection");
-	glUniform3f(locLightDir, lightDirection.x, lightDirection.y, lightDirection.z);
-
-	GLint locCutOffAngle = glGetUniformLocation(shader->program, "cutOffAngle");
-	glUniform1f(locCutOffAngle, cutOffAngle);
-
-	/* Set eye position (camera position) uniform */
-	glm::vec3 eyePosition = GetSceneCamera()->transform->GetWorldPosition();
-	GLint locEyePos = glGetUniformLocation(shader->program, "eyePosition");
-	glUniform3f(locEyePos, eyePosition.x, eyePosition.y, eyePosition.z);
-
-	/* Set material property uniforms (shininess, kd, ks) */
-	GLint locShininess = glGetUniformLocation(shader->program, "materialShininess");
-	glUniform1i(locShininess, materialShininess);
-
-	GLint locMaterialKD = glGetUniformLocation(shader->program, "materialKd");
-	glUniform1f(locMaterialKD, materialKd);
-
-	GLint locMaterialKS = glGetUniformLocation(shader->program, "materialKs");
-	glUniform1f(locMaterialKS, materialKs);
 
 	/* Bind model matrix */
 	GLint locModelMatrix = glGetUniformLocation(shader->program, "Model");
@@ -145,6 +142,34 @@ GLvoid Worms::RenderMesh(
 	/* If the mesh is the terrain, then also provide the heightmap */
 	if (!strcmp(mesh->GetMeshID(), "TerrainMesh"))
 	{
+		/* Set the light parameters */
+		GLint locLightPos = glGetUniformLocation(shader->program, "lightPosition1");
+		glUniform3f(locLightPos, lightPosition1.x, lightPosition1.y, lightPosition1.z);
+
+		locLightPos = glGetUniformLocation(shader->program, "lightPosition2");
+		glUniform3f(locLightPos, lightPosition2.x, lightPosition2.y, lightPosition2.z);
+
+		GLint locLightDir = glGetUniformLocation(shader->program, "lightDirection");
+		glUniform3f(locLightDir, lightDirection.x, lightDirection.y, lightDirection.z);
+
+		GLint locCutOffAngle = glGetUniformLocation(shader->program, "cutOffAngle");
+		glUniform1f(locCutOffAngle, cutOffAngle);
+
+		/* Set eye position (camera position) uniform */
+		glm::vec3 eyePosition = GetSceneCamera()->transform->GetWorldPosition();
+		GLint locEyePos = glGetUniformLocation(shader->program, "eyePosition");
+		glUniform3f(locEyePos, eyePosition.x, eyePosition.y, eyePosition.z);
+
+		/* Set material property uniforms (shininess, kd, ks) */
+		GLint locShininess = glGetUniformLocation(shader->program, "materialShininess");
+		glUniform1i(locShininess, materialShininess);
+
+		GLint locMaterialKD = glGetUniformLocation(shader->program, "materialKd");
+		glUniform1f(locMaterialKD, materialKd);
+
+		GLint locMaterialKS = glGetUniformLocation(shader->program, "materialKs");
+		glUniform1f(locMaterialKS, materialKs);
+
 		/* Activate texture location 1 */
 		glActiveTexture(GL_TEXTURE1);
 
@@ -172,7 +197,7 @@ GLvoid Worms::RenderMesh(
 	glBindTexture(GL_TEXTURE_2D, texture->GetTextureID());
 
 	/* Send texture uniform value */
-	glUniform1i(glGetUniformLocation(shader->program, "terrainTexture"), 0);
+	glUniform1i(glGetUniformLocation(shader->program, "texture"), 0);
 
 	/* Draw the object */
 	glBindVertexArray(mesh->GetBuffers()->VAO);
@@ -218,6 +243,16 @@ void Worms::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 void Worms::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
 	// add mouse button press event
+	if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT) && !projectile->HasBeenFired())
+	{
+		projectile->Fire(
+			2.5f,
+			.5f,
+			2.5f,
+			RADIANS(90.f),
+			RADIANS(0.f)
+		);
+	}
 }
 
 void Worms::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
