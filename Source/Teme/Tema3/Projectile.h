@@ -28,6 +28,9 @@ public:
 	/* Returns the radius of the projectile */
 	GLfloat GetRadius();
 
+	/* Returns the blast radius of the projectile */
+	GLfloat GetBlastRadius();
+
 	/* Returns the model matrix of the projectile */
 	glm::mat4& GetModelMatrix();
 

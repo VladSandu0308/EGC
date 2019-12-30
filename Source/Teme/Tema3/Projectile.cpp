@@ -64,9 +64,9 @@ GLvoid Projectile::Fire(
 
 GLvoid Projectile::MoveProjectile(GLfloat deltaTimeSeconds)
 {
+	/* The law of Galilei */
 	speedOY -= gravity * deltaTimeSeconds;
 
-	/* The equation of motion */
 	posY +=
 		speedOY * deltaTimeSeconds
 		+ gravity * deltaTimeSeconds * deltaTimeSeconds / 2.f;
@@ -98,6 +98,11 @@ glm::mat4& Projectile::GetModelMatrix()
 GLfloat Projectile::GetRadius()
 {
 	return radius;
+}
+
+GLfloat Projectile::GetBlastRadius()
+{
+	return radius * 5.f;
 }
 
 Mesh* Projectile::GetMesh()

@@ -51,7 +51,7 @@
     <ClCompile Include="..\Source\Teme\Tema3\Projectile.cpp" />
     <ClCompile Include="..\Source\Teme\Tema3\Terrain.cpp" />
     <ClCompile Include="..\Source\Teme\Tema3\WormsUtils.cpp" />
-    <ClCompile Include="..\Source\Teme\Tema3\Worm.cpp" />
+    <ClCompile Include="..\Source\Teme\Tema3\Player.cpp" />
     <ClCompile Include="..\Source\Teme\Tema3\Worms.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -92,11 +92,12 @@
     <ClInclude Include="..\Source\Teme\Tema1\FlappyBird.h" />
     <ClInclude Include="..\Source\Teme\Tema1\TexturedRectangle.h" />
     <ClInclude Include="..\Source\Teme\Tema1\Transform2D.h" />
+    <ClInclude Include="..\Source\Teme\Tema3\LabCamera.h" />
     <ClInclude Include="..\Source\Teme\Tema3\Projectile.h" />
     <ClInclude Include="..\Source\Teme\Tema3\Terrain.h" />
     <ClInclude Include="..\Source\Teme\Tema3\Transform3D.h" />
     <ClInclude Include="..\Source\Teme\Tema3\WormsUtils.h" />
-    <ClInclude Include="..\Source\Teme\Tema3\Worm.h" />
+    <ClInclude Include="..\Source\Teme\Tema3\Player.h" />
     <ClInclude Include="..\Source\Teme\Tema3\Worms.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

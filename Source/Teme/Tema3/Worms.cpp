@@ -16,16 +16,12 @@ Worms::~Worms()
 {
 	delete terrain;
 	delete projectile;
+	delete camera;
 	Player::Destroy();
 }
 
 void Worms::Init()
 {
-	{
-		terrain		= new Terrain();
-		projectile	= new Projectile();
-	}
-
 	/* Lighting properties */
 	{
 		lightPosition1		= glm::vec3(5.45f, 2.f, 5.56f);
@@ -44,6 +40,24 @@ void Worms::Init()
 		players.emplace_back(1.54f, .48f, 1.85f, 90.f);
 		players.emplace_back(5.45f, .39f, 5.56f, 90.f);
 	}
+
+	{
+		projectile	= new Projectile();
+		terrain		= new Terrain();
+		camera = new WormsGame::Camera();
+		camera->Set(
+			glm::vec3(1.54f, .48f, 1.85f),
+			glm::vec3(0.f, 1.f, 0.f),
+			glm::vec3(0.f, 1.f, 0.f)
+		);
+
+		projectionMatrix = glm::perspective(
+			RADIANS(60.f),
+			window->props.aspectRatio,
+			.01f,
+			200.f
+		);
+	}
 }
 
 void Worms::FrameStart()
@@ -59,22 +73,13 @@ void Worms::FrameStart()
 
 void Worms::Update(float deltaTimeSeconds)
 {
-	modelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.f, 0.f, 0.f));
-
-	/* Render the terrain */
-	RenderMesh(
-		terrain->GetMesh(),
-		terrain->GetShader(),
-		modelMatrix,
-		terrain->GetTexture()
-	);
-
 	/* Render the projectile if that is the case */
 	if (projectile->HasBeenFired())
 	{
 		projectile->MoveProjectile(deltaTimeSeconds);
 		projectile->GetPosition(posX, posY, posZ);
 
+		/* The area of interest is y >= 0 */
 		if (posY >= 0.f)
 		{
 			RenderMesh(
@@ -83,29 +88,70 @@ void Worms::Update(float deltaTimeSeconds)
 				projectile->GetModelMatrix(),
 				projectile->GetTexture()
 			);
+
+			if (terrain->CheckCollision(
+					posX,
+					posY,
+					posZ,
+					projectile->GetRadius())
+				)
+			{
+				terrain->DeformTerrain(
+					posX,
+					posY,
+					posZ,
+					projectile->GetBlastRadius()
+				);
+
+				projectile->NotFired();
+
+				players[crtPlayer ^ 1].CheckCollision(
+					posX,
+					posY,
+					posZ,
+					projectile->GetRadius()
+				);
+
+				/* Change players only if the other is alive */
+				if (players[crtPlayer ^ 1].IsAlive())
+				{
+					crtPlayer ^= 1;
+				}				
+			}
 		} else
 		{
 			projectile->NotFired();
 			crtPlayer ^= 1;
 		}
 	}
+
+	/* Render the terrain */
+	RenderMesh(
+		terrain->GetMesh(),
+		terrain->GetShader(),
+		modelMatrix,
+		terrain->GetTexture()
+	);
 	
 	/* Render the players */
 	{
 		for (Player& player : players)
 		{
-			RenderMesh(
-				player.GetBazookaMesh(),
-				player.GetShader(),
-				player.GetBazookaModelMatrix(),
-				player.GetBazookaTexture()
-			);
-			RenderMesh(
-				player.GetBearMesh(),
-				player.GetShader(),
-				player.GetBearModelMatrix(),
-				player.GetBearTexture()
-			);
+			if (player.IsAlive())
+			{
+				RenderMesh(
+					player.GetBazookaMesh(),
+					player.GetShader(),
+					player.GetBazookaModelMatrix(),
+					player.GetBazookaTexture()
+				);
+				RenderMesh(
+					player.GetBearMesh(),
+					player.GetShader(),
+					player.GetBearModelMatrix(),
+					player.GetBearTexture()
+				);
+			}
 		}
 	}
 }
@@ -268,7 +314,7 @@ void Worms::OnKeyPress(int key, int mods)
 	if (key == GLFW_KEY_SPACE && !projectile->HasBeenFired())
 	{
 		players[crtPlayer].GetProjectileStartPos(posX, posY, posZ);
-		PlaySound(TEXT("missile_launch.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(TEXT("rocket.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		projectile->Fire(
 			posX,
 			posY,
@@ -277,16 +323,6 @@ void Worms::OnKeyPress(int key, int mods)
 			RADIANS(players[crtPlayer].GetAngleYaw())
 		);
 	}
-}
-
-void Worms::OnKeyRelease(int key, int mods)
-{
-	// add key release event
-}
-
-void Worms::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
-{
-	// add mouse move event
 }
 
 void Worms::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
@@ -295,8 +331,7 @@ void Worms::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 	if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT) && !projectile->HasBeenFired())
 	{
 		players[crtPlayer].GetProjectileStartPos(posX, posY, posZ);
-		PlaySound(TEXT("missile_launch.wav"), NULL, SND_FILENAME | SND_ASYNC);
-
+		PlaySound(TEXT("rocket.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		projectile->Fire(
 			posX,
 			posY,
@@ -305,17 +340,4 @@ void Worms::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 			RADIANS(players[crtPlayer].GetAngleYaw())
 		);
 	}
-}
-
-void Worms::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
-{
-	// add mouse button release event
-}
-
-void Worms::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
-{
-}
-
-void Worms::OnWindowResize(int width, int height)
-{
 }

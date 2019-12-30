@@ -2,7 +2,12 @@
 
 #include <Core/Engine.h>
 
+#include <Windows.h>
+#include <mmsystem.h>
+
 #include "Transform3D.h"
+
+#pragma comment(lib, "winmm.lib")
 
 class Player
 {
@@ -56,6 +61,17 @@ public:
 		GLfloat& _posZ
 	);
 
+	/* Checks whether the projectile hits the player */
+	GLboolean CheckCollision(
+		GLfloat projectileX,
+		GLfloat projectileY,
+		GLfloat projectileZ,
+		GLfloat radius
+	);
+
+	/* Returns whether the player is alive or not */
+	GLboolean IsAlive();
+
 	/* Returns the pitch angle of the bazooka */
 	GLfloat GetAnglePitch();
 
@@ -71,6 +87,7 @@ public:
 private:
 	const GLfloat angularSpeed;
 	const GLfloat posX, posY, posZ;
+	const GLfloat hitSphereRadius;
 
 	const GLfloat bearScale;
 	const GLfloat bearConstructionOffsetX;
@@ -83,6 +100,8 @@ private:
 	const GLfloat bazookaConstructionOffsetZ;
 	const GLfloat bazookaLen;
 	const GLfloat bazookaScale;
+
+	GLboolean alive;
 
 	glm::mat4 modelMatrix;
 	

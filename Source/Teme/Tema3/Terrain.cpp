@@ -2,7 +2,8 @@
 
 #include "Terrain.h"
 
-Terrain::Terrain()
+Terrain::Terrain() :
+	cellSize(.03f)
 {
 	GLint numBytes;
 
@@ -24,10 +25,10 @@ Terrain::Terrain()
 	std::vector<VertexFormat> vertices;
 	std::vector<GLushort> indices;
 
-	for (GLushort i = 0; i != terrainHeight; ++i, posOZ += .03f)
+	for (GLushort i = 0; i != terrainHeight; ++i, posOZ += cellSize)
 	{
 		posOX = 0.f;
-		for (GLushort j = 0; j != terrainWidth; ++j, ++index, posOX += .03f)
+		for (GLushort j = 0; j != terrainWidth; ++j, ++index, posOX += cellSize)
 		{
 			/* Set the vertices for this row */
 			vertices.emplace_back(
@@ -123,6 +124,80 @@ GLvoid Terrain::CreateHeightMap()
 	);
 }
 
+GLboolean Terrain::CheckCollision(
+	GLfloat posX,
+	GLfloat posY,
+	GLfloat posZ,
+	GLfloat radius
+)
+{
+	GLshort mapRadius	= (GLshort)ceil(radius / cellSize);
+	GLfloat sqRadius	= radius * radius;
+	GLint proj			= (GLint)floor(posX / cellSize) * terrainWidth
+						  + (GLint)floor(posZ / cellSize);
+	
+	GLint pos;
+	GLfloat mapY;
+
+	/* Check if the projectile touches the terrain */
+	for (GLint i = -mapRadius; i != mapRadius; ++i)
+	{
+		pos = proj + i * terrainWidth;
+
+		for (GLint j = -mapRadius; j != mapRadius; ++j)
+		{
+			mapY = (GLfloat)heights[pos + j] / 255.f;
+
+			if ((j * j + i * i) * cellSize * cellSize
+				+ (mapY - posY) * (mapY - posY) <= sqRadius)
+			{
+				PlaySound(TEXT("fart.wav"), NULL, SND_FILENAME | SND_ASYNC);
+				return GLFW_TRUE;
+			}
+		}
+	}
+
+	return GLFW_FALSE;
+}
+
+GLvoid Terrain::DeformTerrain(
+	GLfloat posX,
+	GLfloat posY,
+	GLfloat posZ,
+	GLfloat blastRadius
+)
+{
+	GLshort mapRadius	= (GLshort)ceil(blastRadius / cellSize);
+	GLint sqRadius		= 1L * mapRadius * mapRadius;
+	GLint proj			= (GLint)floor(posX / cellSize) * terrainWidth
+		+ (GLint)floor(posZ / cellSize);
+
+	GLint pos;
+
+	/* Make a circular hole */
+	for (GLint i = -mapRadius; i != mapRadius; ++i)
+	{
+		pos = proj + i * terrainWidth;
+
+		for (GLint j = -mapRadius; j != mapRadius; ++j)
+		{
+			if (i * i + j * j <= sqRadius)
+			{
+				if (heights[pos + j] < 50)
+				{
+					heights[pos + j] = 0;
+				} else
+				{
+					heights[pos + j] -= 50;
+				}
+			}
+		}
+	}
+
+	delete heightTexture;
+	CreateHeightMap();
+}
+
 Terrain::~Terrain()
 {
 	delete shader;
@@ -134,9 +209,6 @@ Terrain::~Terrain()
 
 Texture2D* Terrain::GetHeightTexture(GLfloat posX, GLfloat posY, GLfloat posZ)
 {
-	// TODO: aplica deformari
-
-
 	return heightTexture;
 }
 

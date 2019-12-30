@@ -3,14 +3,10 @@
 #include <Component/Transform/Transform.h>
 #include <Core/GPU/Mesh.h>
 
-#include <Windows.h>
-#include <mmsystem.h>
-
 #include "Player.h"
 #include "Terrain.h"
 #include "Projectile.h"
-
-#pragma comment(lib, "winmm.lib")
+#include "LabCamera.h"
 
 class Worms : public SimpleScene
 {
@@ -35,16 +31,13 @@ private:
 
 	void OnInputUpdate(float deltaTime, int mods) override;
 	void OnKeyPress(int key, int mods) override;
-	void OnKeyRelease(int key, int mods) override;
-	void OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY) override;
 	void OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) override;
-	void OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods) override;
-	void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
-	void OnWindowResize(int width, int height) override;
 
 protected:
+	glm::mat4 projectionMatrix;
 	glm::mat4 modelMatrix;
 
+	WormsGame::Camera* camera;
 	Terrain* terrain;
 	Projectile* projectile;
 	std::vector<Player> players;

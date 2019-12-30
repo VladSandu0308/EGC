@@ -2,7 +2,7 @@
 #include <include/glm.h>
 #include <include/math.h>
 
-namespace Laborator
+namespace WormsGame
 {
 	class Camera
 	{

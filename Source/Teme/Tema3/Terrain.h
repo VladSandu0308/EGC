@@ -4,7 +4,12 @@
 #include <Component/SimpleScene.h>
 #include <stb/stb_image.h>
 
+#include <Windows.h>
+#include <mmsystem.h>
+
 #include "WormsUtils.h"
+
+#pragma comment(lib, "winmm.lib")
 
 class Terrain
 {
@@ -33,7 +38,27 @@ public:
 	/* Returns the width of the height map */
 	GLint GetHeightMapWidth();
 
+	/**
+	*	Checks whether a projectile located at the given coordinates collides 
+	*	with the terrain
+	*/
+	GLboolean CheckCollision(
+		GLfloat posX,
+		GLfloat posY,
+		GLfloat posZ,
+		GLfloat radius
+	);
+
+	/* Applies the deformation corresponding to the projectile's explosion */
+	GLvoid DeformTerrain(
+		GLfloat posX,
+		GLfloat posY,
+		GLfloat posZ,
+		GLfloat blastRadius
+	);
+
 private:
+	const GLfloat cellSize;
 	Texture2D* texture;
 	Texture2D* heightTexture;
 	Mesh* mesh;

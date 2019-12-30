@@ -169,13 +169,13 @@
     <ClCompile Include="..\Source\Teme\Tema3\Worms.cpp">
       <Filter>Teme\Tema3</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Teme\Tema3\Worm.cpp">
-      <Filter>Teme\Tema3</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\Teme\Tema3\WormsUtils.cpp">
       <Filter>Teme\Tema3</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Teme\Tema3\Projectile.cpp">
+      <Filter>Teme\Tema3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Teme\Tema3\Player.cpp">
       <Filter>Teme\Tema3</Filter>
     </ClCompile>
   </ItemGroup>
@@ -298,9 +298,6 @@
     <ClInclude Include="..\Source\Teme\Tema3\Worms.h">
       <Filter>Teme\Tema3</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Teme\Tema3\Worm.h">
-      <Filter>Teme\Tema3</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\Teme\Tema3\WormsUtils.h">
       <Filter>Teme\Tema3</Filter>
     </ClInclude>
@@ -308,6 +305,12 @@
       <Filter>Teme\Tema3</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Teme\Tema3\Transform3D.h">
+      <Filter>Teme\Tema3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema3\Player.h">
+      <Filter>Teme\Tema3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema3\LabCamera.h">
       <Filter>Teme\Tema3</Filter>
     </ClInclude>
   </ItemGroup>

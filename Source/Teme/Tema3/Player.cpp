@@ -2,11 +2,11 @@
 
 Shader* Player::shader				= nullptr;
 
-Mesh* Player::bearMesh			= nullptr;
-Mesh* Player::bazookaMesh				= nullptr;
+Mesh* Player::bearMesh				= nullptr;
+Mesh* Player::bazookaMesh			= nullptr;
 
-Texture2D* Player::bazookaTexture		= nullptr;
-Texture2D* Player::bearTexture	= nullptr;
+Texture2D* Player::bazookaTexture	= nullptr;
+Texture2D* Player::bearTexture		= nullptr;
 
 Player::Player(
 	GLfloat _posX,
@@ -17,6 +17,7 @@ Player::Player(
 	posX(_posX),
 	posY(_posY),
 	posZ(_posZ),
+	hitSphereRadius(1.f),
 	angularSpeed(100.f),
 	bazookaConstructionOffsetX(-0.043f),
 	bazookaConstructionOffsetY(.011f),
@@ -31,7 +32,8 @@ Player::Player(
 	bearScale(0.2f),
 	bearConstructionOffsetX(-.05f),
 	bearConstructionOffsetY(-2.5f),
-	bearConstructionOffsetZ(-2.2f)
+	bearConstructionOffsetZ(-2.2f),
+	alive(GLFW_TRUE)
 {
 }
 
@@ -102,6 +104,7 @@ GLvoid Player::UpdateAngles(GLfloat deltaTimeYaw, GLfloat deltaTimePitch)
 
 glm::mat4& Player::GetBearModelMatrix()
 {
+	/* Calculate the model matrix */
 	modelMatrix = Transform3D::Translate(posX, posY, posZ);
 	modelMatrix *= Transform3D::RotateOY(RADIANS((angleYaw - 90.f)));
 	modelMatrix *= Transform3D::RotateOX(RADIANS(-90.f));
@@ -117,6 +120,7 @@ glm::mat4& Player::GetBearModelMatrix()
 
 glm::mat4& Player::GetBazookaModelMatrix()
 {
+	/* Calculate the model matrix */
 	modelMatrix = Transform3D::Translate(posX, posY, posZ);
 	modelMatrix *= Transform3D::RotateOY(RADIANS(angleYaw));
 	modelMatrix *= Transform3D::Translate(
@@ -141,6 +145,7 @@ GLvoid Player::GetProjectileStartPos(
 	GLfloat& _posZ
 )
 {
+	/* Calculate the model matrix and get the starting point */
 	modelMatrix = Transform3D::Translate(posX, posY, posZ);
 	modelMatrix *= Transform3D::RotateOY(RADIANS(angleYaw));
 	modelMatrix *= Transform3D::Translate(
@@ -154,6 +159,38 @@ GLvoid Player::GetProjectileStartPos(
 	_posX = modelMatrix[3][0];
 	_posY = modelMatrix[3][1];
 	_posZ = modelMatrix[3][2];
+}
+
+GLboolean Player::CheckCollision(
+	GLfloat projectileX,
+	GLfloat projectileY,
+	GLfloat projectileZ,
+	GLfloat radius
+)
+{
+	/* There's no point checking collision with a dead bear */
+	if (!alive)
+	{
+		return GLFW_FALSE;
+	}
+
+	/* Collision between 2 spheres */
+	if ((projectileX - posX) * (projectileX - posX)
+		+ (projectileY - posY) * (projectileY - posY)
+		+ (projectileZ - posZ) * (projectileZ - posZ)
+		<= (radius + hitSphereRadius) * (radius + hitSphereRadius))
+	{
+		alive = GLFW_FALSE;
+		PlaySound(TEXT("gotcha.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		return GLFW_TRUE;
+	}
+
+	return GLFW_FALSE;
+}
+
+GLboolean Player::IsAlive()
+{
+	return alive;
 }
 
 GLfloat Player::GetAnglePitch()
