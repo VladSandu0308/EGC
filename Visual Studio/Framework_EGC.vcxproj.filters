@@ -307,6 +307,9 @@
     <ClInclude Include="..\Source\Teme\Tema3\Projectile.h">
       <Filter>Teme\Tema3</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Teme\Tema3\Transform3D.h">
+      <Filter>Teme\Tema3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\FragmentShader.glsl">

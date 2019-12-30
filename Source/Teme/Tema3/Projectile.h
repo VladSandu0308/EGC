@@ -2,6 +2,8 @@
 
 #include <Core/Engine.h>
 
+#include "Transform3D.h"
+
 class Projectile
 {
 public:
@@ -26,6 +28,9 @@ public:
 	/* Returns the radius of the projectile */
 	GLfloat GetRadius();
 
+	/* Returns the model matrix of the projectile */
+	glm::mat4& GetModelMatrix();
+
 	/* Returns the projectile's mesh */
 	Mesh* GetMesh();
 
@@ -44,8 +49,10 @@ public:
 private:
 	const GLfloat initialSpeed;
 	const GLfloat radius;
+	const GLfloat scale;
 	const GLfloat gravity;
 	
+	glm::mat4 modelMatrix;
 	GLfloat speedOY, speedOX, speedOZ;
 	GLfloat posX, posY, posZ;
 	GLboolean fired;

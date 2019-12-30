@@ -1,9 +1,10 @@
 #include "Projectile.h"
 
 Projectile::Projectile() :
-	initialSpeed(3.f),
+	initialSpeed(3.5f),
 	gravity(2.f),
-	radius(.05f),
+	radius(.02f),
+	scale(2.f * radius),
 	fired(GLFW_FALSE)
 {
 	/* Read and compile the shader for the projectile */
@@ -84,6 +85,14 @@ GLvoid Projectile::GetPosition(GLfloat& _posX, GLfloat& _posY, GLfloat& _posZ)
 	_posX = posX;
 	_posY = posY;
 	_posZ = posZ;
+}
+
+glm::mat4& Projectile::GetModelMatrix()
+{
+	modelMatrix = Transform3D::Translate(posX, posY, posZ);
+	modelMatrix *= Transform3D::Scale(scale, scale, scale);
+
+	return modelMatrix;
 }
 
 GLfloat Projectile::GetRadius()

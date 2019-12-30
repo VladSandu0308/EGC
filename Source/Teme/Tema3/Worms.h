@@ -3,9 +3,14 @@
 #include <Component/Transform/Transform.h>
 #include <Core/GPU/Mesh.h>
 
-#include "Worm.h"
+#include <Windows.h>
+#include <mmsystem.h>
+
+#include "Player.h"
 #include "Terrain.h"
 #include "Projectile.h"
+
+#pragma comment(lib, "winmm.lib")
 
 class Worms : public SimpleScene
 {
@@ -42,6 +47,7 @@ protected:
 
 	Terrain* terrain;
 	Projectile* projectile;
+	std::vector<Player> players;
 
 	GLfloat posX, posY, posZ;
 
@@ -53,4 +59,6 @@ protected:
 	GLfloat materialKs;
 
 	GLfloat cutOffAngle;
+
+	GLushort crtPlayer;
 };

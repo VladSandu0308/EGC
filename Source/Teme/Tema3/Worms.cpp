@@ -16,6 +16,7 @@ Worms::~Worms()
 {
 	delete terrain;
 	delete projectile;
+	Player::Destroy();
 }
 
 void Worms::Init()
@@ -27,24 +28,32 @@ void Worms::Init()
 
 	/* Lighting properties */
 	{
-		lightPosition1		= glm::vec3(5.f, 2.f, 5.f);
-		lightPosition2		= glm::vec3(2.f, 2.f, 2.f);
+		lightPosition1		= glm::vec3(5.45f, 2.f, 5.56f);
+		lightPosition2		= glm::vec3(1.54f, 2.f, 1.85f);
 		lightDirection		= glm::vec3(0.f, -1.f, 0.f);
 		materialShininess	= 30;
 		materialKd			= .5f;
 		materialKs			= .5f;
 		cutOffAngle			= 30.f;
 	}
+
+	Player::Init();
+
+	{
+		crtPlayer = 0;
+		players.emplace_back(1.54f, .48f, 1.85f, 90.f);
+		players.emplace_back(5.45f, .39f, 5.56f, 90.f);
+	}
 }
 
 void Worms::FrameStart()
 {
-	// Clears the color buffer (using the previously set color) and depth buffer
-	glClearColor(0, 0, 0, 1);
+	/* Clears the color buffer (using the previously set color) and depth buffer */
+	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	/* Sets the screen area where to draw */
 	glm::ivec2 resolution = window->GetResolution();
-	// Sets the screen area where to draw
 	glViewport(0, 0, resolution.x, resolution.y);
 }
 
@@ -68,28 +77,37 @@ void Worms::Update(float deltaTimeSeconds)
 
 		if (posY >= 0.f)
 		{
-			GLfloat scale	= projectile->GetRadius() * 2.f;
-			modelMatrix		= glm::translate(
-				glm::mat4(1.f),
-				glm::vec3(posX, posY, posZ)
-			);
-			modelMatrix		= glm::scale(
-				modelMatrix,
-				glm::vec3(scale, scale, scale)
-			);
-
 			RenderMesh(
 				projectile->GetMesh(),
 				projectile->GetShader(),
-				modelMatrix,
+				projectile->GetModelMatrix(),
 				projectile->GetTexture()
 			);
 		} else
 		{
 			projectile->NotFired();
+			crtPlayer ^= 1;
 		}
 	}
 	
+	/* Render the players */
+	{
+		for (Player& player : players)
+		{
+			RenderMesh(
+				player.GetBazookaMesh(),
+				player.GetShader(),
+				player.GetBazookaModelMatrix(),
+				player.GetBazookaTexture()
+			);
+			RenderMesh(
+				player.GetBearMesh(),
+				player.GetShader(),
+				player.GetBearModelMatrix(),
+				player.GetBearTexture()
+			);
+		}
+	}
 }
 
 void Worms::FrameEnd()
@@ -214,7 +232,7 @@ GLvoid Worms::RenderMesh(
 
 void Worms::OnInputUpdate(float deltaTime, int mods)
 {
-	float speed = 2;
+	GLfloat deltaTimeYaw = 0.f, deltaTimePitch = 0.f;
 
 	if (!window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
 	{
@@ -223,11 +241,42 @@ void Worms::OnInputUpdate(float deltaTime, int mods)
 		glm::vec3 forward = GetSceneCamera()->transform->GetLocalOZVector();
 		forward = glm::normalize(glm::vec3(forward.x, 0, forward.z));
 	}
+
+	if (window->KeyHold(GLFW_KEY_UP))
+	{
+		deltaTimePitch += deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_DOWN))
+	{
+		deltaTimePitch -= deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_LEFT))
+	{
+		deltaTimeYaw += deltaTime;
+	}
+	if (window->KeyHold(GLFW_KEY_RIGHT))
+	{
+		deltaTimeYaw -= deltaTime;
+	}
+
+	players[crtPlayer].UpdateAngles(deltaTimeYaw, deltaTimePitch);
 }
 
 void Worms::OnKeyPress(int key, int mods)
 {
-	// add key press event
+	/* Fire the bazooka with SPACE */
+	if (key == GLFW_KEY_SPACE && !projectile->HasBeenFired())
+	{
+		players[crtPlayer].GetProjectileStartPos(posX, posY, posZ);
+		PlaySound(TEXT("missile_launch.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		projectile->Fire(
+			posX,
+			posY,
+			posZ,
+			RADIANS(players[crtPlayer].GetAnglePitch()),
+			RADIANS(players[crtPlayer].GetAngleYaw())
+		);
+	}
 }
 
 void Worms::OnKeyRelease(int key, int mods)
@@ -242,15 +291,18 @@ void Worms::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 
 void Worms::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
-	// add mouse button press event
+	/* Fire the bazooka with the left mouse button */
 	if (IS_BIT_SET(button, GLFW_MOUSE_BUTTON_LEFT) && !projectile->HasBeenFired())
 	{
+		players[crtPlayer].GetProjectileStartPos(posX, posY, posZ);
+		PlaySound(TEXT("missile_launch.wav"), NULL, SND_FILENAME | SND_ASYNC);
+
 		projectile->Fire(
-			2.5f,
-			.5f,
-			2.5f,
-			RADIANS(90.f),
-			RADIANS(0.f)
+			posX,
+			posY,
+			posZ,
+			RADIANS(players[crtPlayer].GetAnglePitch()),
+			RADIANS(players[crtPlayer].GetAngleYaw())
 		);
 	}
 }
