@@ -44,10 +44,10 @@ void Worms::Init()
 	{
 		projectile	= new Projectile();
 		terrain		= new Terrain();
-		camera = new WormsGame::Camera();
+		camera		= new WormsGame::Camera();
 		camera->Set(
+			glm::vec3(1.3f, .6f, 1.5f),
 			glm::vec3(1.54f, .48f, 1.85f),
-			glm::vec3(0.f, 1.f, 0.f),
 			glm::vec3(0.f, 1.f, 0.f)
 		);
 
@@ -58,6 +58,8 @@ void Worms::Init()
 			200.f
 		);
 	}
+
+	cameraTime = 0.f;
 }
 
 void Worms::FrameStart()
@@ -89,6 +91,24 @@ void Worms::Update(float deltaTimeSeconds)
 				projectile->GetTexture()
 			);
 
+			/* Set the camera to follow the projectile */
+			if (crtPlayer)
+			{
+				camera->Set(
+					glm::vec3(posX + .3f, posY + .5f, posZ + .5f),
+					glm::vec3(posX, posY, posZ),
+					glm::vec3(0.f, 1.f, 0.f)
+				);
+			} else
+			{
+				camera->Set(
+					glm::vec3(posX - .3f, posY + .5f, posZ - .5f),
+					glm::vec3(posX, posY, posZ),
+					glm::vec3(0.f, 1.f, 0.f)
+				);
+			}
+
+			/* Dig a hole in the ground where there is a collision */
 			if (terrain->CheckCollision(
 					posX,
 					posY,
@@ -122,6 +142,30 @@ void Worms::Update(float deltaTimeSeconds)
 		{
 			projectile->NotFired();
 			crtPlayer ^= 1;
+		}
+	} else
+	{
+		/* After 0.5 seconds, change the camera to the other player */
+		if (cameraTime > .5f)
+		{
+			if (crtPlayer)
+			{
+				camera->Set(
+					glm::vec3(5.75f, .55f, 5.85f),
+					glm::vec3(5.45f, .39f, 5.56f),
+					glm::vec3(0.f, 1.f, 0.f)
+				);
+			} else
+			{
+				camera->Set(
+					glm::vec3(1.3f, .7f, 1.5f),
+					glm::vec3(1.54f, .48f, 1.85f),
+					glm::vec3(0.f, 1.f, 0.f)
+				);
+			}
+		} else
+		{
+			cameraTime += deltaTimeSeconds;
 		}
 	}
 
@@ -158,7 +202,7 @@ void Worms::Update(float deltaTimeSeconds)
 
 void Worms::FrameEnd()
 {
-	DrawCoordinatSystem();
+	DrawCoordinatSystem(camera->GetViewMatrix(), projectionMatrix);
 }
 
 GLvoid Worms::RenderMesh(
@@ -181,7 +225,7 @@ GLvoid Worms::RenderMesh(
 	glUniformMatrix4fv(locModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
 	/* Bind view matrix */
-	glm::mat4 viewMatrix = GetSceneCamera()->GetViewMatrix();
+	glm::mat4 viewMatrix = camera->GetViewMatrix();
 	GLint locViewMatrix = glGetUniformLocation(shader->program, "View");
 	glUniformMatrix4fv(
 		locViewMatrix,
@@ -191,7 +235,6 @@ GLvoid Worms::RenderMesh(
 	);
 
 	/* Bind projection matrix */
-	glm::mat4 projectionMatrix = GetSceneCamera()->GetProjectionMatrix();
 	GLint locProjectionMatrix = glGetUniformLocation(
 		shader->program,
 		"Projection"
@@ -220,7 +263,7 @@ GLvoid Worms::RenderMesh(
 		glUniform1f(locCutOffAngle, cutOffAngle);
 
 		/* Set eye position (camera position) uniform */
-		glm::vec3 eyePosition = GetSceneCamera()->transform->GetWorldPosition();
+		glm::vec3 eyePosition = camera->position;
 		GLint locEyePos = glGetUniformLocation(shader->program, "eyePosition");
 		glUniform3f(locEyePos, eyePosition.x, eyePosition.y, eyePosition.z);
 
@@ -273,20 +316,15 @@ GLvoid Worms::RenderMesh(
 	);
 }
 
-// Documentation for the input functions can be found in: "/Source/Core/Window/InputController.h" or
-// https://github.com/UPB-Graphics/Framework-EGC/blob/master/Source/Core/Window/InputController.h
+/**
+*	Documentation for the input functions can be found in:
+*	"/Source/Core/Window/InputController.h" or
+*	https://github.com/UPB-Graphics/Framework-EGC/blob/master/Source/Core/Window/InputController.h
+*/
 
 void Worms::OnInputUpdate(float deltaTime, int mods)
 {
 	GLfloat deltaTimeYaw = 0.f, deltaTimePitch = 0.f;
-
-	if (!window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
-	{
-		glm::vec3 up = glm::vec3(0, 1, 0);
-		glm::vec3 right = GetSceneCamera()->transform->GetLocalOXVector();
-		glm::vec3 forward = GetSceneCamera()->transform->GetLocalOZVector();
-		forward = glm::normalize(glm::vec3(forward.x, 0, forward.z));
-	}
 
 	if (window->KeyHold(GLFW_KEY_UP))
 	{
@@ -308,6 +346,27 @@ void Worms::OnInputUpdate(float deltaTime, int mods)
 	players[crtPlayer].UpdateAngles(deltaTimeYaw, deltaTimePitch);
 }
 
+void Worms::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
+{
+	/* Mouse move events */
+	if (window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
+	{
+		float sensivityOX = 0.001f;
+		float sensivityOY = 0.001f;
+
+		if (window->GetSpecialKeyState() == 0)
+		{
+			/*
+			* Rotate the camera in First-person mode around OX and OY using
+			* deltaX and deltaY.
+			* Use the sensitivity variables for setting up the rotation speed
+			*/
+			camera->RotateFirstPerson_OX(sensivityOX * -deltaY);
+			camera->RotateFirstPerson_OY(sensivityOY * -deltaX);
+		}
+	}
+}
+
 void Worms::OnKeyPress(int key, int mods)
 {
 	/* Fire the bazooka with SPACE */
@@ -322,6 +381,7 @@ void Worms::OnKeyPress(int key, int mods)
 			RADIANS(players[crtPlayer].GetAnglePitch()),
 			RADIANS(players[crtPlayer].GetAngleYaw())
 		);
+		cameraTime = 0.f;
 	}
 }
 
@@ -339,5 +399,6 @@ void Worms::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 			RADIANS(players[crtPlayer].GetAnglePitch()),
 			RADIANS(players[crtPlayer].GetAngleYaw())
 		);
+		cameraTime = 0.f;
 	}
 }

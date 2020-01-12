@@ -32,6 +32,7 @@ private:
 	void OnInputUpdate(float deltaTime, int mods) override;
 	void OnKeyPress(int key, int mods) override;
 	void OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) override;
+	void OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY) override;
 
 protected:
 	glm::mat4 projectionMatrix;
@@ -43,6 +44,7 @@ protected:
 	std::vector<Player> players;
 
 	GLfloat posX, posY, posZ;
+	GLfloat cameraTime;
 
 	glm::vec3 lightPosition1;
 	glm::vec3 lightPosition2;
