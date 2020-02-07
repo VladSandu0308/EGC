@@ -18,3 +18,5 @@ Each of these is documented via a `README.md` file
 
 ## Homework Assignments
 1. Flappy Bird
+2. Aeroplane aka 3D Flappy Bird
+3. 3D Worms but with teddy bears
