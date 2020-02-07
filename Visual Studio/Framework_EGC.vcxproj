@@ -106,12 +106,17 @@
     <None Include="..\Source\Laboratoare\Laborator1\README.md" />
     <None Include="..\Source\Laboratoare\Laborator3\README.md" />
     <None Include="..\Source\Laboratoare\Laborator4\README.md" />
+    <None Include="..\Source\Laboratoare\Laborator5\README.md" />
+    <None Include="..\Source\Laboratoare\Laborator6\README.md" />
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator6\Shaders\VertexShader.glsl" />
+    <None Include="..\Source\Laboratoare\Laborator7\README.md" />
     <None Include="..\Source\Laboratoare\Laborator7\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator7\Shaders\VertexShader.glsl" />
+    <None Include="..\Source\Laboratoare\Laborator8\README.md" />
     <None Include="..\Source\Laboratoare\Laborator8\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator8\Shaders\VertexShader.glsl" />
+    <None Include="..\Source\Laboratoare\Laborator9\README.md" />
     <None Include="..\Source\Laboratoare\Laborator9\Shaders\FragmentShader.glsl" />
     <None Include="..\Source\Laboratoare\Laborator9\Shaders\VertexShader.glsl" />
     <None Include="..\Source\Teme\Tema1\README.md" />

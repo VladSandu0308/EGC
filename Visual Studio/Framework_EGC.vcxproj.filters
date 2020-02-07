@@ -347,7 +347,6 @@
     <None Include="..\Source\Laboratoare\Laborator1\README.md">
       <Filter>Laboratoare\Laborator1</Filter>
     </None>
-    <None Include="..\Source\Laboratoare\Laborator4\README.md" />
     <None Include="..\Source\Teme\Tema1\Shaders\FragmentShader.glsl">
       <Filter>Teme\Tema1\Shaders</Filter>
     </None>
@@ -368,6 +367,24 @@
     </None>
     <None Include="..\Source\Teme\Tema3\Shaders\ProjectileFS.glsl">
       <Filter>Teme\Tema3\Shaders</Filter>
+    </None>
+    <None Include="..\Source\Laboratoare\Laborator4\README.md">
+      <Filter>Laboratoare\Laborator4</Filter>
+    </None>
+    <None Include="..\Source\Laboratoare\Laborator5\README.md">
+      <Filter>Laboratoare\Laborator5</Filter>
+    </None>
+    <None Include="..\Source\Laboratoare\Laborator6\README.md">
+      <Filter>Laboratoare\Laborator6</Filter>
+    </None>
+    <None Include="..\Source\Laboratoare\Laborator7\README.md">
+      <Filter>Laboratoare\Laborator7</Filter>
+    </None>
+    <None Include="..\Source\Laboratoare\Laborator8\README.md">
+      <Filter>Laboratoare\Laborator8</Filter>
+    </None>
+    <None Include="..\Source\Laboratoare\Laborator9\README.md">
+      <Filter>Laboratoare\Laborator9</Filter>
     </None>
   </ItemGroup>
 </Project>
